@@ -63,6 +63,19 @@
   :focus-visible {
     outline-color: var(--color-brand);
   }
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Phones: 16px inputs stop iOS from zooming in when a field is tapped */
+  @media (max-width: 767px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px !important;
+    }
+  }
 }
 
 @layer components {

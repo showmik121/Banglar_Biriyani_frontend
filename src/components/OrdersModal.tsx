@@ -54,8 +54,8 @@ export function OrdersModal({ isOpen, onClose }: Props) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs">
-      <div className="flex max-h-[92vh] w-full max-w-4xl flex-col rounded-card bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4">
+      <div className="flex max-h-[94dvh] w-full max-w-4xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 sm:max-h-[92vh] sm:rounded-card">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-line bg-charcoal px-6 py-4 text-white">
           <div className="flex items-center gap-3">

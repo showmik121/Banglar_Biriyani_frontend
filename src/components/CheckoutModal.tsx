@@ -228,7 +228,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs transition-opacity duration-200"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4 transition-opacity duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby={placedOrder ? "order-confirmation-title" : "checkout-modal-title"}
@@ -242,7 +242,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
 
       <div
         ref={modalRef}
-        className="relative flex max-h-[92vh] w-full max-w-xl flex-col overflow-hidden rounded-card bg-white shadow-2xl"
+        className="relative flex max-h-[94dvh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[92vh] sm:rounded-card"
       >
         {/* If order has been placed, show Celebratory Confirmation Receipt view */}
         {placedOrder ? (
@@ -400,7 +400,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
               <button
                 type="button"
                 onClick={handleClose}
-                className="grid size-8 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
+                className="grid size-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
                 aria-label="Close checkout modal"
               >
                 ✕
@@ -448,7 +448,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                   <button
                     type="button"
                     onClick={() => openAuthModal("login")}
-                    className="shrink-0 rounded-full bg-brand px-3 py-1 text-xs font-semibold text-white shadow-xs transition hover:bg-brand-hover cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+                    className="inline-flex h-9 shrink-0 items-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs transition hover:bg-brand-hover cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
                   >
                     Sign In
                   </button>
@@ -577,7 +577,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     <button
                       type="button"
                       onClick={() => setIsAddressModalOpen(true)}
-                      className="cursor-pointer text-xs font-semibold text-brand hover:underline"
+                      className="cursor-pointer py-2 text-xs font-semibold text-brand hover:underline"
                     >
                       {selectedAddress
                         ? `📍 Change Address (${selectedAddress.label})`
@@ -628,7 +628,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                       type="checkbox"
                       checked={saveForFuture}
                       onChange={(e) => setSaveForFuture(e.target.checked)}
-                      className="size-3.5 rounded border-line text-brand focus:ring-brand"
+                      className="size-5 rounded border-line text-brand focus:ring-brand"
                     />
                     <span className="text-[11px] text-slate">
                       Save this address to my saved locations
@@ -661,7 +661,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                       className="sr-only"
                     />
                     <span>Lunch</span>
-                    <span className="text-[10px] font-normal text-slate">12:30 PM – 2:30 PM</span>
+                    <span className="text-xs font-normal text-slate">12:30 PM – 2:30 PM</span>
                   </label>
 
                   <label
@@ -682,7 +682,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                       className="sr-only"
                     />
                     <span>Dinner</span>
-                    <span className="text-[10px] font-normal text-slate">7:30 PM – 9:30 PM</span>
+                    <span className="text-xs font-normal text-slate">7:30 PM – 9:30 PM</span>
                   </label>
 
                   <label
@@ -703,7 +703,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                       className="sr-only"
                     />
                     <span>Express</span>
-                    <span className="text-[10px] font-normal text-slate">45-60 mins</span>
+                    <span className="text-xs font-normal text-slate">45-60 mins</span>
                   </label>
                 </div>
               </fieldset>

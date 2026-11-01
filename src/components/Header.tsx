@@ -71,6 +71,7 @@ export function Header({
   const [isRecommendationOpen, setIsRecommendationOpen] = useState(false)
   const [isSearchRecOpen, setIsSearchRecOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(false)
   const cartCount = propCartCount ?? totalItems
 
   // Close user dropdown when clicking outside
@@ -107,9 +108,9 @@ export function Header({
       className="sticky top-0 z-40 border-b border-line/80 bg-alabaster/90 backdrop-blur-xl supports-[backdrop-filter]:bg-alabaster/80"
     >
       {/* Row 1: logo, address, account */}
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 lg:px-8">
+      <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3 lg:px-8">
         <a href="#" className="group flex shrink-0 items-center gap-2.5" aria-label="Banglar Biriyani home">
-          <span className="grid size-11 place-items-center rounded-full bg-white p-0.5 shadow-card ring-2 ring-gold/40 transition group-hover:ring-gold sm:size-12">
+          <span className="grid size-10 place-items-center rounded-full bg-white p-0.5 shadow-card ring-2 ring-gold/40 transition group-hover:ring-gold sm:size-12">
             <img src="/logo-mark.png" alt="" className="size-full rounded-full object-contain" />
           </span>
           <span className="hidden flex-col leading-none sm:flex">
@@ -121,12 +122,13 @@ export function Header({
         {/* Mobile Address Button */}
         <button
           type="button"
-          onClick={() => setIsRecommendationOpen(true)}
-          className="flex items-center gap-1.5 rounded-full bg-cream px-2.5 py-1.5 text-xs text-charcoal transition hover:bg-gold-light md:hidden"
+          onClick={() => setIsAddressModalOpen(true)}
+          aria-label="Change delivery address"
+          className="flex h-10 min-w-0 items-center gap-1.5 rounded-full bg-cream px-3 text-xs text-charcoal transition hover:bg-gold-light md:hidden"
           title="Change delivery address"
         >
           <Icon d={ICONS.pin} className="size-3.5 text-brand" />
-          <span className="max-w-[100px] truncate font-medium">
+          <span className="hidden max-w-[88px] truncate font-medium min-[360px]:inline min-[380px]:max-w-[120px]">
             {selectedAddress ? selectedAddress.area : "Address"}
           </span>
           <Icon d={ICONS.chevron} className="size-3 text-slate" />
@@ -145,7 +147,7 @@ export function Header({
             <span className="font-semibold text-charcoal">
               {selectedAddress?.label ? `${selectedAddress.label} address` : "New address"}
             </span>
-            <span className="text-slate max-w-[200px] truncate">
+            <span className="max-w-[110px] truncate text-slate lg:max-w-[200px]">
               {selectedAddress ? selectedAddress.details : "Select your address"}
             </span>
             <Icon
@@ -167,7 +169,7 @@ export function Header({
           />
         </div>
 
-        <div ref={userMenuRef} className="relative ml-auto flex items-center gap-1 md:ml-0">
+        <div ref={userMenuRef} className="relative ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1 md:ml-0">
           {user ? (
             <>
               <button
@@ -312,13 +314,13 @@ export function Header({
           )}
           <button
             type="button"
-            className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream sm:flex"
+            className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
           >
             <Icon d={ICONS.globe} className="size-4" />
             EN
             <Icon d={ICONS.chevron} className="size-4 text-brand" />
           </button>
-          <button type="button" aria-label="Favourites" className={`${iconBtn} max-sm:hidden`}>
+          <button type="button" aria-label="Favourites" className={`${iconBtn} hidden lg:grid`}>
             <Icon d={ICONS.heart} />
           </button>
           <button
@@ -337,12 +339,45 @@ export function Header({
               {cartCount}
             </span>
           </button>
+          <button
+            type="button"
+            onClick={() => setIsNavOpen((o) => !o)}
+            aria-expanded={isNavOpen}
+            aria-controls="mobile-nav"
+            aria-label={isNavOpen ? "Close menu" : "Open menu"}
+            className={`${iconBtn} md:hidden`}
+          >
+            <Icon d={isNavOpen ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"} />
+          </button>
         </div>
       </div>
 
+      {/* Mobile menu panel */}
+      {isNavOpen && (
+        <nav
+          id="mobile-nav"
+          aria-label="Sections"
+          className="border-t border-line/70 bg-alabaster px-4 pb-3 pt-2 md:hidden"
+        >
+          <ul className="grid grid-cols-2 gap-2">
+            {NAV.map((n) => (
+              <li key={n.label}>
+                <a
+                  href={n.href}
+                  onClick={() => setIsNavOpen(false)}
+                  className="flex h-12 items-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-charcoal active:bg-cream"
+                >
+                  {n.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      )}
+
       {/* Row 2: section nav + search */}
-      <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 pb-3 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-        <nav aria-label="Sections" className="no-scrollbar -mx-1 flex gap-1 overflow-x-auto">
+      <div className="mx-auto flex max-w-7xl flex-col gap-2 px-3 pb-3 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+        <nav aria-label="Sections" className="no-scrollbar -mx-1 hidden gap-1 overflow-x-auto md:flex">
           {NAV.map((n, i) => (
             <a
               key={n.label}
@@ -392,7 +427,7 @@ export function Header({
               type="submit"
               aria-label="Search"
               title="Search"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 grid size-8 place-items-center rounded-full bg-brand text-white transition hover:bg-brand-hover active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
+              className="absolute right-1 top-1/2 -translate-y-1/2 grid size-9 place-items-center rounded-full bg-brand text-white transition hover:bg-brand-hover active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
             >
               <Icon d={ICONS.search} className="size-3.5" />
             </button>

@@ -93,7 +93,8 @@ const INITIAL_MENU: Product[] = [
   },
 ]
 
-const grid = "grid grid-cols-1 gap-5 min-[420px]:grid-cols-2 sm:gap-6 lg:grid-cols-4"
+const grid =
+  "grid grid-cols-1 gap-3 min-[560px]:grid-cols-2 min-[560px]:gap-5 md:grid-cols-3 lg:grid-cols-4 lg:gap-6"
 
 function SectionTitle({
   title,
@@ -109,13 +110,13 @@ function SectionTitle({
   light?: boolean
 }) {
   return (
-    <div className="mb-10 flex flex-col items-center text-center">
+    <div className="mb-8 flex flex-col items-center text-center sm:mb-10">
       {eyebrow && (
         <p className={`text-eyebrow ${light ? "text-saffron" : "text-brand"}`}>{eyebrow}</p>
       )}
       {bangla && (
         <h2
-          className={`text-display mt-3 text-4xl sm:text-5xl ${light ? "text-white" : "text-charcoal"}`}
+          className={`text-display mt-3 text-[2rem] sm:text-5xl ${light ? "text-white" : "text-charcoal"}`}
         >
           {bangla}
         </h2>
@@ -245,10 +246,10 @@ function LocationSection() {
   return (
     <section id="location" className="bg-jali relative scroll-mt-[var(--header-h,120px)] text-white">
       <TornEdge side="top" className="text-brand" />
-      <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[1.1fr_1fr] lg:px-8 lg:py-24">
+      <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:gap-12 sm:px-6 sm:py-20 lg:grid-cols-[1.1fr_1fr] lg:px-8 lg:py-24">
         <div>
           <p className="text-eyebrow text-saffron">Find us</p>
-          <h2 className="text-display mt-3 text-4xl sm:text-5xl">
+          <h2 className="text-display mt-3 text-[2rem] sm:text-5xl">
             ড্যাফোডিল স্মার্ট সিটির পাশেই
           </h2>
           <p className="mt-3 text-lg font-semibold text-white/85">
@@ -317,13 +318,13 @@ function LocationSection() {
 
 function OrderProcess() {
   return (
-    <section id="how" className="mx-auto w-full max-w-7xl px-4 py-20 sm:px-6 lg:px-8 lg:py-24">
+    <section id="how" className="mx-auto w-full max-w-7xl scroll-mt-[var(--header-h,120px)] px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
       <SectionTitle eyebrow="How to order" bangla="অর্ডার করুন সহজে" title="Three steps to a plate of biriyani" />
-      <ol className="grid gap-6 md:grid-cols-3">
+      <ol className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
         {STEPS.map((s, i) => (
           <li
             key={s.n}
-            className="group relative overflow-hidden rounded-card border border-line bg-white p-3 pb-7 shadow-card"
+            className="group relative w-[78%] shrink-0 snap-center overflow-hidden rounded-card border border-line bg-white p-3 pb-7 shadow-card sm:w-auto"
           >
             <div className="relative overflow-hidden rounded-[0.9rem]">
               <img
@@ -400,8 +401,8 @@ function AboutSection() {
       id="about"
       className="bg-halftone relative scroll-mt-[var(--header-h,120px)] overflow-hidden"
     >
-      <div className="mx-auto grid max-w-7xl items-center gap-14 px-4 py-20 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-28">
-        <div className="relative mx-auto w-full max-w-md">
+      <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:gap-14 sm:px-6 sm:py-20 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-28">
+        <div className="relative mx-auto w-[85%] max-w-md sm:w-full">
           <div className="bg-jali absolute -inset-3 rotate-[-3deg] rounded-[2rem]" />
           <div className="relative overflow-hidden rounded-[1.75rem] ring-8 ring-white shadow-lift">
             <img
@@ -415,10 +416,10 @@ function AboutSection() {
             src={PHOTOS.aboutInset}
             alt="Whole spices used in our biriyani"
             loading="lazy"
-            className="absolute -left-6 -top-6 size-28 rounded-full object-cover shadow-lift ring-[6px] ring-white sm:-left-10 sm:size-36"
+            className="absolute -left-4 -top-4 size-20 rounded-full object-cover shadow-lift ring-4 ring-white sm:-left-10 sm:-top-6 sm:size-36 sm:ring-[6px]"
           />
-          <div className="absolute -bottom-6 -right-3 rotate-[4deg] rounded-2xl bg-saffron px-6 py-4 text-charcoal shadow-lift sm:-right-8">
-            <p className="font-calli text-3xl leading-none">ভালোবাসায় রান্না</p>
+          <div className="absolute -bottom-6 -right-3 rotate-[4deg] rounded-2xl bg-saffron px-4 py-3 text-charcoal shadow-lift sm:-right-8 sm:px-6 sm:py-4">
+            <p className="font-calli text-2xl leading-none sm:text-3xl">ভালোবাসায় রান্না</p>
             <p className="text-eyebrow mt-1.5 text-charcoal/70">Cooked with love</p>
           </div>
         </div>
@@ -451,8 +452,16 @@ function AboutSection() {
 
 export default function App() {
   const currentPath = useCurrentPath()
-  const { totalItems, addItem, activeDay, setIsCartOpen, isCheckoutOpen, setIsCheckoutOpen } =
-    useCart()
+  const {
+    totalItems,
+    totalBdt,
+    addItem,
+    activeDay,
+    isCartOpen,
+    setIsCartOpen,
+    isCheckoutOpen,
+    setIsCheckoutOpen,
+  } = useCart()
   const { isAddressModalOpen, setIsAddressModalOpen } = useAddress()
   const [query, setQuery] = useState("")
   const [showAll, setShowAll] = useState(false)
@@ -618,7 +627,7 @@ export default function App() {
 
       <section
         id="menu"
-        className="mx-auto w-full max-w-7xl scroll-mt-[calc(var(--header-h,120px)+16px)] px-4 pb-16 pt-20 sm:px-6 lg:px-8 lg:pb-24 lg:pt-28"
+        className="mx-auto w-full max-w-7xl scroll-mt-[calc(var(--header-h,120px)+16px)] px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-28"
       >
         <SectionTitle
           eyebrow="Our Menu"
@@ -717,6 +726,31 @@ export default function App() {
       <LocationSection />
 
       <Footer />
+
+      {/* Phone-only cart bar, shown once something is in the cart */}
+      {totalItems > 0 && !isCartOpen && !isCheckoutOpen && (
+        <div className="fixed inset-x-0 bottom-0 z-30 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] md:hidden">
+          <button
+            type="button"
+            onClick={() => setIsCartOpen(true)}
+            className="flex h-14 w-full items-center justify-between rounded-2xl bg-brand pl-4 pr-3 text-white shadow-[0_18px_40px_-14px_rgba(140,10,18,0.9)] active:scale-[0.99]"
+          >
+            <span className="flex items-center gap-3">
+              <span className="grid size-8 place-items-center rounded-full bg-saffron text-sm font-extrabold text-charcoal">
+                {totalItems}
+              </span>
+              <span className="text-sm font-bold">View cart</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-base font-extrabold">
+              ৳{totalBdt}
+              <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden>
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </span>
+          </button>
+        </div>
+      )}
+      {totalItems > 0 && <div className="h-20 md:hidden" aria-hidden />}
 
       <CartDrawer onProceedToCheckout={() => setIsCheckoutOpen(true)} />
       <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />

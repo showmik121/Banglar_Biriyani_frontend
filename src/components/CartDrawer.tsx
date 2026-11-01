@@ -163,7 +163,7 @@ export function CartDrawer({
       {/* Drawer content */}
       <div
         ref={drawerRef}
-        className="relative flex h-full w-full max-w-md flex-col bg-white shadow-2xl transition-transform duration-300"
+        className="relative flex h-full w-full max-w-md flex-col bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl transition-transform duration-300"
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-line px-6 py-4">
@@ -221,7 +221,7 @@ export function CartDrawer({
               {items.map((item: CartItem) => (
                 <div
                   key={`${item.menuItemId}-${item.scheduledDay}`}
-                  className="flex items-center gap-3 rounded-card border border-line bg-white p-3 shadow-xs transition hover:border-slate/30"
+                  className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-card border border-line bg-white p-3 shadow-xs transition hover:border-slate/30"
                 >
                   {item.imageUrl ? (
                     <img
@@ -238,20 +238,20 @@ export function CartDrawer({
                     </div>
                   )}
 
-                  <div className="min-w-0 flex-1">
-                    <h4 className="truncate text-sm font-semibold text-charcoal">{item.name}</h4>
+                  <div className="min-w-0 flex-1 basis-[calc(100%-4.75rem)]">
+                    <h4 className="line-clamp-2 text-sm font-semibold leading-snug text-charcoal">{item.name}</h4>
                     <div className="mt-0.5 flex items-center gap-2">
-                      <span className="text-xs font-bold text-brand">৳{item.priceBdt}</span>
+                      <span className="text-sm font-bold text-brand">৳{item.priceBdt}</span>
                     </div>
                   </div>
 
-                  <div className="flex shrink-0 items-center gap-1.5">
+                  <div className="ml-[4.75rem] flex w-[calc(100%-4.75rem)] items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() =>
                         updateQuantity(item.menuItemId, item.scheduledDay, item.quantity - 1)
                       }
-                      className="grid size-7 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-brand hover:bg-brand hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                      className="grid size-9 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-brand hover:bg-brand hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                       aria-label={`Decrease quantity of ${item.name}`}
                     >
                       -
@@ -267,7 +267,7 @@ export function CartDrawer({
                       onClick={() =>
                         updateQuantity(item.menuItemId, item.scheduledDay, item.quantity + 1)
                       }
-                      className="grid size-7 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-brand hover:bg-brand hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                      className="grid size-9 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-brand hover:bg-brand hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                       aria-label={`Increase quantity of ${item.name}`}
                     >
                       +
@@ -275,7 +275,7 @@ export function CartDrawer({
                     <button
                       type="button"
                       onClick={() => removeItem(item.menuItemId, item.scheduledDay)}
-                      className="ml-1 p-1 text-slate transition hover:text-brand cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                      className="ml-auto grid size-9 place-items-center rounded-full text-slate transition hover:text-brand cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                       title="Remove item"
                       aria-label={`Remove ${item.name} from cart`}
                     >
@@ -306,11 +306,11 @@ export function CartDrawer({
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-bold text-charcoal">Complete Your Biriyani</span>
-                    <span className="rounded-full bg-brand px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider text-white">
+                    <span className="rounded-full bg-brand px-1.5 py-0.2 text-[11px] font-bold uppercase tracking-wider text-white">
                       Add-ons
                     </span>
                   </div>
-                  <span className="text-[10px] font-medium text-slate">Pairs best</span>
+                  <span className="text-[11px] font-medium text-slate">Pairs best</span>
                 </div>
 
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -340,7 +340,7 @@ export function CartDrawer({
                         type="button"
                         onClick={() => handleAddUpsell(upsell)}
                         disabled={addingId === upsell.id}
-                        className="shrink-0 rounded-full bg-brand px-2.5 py-1 text-[11px] font-bold text-white shadow-2xs transition hover:bg-brand-hover active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                        className="inline-flex h-9 shrink-0 items-center rounded-full bg-brand px-3 text-xs font-bold text-white shadow-2xs transition hover:bg-brand-hover active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                       >
                         {addingId === upsell.id ? "✓" : "+ Add"}
                       </button>

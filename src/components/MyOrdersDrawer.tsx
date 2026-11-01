@@ -152,7 +152,7 @@ export function MyOrdersDrawer() {
       />
 
       <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
-        <div ref={drawerRef} className="w-screen max-w-lg bg-white shadow-2xl flex flex-col">
+        <div ref={drawerRef} className="flex w-screen max-w-lg flex-col bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl">
           {/* Header */}
           <div className="flex items-center justify-between border-b border-line px-6 py-4.5 bg-gradient-to-r from-white via-brand-light/40 to-white">
             <div className="flex items-center gap-3">

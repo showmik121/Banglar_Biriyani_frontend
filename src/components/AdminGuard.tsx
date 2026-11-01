@@ -113,7 +113,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                   <button
                     type="button"
                     onClick={() => setShowPassword((p) => !p)}
-                    className="text-[11px] font-medium text-brand hover:underline cursor-pointer"
+                    className="-my-2 px-2 py-2 text-xs font-medium text-brand hover:underline cursor-pointer"
                   >
                     {showPassword ? "Hide" : "Show"}
                   </button>
@@ -154,14 +154,14 @@ export function AdminGuard({ children }: AdminGuardProps) {
                 <button
                   type="button"
                   onClick={() => fillDemo("admin@banglarbiriyani.com", "Admin@1234")}
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-center text-xs font-medium text-slate-700 transition hover:border-brand hover:bg-brand-light hover:text-brand cursor-pointer"
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2.5 text-center text-xs font-medium text-slate-700 transition hover:border-brand hover:bg-brand-light hover:text-brand cursor-pointer"
                 >
                   Admin Portal
                 </button>
                 <button
                   type="button"
                   onClick={() => fillDemo("kitchen@banglarbiriyani.com", "Staff@1234")}
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-center text-xs font-medium text-slate-700 transition hover:border-brand hover:bg-brand-light hover:text-brand cursor-pointer"
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2.5 text-center text-xs font-medium text-slate-700 transition hover:border-brand hover:bg-brand-light hover:text-brand cursor-pointer"
                 >
                   Head Chef (Staff)
                 </button>
@@ -173,7 +173,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
             <button
               type="button"
               onClick={() => navigateTo("/")}
-              className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 transition hover:text-slate-900 cursor-pointer"
+              className="inline-flex items-center gap-2 py-2.5 text-xs font-medium text-slate-500 transition hover:text-slate-900 cursor-pointer"
             >
               <svg
                 className="size-4"

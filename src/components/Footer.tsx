@@ -75,10 +75,10 @@ export function Footer() {
 
           <div>
             <p className="text-eyebrow text-saffron">Explore</p>
-            <ul className="mt-4 space-y-2.5 text-sm text-white/85">
+            <ul className="mt-3 space-y-1 text-sm text-white/85">
               {LINKS.map((l) => (
                 <li key={l.label}>
-                  <a href={l.href} className="transition hover:text-saffron">
+                  <a href={l.href} className="inline-block py-2 transition hover:text-saffron">
                     {l.label}
                   </a>
                 </li>
@@ -88,15 +88,15 @@ export function Footer() {
 
           <div>
             <p className="text-eyebrow text-saffron">Contact</p>
-            <ul className="mt-4 space-y-2.5 text-sm text-white/85">
+            <ul className="mt-3 space-y-1 text-sm text-white/85">
               <li>Near Daffodil Smart City, Birulia, Savar, Dhaka-1216</li>
               <li>
-                <a href="tel:+8809612000000" className="transition hover:text-saffron">
+                <a href="tel:+8809612000000" className="inline-block py-2 transition hover:text-saffron">
                   +880 9612-000000
                 </a>
               </li>
               <li>
-                <a href="mailto:hello@banglarbiriyani.com" className="transition hover:text-saffron">
+                <a href="mailto:hello@banglarbiriyani.com" className="inline-block py-2 transition hover:text-saffron">
                   hello@banglarbiriyani.com
                 </a>
               </li>

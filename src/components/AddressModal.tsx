@@ -156,14 +156,14 @@ export function AddressModal({ isOpen, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs transition-opacity duration-200"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4 transition-opacity duration-200"
       aria-modal="true"
       role="dialog"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="relative flex max-h-[92vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+      <div className="relative flex max-h-[94dvh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[92vh] sm:rounded-2xl">
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-line px-6 py-4">
           <div className="flex items-center gap-2.5">
@@ -180,7 +180,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
           <button
             type="button"
             onClick={onClose}
-            className="grid size-8 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal cursor-pointer"
+            className="grid size-10 shrink-0 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal cursor-pointer"
             aria-label="Close"
           >
             <Icon d={ICONS.close} className="size-4" />
@@ -269,7 +269,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                     key={areaName}
                     type="button"
                     onClick={() => handleAppendArea(areaName)}
-                    className="rounded-full border border-line/80 bg-alabaster px-2.5 py-1 text-xs text-charcoal transition hover:border-brand hover:bg-brand/10 hover:text-brand cursor-pointer"
+                    className="rounded-full border border-line/80 bg-alabaster px-3 py-2 text-xs text-charcoal transition hover:border-brand hover:bg-brand/10 hover:text-brand cursor-pointer"
                   >
                     + {areaName}
                   </button>
@@ -285,7 +285,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                   key={t}
                   type="button"
                   onClick={() => setTag(t)}
-                  className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition cursor-pointer ${
+                  className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition cursor-pointer ${
                     tag === t
                       ? "bg-brand text-white"
                       : "bg-alabaster text-charcoal hover:bg-slate/15"
@@ -302,7 +302,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => setShowDetailedFields((prev) => !prev)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1.5 py-2 text-xs font-semibold text-brand hover:underline cursor-pointer"
               >
                 <Icon d={showDetailedFields ? ICONS.close : ICONS.plus} className="size-3.5" />
                 {showDetailedFields

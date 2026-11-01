@@ -154,7 +154,7 @@ export function SearchRecommendationPopup({
                 ? `Dish Recommendations (${filteredDishes.length})`
                 : "Popular Recommendations"}
             </span>
-            <span className="text-[10px] font-semibold text-brand">Banglar Biriyani</span>
+            <span className="text-[11px] font-semibold text-brand">Banglar Biriyani</span>
           </div>
 
           {filteredDishes.length > 0 ? (
@@ -204,7 +204,7 @@ export function SearchRecommendationPopup({
                   {/* Price & Action */}
                   <div className="text-right shrink-0">
                     <span className="text-xs font-bold text-brand">৳{dish.price}</span>
-                    <span className="block text-[10px] text-slate group-hover:text-charcoal transition-colors">
+                    <span className="block text-[11px] text-slate group-hover:text-charcoal transition-colors">
                       View →
                     </span>
                   </div>

@@ -36,12 +36,12 @@ export function MultiDayWarningModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4 animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="multiday-modal-title"
     >
-      <div className="w-full max-w-md rounded-card bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+      <div className="w-full max-w-md rounded-t-3xl bg-white p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl animate-in zoom-in-95 duration-200 sm:rounded-card">
         <div className="flex items-center gap-3 mb-4">
           <div className="grid size-10 place-items-center rounded-full bg-amber-100 text-amber-700">
             <svg

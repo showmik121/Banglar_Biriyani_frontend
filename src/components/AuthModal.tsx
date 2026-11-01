@@ -123,7 +123,7 @@ export function AuthModal() {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-modal-title"
@@ -138,7 +138,7 @@ export function AuthModal() {
       {/* Modal Dialog Card */}
       <div
         ref={modalRef}
-        className="relative w-full max-w-md overflow-hidden rounded-2xl bg-white shadow-2xl transition-all"
+        className="relative max-h-[94dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-t-3xl bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl transition-all sm:max-h-[92vh] sm:rounded-2xl"
       >
         {/* Top Header with Brand Badge and Close Button */}
         <div className="relative border-b border-line bg-gradient-to-r from-white via-brand-light/50 to-white px-6 pb-4 pt-6">
@@ -193,7 +193,7 @@ export function AuthModal() {
                 setActiveTab("login")
                 setErrorMessage(null)
               }}
-              className={`flex-1 rounded-lg py-1.5 transition ${
+              className={`flex-1 rounded-lg py-2.5 transition ${
                 activeTab === "login"
                   ? "bg-white text-brand shadow-xs"
                   : "text-slate hover:text-charcoal"
@@ -207,7 +207,7 @@ export function AuthModal() {
                 setActiveTab("signup")
                 setErrorMessage(null)
               }}
-              className={`flex-1 rounded-lg py-1.5 transition ${
+              className={`flex-1 rounded-lg py-2.5 transition ${
                 activeTab === "signup"
                   ? "bg-white text-brand shadow-xs"
                   : "text-slate hover:text-charcoal"
@@ -288,7 +288,7 @@ export function AuthModal() {
                   <button
                     type="button"
                     onClick={() => setShowLoginPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate hover:text-charcoal"
+                    className="absolute right-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-slate hover:text-charcoal"
                     aria-label={showLoginPassword ? "Hide password" : "Show password"}
                   >
                     <svg
@@ -355,7 +355,7 @@ export function AuthModal() {
                     className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-brand hover:bg-brand-light"
                   >
                     <span className="text-xs font-bold text-charcoal">Customer</span>
-                    <span className="text-[10px] text-slate">Tanvir Ahmed</span>
+                    <span className="text-[11px] text-slate">Tanvir Ahmed</span>
                   </button>
 
                   <button
@@ -364,7 +364,7 @@ export function AuthModal() {
                     className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-brand hover:bg-brand-light"
                   >
                     <span className="text-xs font-bold text-charcoal">Kitchen Staff</span>
-                    <span className="text-[10px] text-slate">Chef Rahim</span>
+                    <span className="text-[11px] text-slate">Chef Rahim</span>
                   </button>
 
                   <button
@@ -373,7 +373,7 @@ export function AuthModal() {
                     className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-brand hover:bg-brand-light"
                   >
                     <span className="text-xs font-bold text-charcoal">Admin</span>
-                    <span className="text-[10px] text-slate">Owner</span>
+                    <span className="text-[11px] text-slate">Owner</span>
                   </button>
                 </div>
               </div>
@@ -467,7 +467,7 @@ export function AuthModal() {
                   <button
                     type="button"
                     onClick={() => setShowSignupPassword((prev) => !prev)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate hover:text-charcoal"
+                    className="absolute right-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-slate hover:text-charcoal"
                     aria-label={showSignupPassword ? "Hide password" : "Show password"}
                   >
                     <svg
