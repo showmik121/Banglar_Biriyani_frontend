@@ -1,0 +1,9 @@
+# Netlify routing rules (order matters: first match wins).
+
+# 1) API calls go to the backend server. Replace the address with your
+#    live backend URL (e.g. https://banglar-biriyani-api.onrender.com),
+#    then remove the "#" at the start of the next line.
+# /api/*  https://YOUR-BACKEND-URL/api/:splat  200!
+
+# 2) Every other page (/admin, /admin/orders, ...) loads the React app.
+/*  /index.html  200
