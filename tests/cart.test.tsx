@@ -16,7 +16,7 @@ describe("cart", () => {
     expect(result.current.totalBdt).toBe(0)
   })
 
-  test("adding items updates count, subtotal and adds the ৳60 delivery fee", () => {
+  test("adding items updates count and subtotal; delivery stays free", () => {
     const { result } = renderHook(() => useCart(), { wrapper })
     act(() => {
       result.current.addItem(kacchi)
@@ -25,8 +25,8 @@ describe("cart", () => {
     })
     expect(result.current.totalItems).toBe(3)
     expect(result.current.subtotalBdt).toBe(450 * 2 + 80)
-    expect(result.current.deliveryFeeBdt).toBe(60)
-    expect(result.current.totalBdt).toBe(980 + 60)
+    expect(result.current.deliveryFeeBdt).toBe(0)
+    expect(result.current.totalBdt).toBe(980)
   })
 
   test("the same dish is merged into one line with a higher quantity", () => {

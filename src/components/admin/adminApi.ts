@@ -20,12 +20,35 @@ export async function adminFetch<T>(url: string, init: RequestInit = {}): Promis
     const err = body?.error
     if (res.status === 401) throw new ApiError("Your session has ended. Please sign in again.")
     if (res.status === 403) throw new ApiError("Only an admin can do this.")
-    throw new ApiError(err?.message || `Request failed (${res.status})`, err?.details || {})
+    const details = err?.details && typeof err.details === "object" ? err.details : {}
+    throw new ApiError(err?.message || `Something went wrong (${res.status}). Please try again.`, details)
   }
   return body?.data as T
 }
 
-export const inputClass =
-  "h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-900 outline-none transition focus:border-brand focus:ring-4 focus:ring-brand/10"
+export const taka = (n: number) => `৳${n.toLocaleString("en-IN")}`
 
-export const labelClass = "mb-1.5 block text-xs font-semibold text-slate-700"
+/** "just now", "5 min ago", "2 h ago", else a short date. */
+export function timeAgo(iso: string) {
+  const diff = Math.max(0, Date.now() - new Date(iso).getTime())
+  const min = Math.floor(diff / 60000)
+  if (min < 1) return "just now"
+  if (min < 60) return `${min} min ago`
+  const h = Math.floor(min / 60)
+  if (h < 24) return `${h} h ago`
+  return new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
+}
+
+export const inputClass =
+  "h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 sm:text-sm"
+
+export const labelClass = "mb-1.5 block text-sm font-medium text-slate-700"
+
+export const btnPrimary =
+  "inline-flex h-10 items-center justify-center rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50"
+
+export const btnSecondary =
+  "inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50"
+
+export const btnDanger =
+  "inline-flex h-10 items-center justify-center rounded-lg px-3 text-sm font-medium text-red-600 transition hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:opacity-50"

@@ -162,9 +162,9 @@ const PROMISES = [
     d: "M12 21c-4-2-7-6-7-11 3 0 5 1 7 3 2-2 4-3 7-3 0 5-3 9-7 11ZM12 13V3",
   },
   {
-    title: "গরম গরম ডেলিভারি",
+    title: "ফ্রি ডেলিভারি",
     photo: PHOTOS.promise.delivery,
-    body: "Hot to DIU campus, hostels & Ashulia",
+    body: "Free, hot delivery to DIU campus, hostels & Ashulia",
     d: "M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z",
   },
 ]
@@ -231,7 +231,7 @@ const STEPS = [
   { n: "০৩", title: "Enjoy it hot", body: "We pack it straight from the handi and ride it to you." },
 ]
 
-type ZoneView = { name: string; note: string; time: string; fee?: number }
+type ZoneView = { name: string; note: string; time: string }
 
 // Shown until the delivery points set in the admin panel load
 const FALLBACK_ZONES: ZoneView[] = [
@@ -260,11 +260,10 @@ function useStoreData() {
         const rows = json?.data
         if (Array.isArray(rows) && rows.length > 0) {
           setZones(
-            rows.map((z: { name: string; area: string; etaMinutes: string; feeBdt: number }) => ({
+            rows.map((z: { name: string; area: string; etaMinutes: string }) => ({
               name: z.name,
               note: z.area,
               time: `${z.etaMinutes.replace("-", "–")} min`,
-              fee: z.feeBdt,
             })),
           )
         }
@@ -372,9 +371,7 @@ function LocationSection({ zones }: { zones: ZoneView[] }) {
                   <span className="block rounded-full bg-gold-light px-3 py-1 text-xs font-bold text-gold">
                     {z.time}
                   </span>
-                  {z.fee !== undefined && (
-                    <span className="mt-1 block text-xs font-semibold text-slate">Delivery ৳{z.fee}</span>
-                  )}
+                  <span className="mt-1 block text-xs font-semibold text-emerald-700">Free delivery</span>
                 </span>
               </li>
             ))}

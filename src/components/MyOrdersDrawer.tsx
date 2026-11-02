@@ -429,8 +429,8 @@ export function MyOrdersDrawer() {
                           <span>৳{order.subtotalBdt}</span>
                         </div>
                         <div className="flex justify-between">
-                          <span>Delivery Fee (Savar)</span>
-                          <span>৳{order.deliveryFeeBdt}</span>
+                          <span>Delivery</span>
+                          <span>{order.deliveryFeeBdt ? `৳${order.deliveryFeeBdt}` : "Free"}</span>
                         </div>
                         <div className="flex justify-between items-baseline pt-1 text-sm font-bold text-charcoal">
                           <span>Total Amount</span>

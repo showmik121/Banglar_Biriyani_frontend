@@ -11,7 +11,7 @@ type Props = {
   onClose?: () => void
 }
 
-type DeliveryZone = { id: number; name: string; area: string; feeBdt: number; etaMinutes: string }
+type DeliveryZone = { id: number; name: string; area: string; etaMinutes: string }
 type AppliedOffer = { code: string; title: string; discountBdt: number }
 
 type DeliverySlot = "Lunch 12:30 PM - 2:30 PM" | "Dinner 7:30 PM - 9:30 PM" | "Express 45-60 mins"
@@ -28,7 +28,6 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
     items,
     activeDay,
     subtotalBdt,
-    deliveryFeeBdt,
     totalBdt,
     clearCart,
     isCheckoutOpen,
@@ -108,7 +107,8 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
   }, [subtotalBdt])
 
   const selectedZone = zones.find((z) => z.id === zoneId) || null
-  const checkoutFeeBdt = selectedZone ? selectedZone.feeBdt : deliveryFeeBdt
+  // Delivery is free.
+  const checkoutFeeBdt = 0
   const discountBdt = appliedOffer?.discountBdt ?? 0
   const checkoutTotalBdt = Math.max(0, subtotalBdt - discountBdt) + checkoutFeeBdt
 
@@ -396,8 +396,10 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                   </div>
                 )}
                 <div className="flex justify-between text-slate">
-                  <span>Delivery Fee</span>
-                  <span className="font-mono">৳{placedOrder.order.deliveryFeeBdt}</span>
+                  <span>Delivery</span>
+                  <span className="font-semibold text-emerald-700">
+                    {placedOrder.order.deliveryFeeBdt ? `৳${placedOrder.order.deliveryFeeBdt}` : "Free"}
+                  </span>
                 </div>
                 <div className="flex justify-between border-t border-line/40 pt-1 text-sm font-bold text-charcoal">
                   <span>Total Due</span>
@@ -741,12 +743,9 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                           />
                           <span className="min-w-0">
                             <span className="block font-bold">{z.name}</span>
-                            <span className="block text-slate">{z.area || `${z.etaMinutes} min`}</span>
+                            {z.area && <span className="block text-slate">{z.area}</span>}
                           </span>
-                          <span className="shrink-0 text-right">
-                            <span className="block font-bold">৳{z.feeBdt}</span>
-                            <span className="block text-slate">{z.etaMinutes} min</span>
-                          </span>
+                          <span className="shrink-0 text-right text-slate">{z.etaMinutes} min</span>
                         </label>
                       )
                     })}
@@ -1061,8 +1060,8 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                   </div>
                 )}
                 <div className="flex justify-between text-slate">
-                  <span>Delivery Fee{selectedZone ? ` (${selectedZone.name})` : ""}</span>
-                  <span className="font-mono">৳{checkoutFeeBdt}</span>
+                  <span>Delivery{selectedZone ? ` (${selectedZone.name})` : ""}</span>
+                  <span className="font-semibold text-emerald-700">Free</span>
                 </div>
                 <div className="flex justify-between border-t border-line/60 pt-1 text-sm font-bold text-charcoal">
                   <span>Total Due</span>

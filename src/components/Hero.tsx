@@ -92,7 +92,7 @@ export function Hero({
               <span className="text-saffron">★★★★★</span> Loved by DIU students
             </li>
             <li className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-brand" /> Fast delivery in Savar & Ashulia
+              <span className="size-2 rounded-full bg-brand" /> Free delivery in Savar & Ashulia
             </li>
           </ul>
         </div>

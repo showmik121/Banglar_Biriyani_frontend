@@ -356,11 +356,11 @@ export function CartDrawer({
                 <span className="font-medium text-charcoal">৳{subtotalBdt}</span>
               </div>
               <div className="flex justify-between text-slate">
-                <span>Delivery fee (est.)</span>
-                <span className="font-medium text-charcoal">৳{deliveryFeeBdt}</span>
+                <span>Delivery</span>
+                <span className="font-semibold text-emerald-700">{deliveryFeeBdt === 0 ? "Free" : `৳${deliveryFeeBdt}`}</span>
               </div>
               <div className="flex justify-between border-t border-line/60 pt-2 text-base font-bold text-charcoal">
-                <span>Estimated Total</span>
+                <span>Total</span>
                 <span className="text-display text-xl text-brand">৳{totalBdt}</span>
               </div>
             </div>
