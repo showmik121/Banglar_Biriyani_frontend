@@ -145,7 +145,8 @@ export function AdminGuard({ children }: AdminGuardProps) {
               </button>
             </form>
 
-            {/* Quick Demo Access Buttons */}
+            {/* Quick Demo Access Buttons (local development only, never on the live site) */}
+            {import.meta.env.DEV && (
             <div className="mt-6 border-t border-slate-200 pt-4">
               <p className="text-center text-[11px] font-medium text-slate-500">
                 Quick-Fill Demo Staff Credentials
@@ -167,6 +168,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                 </button>
               </div>
             </div>
+            )}
           </div>
 
           <div className="text-center">

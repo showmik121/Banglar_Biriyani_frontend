@@ -337,7 +337,8 @@ export function AuthModal() {
                 )}
               </button>
 
-              {/* Quick Fill Demo Section */}
+              {/* Quick Fill Demo Section (local development only) */}
+              {import.meta.env.DEV && (
               <div className="pt-2">
                 <div className="relative flex items-center justify-center">
                   <div className="absolute inset-0 flex items-center">
@@ -377,6 +378,7 @@ export function AuthModal() {
                   </button>
                 </div>
               </div>
+              )}
             </form>
           ) : (
             <form onSubmit={handleSignupSubmit} className="space-y-3.5">

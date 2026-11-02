@@ -231,7 +231,10 @@ const STEPS = [
   { n: "০৩", title: "Enjoy it hot", body: "We pack it straight from the handi and ride it to you." },
 ]
 
-const ZONES = [
+type ZoneView = { name: string; note: string; time: string; fee?: number }
+
+// Shown until the delivery points set in the admin panel load
+const FALLBACK_ZONES: ZoneView[] = [
   { name: "Daffodil Smart City", note: "Campus & hostels", time: "15–20 min" },
   { name: "Khagan", note: "Student mess area", time: "15–20 min" },
   { name: "Birulia", note: "Bazar & around", time: "20–25 min" },
@@ -239,10 +242,72 @@ const ZONES = [
   { name: "Savar", note: "Nabinagar, Savar Bazar", time: "35–45 min" },
 ]
 
+type PublicOffer = {
+  code: string
+  title: string
+  description: string
+  discountType: "PERCENT" | "FLAT"
+  discountValue: number
+}
+
+function useStoreData() {
+  const [zones, setZones] = useState<ZoneView[]>(FALLBACK_ZONES)
+  const [offers, setOffers] = useState<PublicOffer[]>([])
+  useEffect(() => {
+    fetch("/api/delivery-zones")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        const rows = json?.data
+        if (Array.isArray(rows) && rows.length > 0) {
+          setZones(
+            rows.map((z: { name: string; area: string; etaMinutes: string; feeBdt: number }) => ({
+              name: z.name,
+              note: z.area,
+              time: `${z.etaMinutes.replace("-", "–")} min`,
+              fee: z.feeBdt,
+            })),
+          )
+        }
+      })
+      .catch(() => {})
+    fetch("/api/offers")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => Array.isArray(json?.data) && setOffers(json.data))
+      .catch(() => {})
+  }, [])
+  return { zones, offers }
+}
+
+function OffersBand({ offers }: { offers: PublicOffer[] }) {
+  if (offers.length === 0) return null
+  return (
+    <section id="offers" aria-label="Current offers" className="mx-auto w-full max-w-7xl scroll-mt-[var(--header-h,120px)] px-4 pt-14 sm:px-6 lg:px-8">
+      <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
+        {offers.map((o) => (
+          <article
+            key={o.code}
+            className="relative w-[85%] shrink-0 snap-center overflow-hidden rounded-2xl bg-saffron p-5 text-charcoal shadow-card sm:w-auto"
+          >
+            <span className="absolute -right-6 -top-6 size-24 rounded-full bg-white/25" aria-hidden />
+            <p className="text-display text-3xl">
+              {o.discountType === "PERCENT" ? `${o.discountValue}% OFF` : `৳${o.discountValue} OFF`}
+            </p>
+            <p className="mt-1 font-bold">{o.title}</p>
+            {o.description && <p className="mt-1 text-sm text-charcoal/75">{o.description}</p>}
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm">
+              Code <strong className="font-mono tracking-wider text-brand">{o.code}</strong>
+            </p>
+          </article>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 const MAP_URL =
   "https://www.google.com/maps/search/?api=1&query=Daffodil+Smart+City+Birulia+Savar"
 
-function LocationSection() {
+function LocationSection({ zones }: { zones: ZoneView[] }) {
   return (
     <section id="location" className="bg-jali relative scroll-mt-[var(--header-h,120px)] text-white">
       <TornEdge side="top" className="text-brand" />
@@ -290,7 +355,7 @@ function LocationSection() {
             </span>
           </div>
           <ul className="mt-5 divide-y divide-line">
-            {ZONES.map((z, i) => (
+            {zones.map((z, i) => (
               <li key={z.name} className="flex items-center gap-4 py-3.5">
                 <span
                   className={`grid size-10 shrink-0 place-items-center rounded-full text-sm font-extrabold ${
@@ -303,8 +368,13 @@ function LocationSection() {
                   <p className="font-bold">{z.name}</p>
                   <p className="text-sm text-slate">{z.note}</p>
                 </div>
-                <span className="shrink-0 rounded-full bg-gold-light px-3 py-1 text-xs font-bold text-gold">
-                  {z.time}
+                <span className="shrink-0 text-right">
+                  <span className="block rounded-full bg-gold-light px-3 py-1 text-xs font-bold text-gold">
+                    {z.time}
+                  </span>
+                  {z.fee !== undefined && (
+                    <span className="mt-1 block text-xs font-semibold text-slate">Delivery ৳{z.fee}</span>
+                  )}
                 </span>
               </li>
             ))}
@@ -452,6 +522,7 @@ function AboutSection() {
 
 export default function App() {
   const currentPath = useCurrentPath()
+  const { zones: storeZones, offers: storeOffers } = useStoreData()
   const {
     totalItems,
     totalBdt,
@@ -625,6 +696,8 @@ export default function App() {
 
       <PromiseStrip />
 
+      <OffersBand offers={storeOffers} />
+
       <section
         id="menu"
         className="mx-auto w-full max-w-7xl scroll-mt-[calc(var(--header-h,120px)+16px)] px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-28"
@@ -723,7 +796,7 @@ export default function App() {
 
       <OrderProcess />
 
-      <LocationSection />
+      <LocationSection zones={storeZones} />
 
       <Footer />
 

@@ -74,6 +74,42 @@ const NAV_ITEMS: NavItem[] = [
     ),
   },
   {
+    id: "offers",
+    label: "Offers",
+    path: "/admin/offers",
+    icon: (active) => (
+      <svg
+        className={`size-5 ${active ? "text-white" : "text-slate-500 group-hover:text-slate-700"}`}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M20.6 13.4 13.4 20.6a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8ZM7.5 7.5h.01" />
+      </svg>
+    ),
+  },
+  {
+    id: "delivery",
+    label: "Delivery Points",
+    path: "/admin/delivery",
+    icon: (active) => (
+      <svg
+        className={`size-5 ${active ? "text-white" : "text-slate-500 group-hover:text-slate-700"}`}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12Zm0-9.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
+      </svg>
+    ),
+  },
+  {
     id: "users",
     label: "Customers & Staff",
     path: "/admin/users",

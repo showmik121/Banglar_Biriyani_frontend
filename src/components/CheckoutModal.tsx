@@ -11,6 +11,9 @@ type Props = {
   onClose?: () => void
 }
 
+type DeliveryZone = { id: number; name: string; area: string; feeBdt: number; etaMinutes: string }
+type AppliedOffer = { code: string; title: string; discountBdt: number }
+
 type DeliverySlot = "Lunch 12:30 PM - 2:30 PM" | "Dinner 7:30 PM - 9:30 PM" | "Express 45-60 mins"
 
 type PaymentMethod = "COD" | "BKASH" | "NAGAD"
@@ -77,6 +80,63 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[] | undefined>>({})
   const [placedOrder, setPlacedOrder] = useState<PlacedOrderState | null>(null)
 
+  // Delivery points and promo code
+  const [zones, setZones] = useState<DeliveryZone[]>([])
+  const [zoneId, setZoneId] = useState<number | null>(null)
+  const [promoInput, setPromoInput] = useState("")
+  const [appliedOffer, setAppliedOffer] = useState<AppliedOffer | null>(null)
+  const [promoError, setPromoError] = useState<string | null>(null)
+  const [promoLoading, setPromoLoading] = useState(false)
+
+  useEffect(() => {
+    if (!isOpen) return
+    let alive = true
+    fetch("/api/delivery-zones")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (alive && Array.isArray(json?.data)) setZones(json.data)
+      })
+      .catch(() => {})
+    return () => {
+      alive = false
+    }
+  }, [isOpen])
+
+  // A cart change can push the order under an offer's minimum, so ask again
+  useEffect(() => {
+    setAppliedOffer(null)
+  }, [subtotalBdt])
+
+  const selectedZone = zones.find((z) => z.id === zoneId) || null
+  const checkoutFeeBdt = selectedZone ? selectedZone.feeBdt : deliveryFeeBdt
+  const discountBdt = appliedOffer?.discountBdt ?? 0
+  const checkoutTotalBdt = Math.max(0, subtotalBdt - discountBdt) + checkoutFeeBdt
+
+  const applyPromo = async () => {
+    const code = promoInput.trim()
+    if (!code) return
+    setPromoLoading(true)
+    setPromoError(null)
+    try {
+      const res = await fetch("/api/offers/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code, subtotalBdt }),
+      })
+      const json = await res.json().catch(() => null)
+      if (!res.ok) {
+        setAppliedOffer(null)
+        setPromoError(json?.error?.message || "This code can't be used right now")
+        return
+      }
+      setAppliedOffer(json.data)
+    } catch {
+      setPromoError("Couldn't check the code. Please try again.")
+    } finally {
+      setPromoLoading(false)
+    }
+  }
+
   const nameInputRef = useRef<HTMLInputElement>(null)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
 
@@ -125,6 +185,12 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
       return
     }
 
+    if (zones.length > 0 && !selectedZone) {
+      setFieldErrors({ deliveryZoneId: ["Choose where we should deliver"] })
+      setGeneralError("Choose a delivery point to continue.")
+      return
+    }
+
     // Phone validation for Bangladesh (01XXXXXXXXX)
     const cleanPhone = customerPhone.replace(/[\s-]/g, "")
     const bdPhoneRegex = /^(?:\+?88)?01[3-9]\d{8}$/
@@ -165,6 +231,8 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
             ? paymentTrxId.trim().toUpperCase()
             : undefined,
         notes: notes.trim() || undefined,
+        deliveryZoneId: selectedZone?.id ?? null,
+        offerCode: appliedOffer?.code ?? null,
         items: items.map((i) => ({
           menuItemId: i.menuItemId,
           quantity: i.quantity,
@@ -321,6 +389,12 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                   <span>Subtotal</span>
                   <span className="font-mono">৳{placedOrder.order.subtotalBdt}</span>
                 </div>
+                {(placedOrder.order.discountBdt ?? 0) > 0 && (
+                  <div className="flex justify-between font-semibold text-emerald-700">
+                    <span>Discount ({placedOrder.order.offerCode})</span>
+                    <span className="font-mono">−৳{placedOrder.order.discountBdt}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-slate">
                   <span>Delivery Fee</span>
                   <span className="font-mono">৳{placedOrder.order.deliveryFeeBdt}</span>
@@ -637,6 +711,54 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 </div>
               </div>
 
+              {/* Delivery Point */}
+              {zones.length > 0 && (
+                <fieldset className="space-y-2 border-t border-line pt-2">
+                  <legend className="text-display text-sm tracking-wider text-charcoal">
+                    Delivery Point *
+                  </legend>
+                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2" role="radiogroup">
+                    {zones.map((z) => {
+                      const active = z.id === zoneId
+                      return (
+                        <label
+                          key={z.id}
+                          className={`flex min-h-12 cursor-pointer items-center justify-between gap-2 rounded-lg border p-2.5 text-xs transition ${
+                            active
+                              ? "border-brand bg-brand-light text-brand"
+                              : "border-line bg-white text-charcoal hover:border-brand/40"
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name="delivery-zone"
+                            className="sr-only"
+                            checked={active}
+                            onChange={() => {
+                              setZoneId(z.id)
+                              setFieldErrors((prev) => ({ ...prev, deliveryZoneId: undefined }))
+                            }}
+                          />
+                          <span className="min-w-0">
+                            <span className="block font-bold">{z.name}</span>
+                            <span className="block text-slate">{z.area || `${z.etaMinutes} min`}</span>
+                          </span>
+                          <span className="shrink-0 text-right">
+                            <span className="block font-bold">৳{z.feeBdt}</span>
+                            <span className="block text-slate">{z.etaMinutes} min</span>
+                          </span>
+                        </label>
+                      )
+                    })}
+                  </div>
+                  {fieldErrors.deliveryZoneId && (
+                    <p role="alert" className="text-xs font-medium text-rose-600">
+                      {fieldErrors.deliveryZoneId[0]}
+                    </p>
+                  )}
+                </fieldset>
+              )}
+
               {/* Delivery Slot */}
               <fieldset className="border-t border-line pt-2 space-y-2">
                 <legend className="text-display text-sm tracking-wider text-charcoal">
@@ -795,7 +917,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                         </div>
                         <p className="mt-1 text-[11px] text-slate leading-relaxed">
                           Please send the exact total of{" "}
-                          <strong className="font-bold text-charcoal">৳{totalBdt}</strong> to the
+                          <strong className="font-bold text-charcoal">৳{checkoutTotalBdt}</strong> to the
                           number above and enter your Transaction ID (TrxID) below.
                         </p>
                       </div>
@@ -869,19 +991,82 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 />
               </div>
 
+              {/* Promo code */}
+              <div>
+                <label htmlFor="promo-code" className="mb-1 block text-xs font-semibold text-charcoal">
+                  Promo code
+                </label>
+                {appliedOffer ? (
+                  <div className="flex items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs">
+                    <span className="text-emerald-800">
+                      <strong className="font-mono">{appliedOffer.code}</strong> applied · you save ৳
+                      {appliedOffer.discountBdt}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setAppliedOffer(null)
+                        setPromoInput("")
+                      }}
+                      className="py-2 font-semibold text-emerald-800 underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <input
+                      id="promo-code"
+                      value={promoInput}
+                      onChange={(e) => {
+                        setPromoInput(e.target.value)
+                        setPromoError(null)
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault()
+                          applyPromo()
+                        }
+                      }}
+                      placeholder="e.g. DIU10"
+                      className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 font-mono text-sm uppercase outline-none transition focus:border-brand"
+                    />
+                    <button
+                      type="button"
+                      onClick={applyPromo}
+                      disabled={promoLoading || !promoInput.trim()}
+                      className="h-11 shrink-0 rounded-lg bg-charcoal px-4 text-sm font-bold text-white disabled:opacity-50"
+                    >
+                      {promoLoading ? "Checking…" : "Apply"}
+                    </button>
+                  </div>
+                )}
+                {promoError && (
+                  <p role="alert" className="mt-1 text-xs font-medium text-rose-600">
+                    {promoError}
+                  </p>
+                )}
+              </div>
+
               {/* Breakdown */}
               <div className="space-y-1.5 rounded-lg border border-line bg-alabaster p-3 text-xs">
                 <div className="flex justify-between text-slate">
                   <span>Subtotal ({items.length} items)</span>
                   <span className="font-mono">৳{subtotalBdt}</span>
                 </div>
+                {discountBdt > 0 && (
+                  <div className="flex justify-between font-semibold text-emerald-700">
+                    <span>Discount ({appliedOffer?.code})</span>
+                    <span className="font-mono">−৳{discountBdt}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-slate">
-                  <span>Delivery Fee</span>
-                  <span className="font-mono">৳{deliveryFeeBdt}</span>
+                  <span>Delivery Fee{selectedZone ? ` (${selectedZone.name})` : ""}</span>
+                  <span className="font-mono">৳{checkoutFeeBdt}</span>
                 </div>
                 <div className="flex justify-between border-t border-line/60 pt-1 text-sm font-bold text-charcoal">
                   <span>Total Due</span>
-                  <span className="text-display text-brand">৳{totalBdt}</span>
+                  <span className="text-display text-brand">৳{checkoutTotalBdt}</span>
                 </div>
               </div>
             </form>
@@ -916,7 +1101,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     <span>Placing Order in Neon...</span>
                   </>
                 ) : (
-                  <span>Confirm Order (৳{totalBdt})</span>
+                  <span>Confirm Order (৳{checkoutTotalBdt})</span>
                 )}
               </button>
             </div>

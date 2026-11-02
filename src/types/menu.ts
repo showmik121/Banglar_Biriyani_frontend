@@ -88,6 +88,9 @@ export interface OrderDTO {
   isPaymentVerified?: boolean
   subtotalBdt: number
   deliveryFeeBdt: number
+  discountBdt?: number
+  offerCode?: string | null
+  deliveryZoneId?: number | null
   totalBdt: number
   status: "PENDING" | "CONFIRMED" | "PREPARING" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
   notes?: string | null

@@ -356,7 +356,7 @@ export function CartDrawer({
                 <span className="font-medium text-charcoal">৳{subtotalBdt}</span>
               </div>
               <div className="flex justify-between text-slate">
-                <span>Delivery Fee (Savar)</span>
+                <span>Delivery fee (est.)</span>
                 <span className="font-medium text-charcoal">৳{deliveryFeeBdt}</span>
               </div>
               <div className="flex justify-between border-t border-line/60 pt-2 text-base font-bold text-charcoal">

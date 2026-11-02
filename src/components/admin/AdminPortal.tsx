@@ -5,6 +5,8 @@ import { AdminOverview } from "./AdminOverview"
 import { AdminOrders } from "./AdminOrders"
 import { AdminMenuCrud } from "./AdminMenuCrud"
 import { AdminUsers } from "./AdminUsers"
+import { AdminOffers } from "./AdminOffers"
+import { AdminDeliveryZones } from "./AdminDeliveryZones"
 
 export function AdminPortal() {
   const currentPath = useCurrentPath()
@@ -15,6 +17,12 @@ export function AdminPortal() {
     }
     if (currentPath.startsWith("/admin/menu")) {
       return <AdminMenuCrud />
+    }
+    if (currentPath.startsWith("/admin/offers")) {
+      return <AdminOffers />
+    }
+    if (currentPath.startsWith("/admin/delivery")) {
+      return <AdminDeliveryZones />
     }
     if (currentPath.startsWith("/admin/users")) {
       return <AdminUsers />
