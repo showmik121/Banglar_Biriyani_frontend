@@ -4,7 +4,7 @@ import { btnPrimary, btnSecondary } from "./adminApi"
 export function PageHeader({ title, action }: { title: string; action?: ReactNode }) {
   return (
     <div className="mb-5 flex items-center justify-between gap-3">
-      <h1 className="text-xl font-semibold text-slate-900">{title}</h1>
+      <h1 className="text-xl font-semibold text-charcoal">{title}</h1>
       {action}
     </div>
   )
@@ -25,9 +25,9 @@ export function Notice({ kind, children }: { kind: "error" | "ok"; children: Rea
 
 export function Empty({ title, hint }: { title: string; hint?: string }) {
   return (
-    <div className="rounded-xl border border-dashed border-slate-300 px-6 py-12 text-center">
-      <p className="font-medium text-slate-900">{title}</p>
-      {hint && <p className="mt-1 text-sm text-slate-500">{hint}</p>}
+    <div className="rounded-xl border border-dashed border-line px-6 py-12 text-center">
+      <p className="font-medium text-charcoal">{title}</p>
+      {hint && <p className="mt-1 text-sm text-slate">{hint}</p>}
     </div>
   )
 }
@@ -36,7 +36,7 @@ export function ListSkeleton() {
   return (
     <div className="space-y-2" aria-hidden>
       {[0, 1, 2].map((i) => (
-        <div key={i} className="h-16 animate-pulse rounded-xl bg-slate-100" />
+        <div key={i} className="h-16 animate-pulse rounded-xl bg-cream" />
       ))}
     </div>
   )
@@ -56,9 +56,9 @@ export function Toggle({
   compact?: boolean
 }) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 text-sm text-slate-700">
+    <label className="flex cursor-pointer items-center gap-3 text-sm text-charcoal">
       <input type="checkbox" className="peer sr-only" checked={checked} onChange={(e) => onChange(e.target.checked)} />
-      <span className="relative h-6 w-10 shrink-0 rounded-full bg-slate-300 transition peer-checked:bg-emerald-600 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-slate-900 after:absolute after:left-0.5 after:top-0.5 after:size-5 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-4" />
+      <span className="relative h-6 w-10 shrink-0 rounded-full bg-slate/30 transition peer-checked:bg-emerald-600 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-brand after:absolute after:left-0.5 after:top-0.5 after:size-5 after:rounded-full after:bg-white after:transition peer-checked:after:translate-x-4" />
       <span className={compact ? "sr-only sm:not-sr-only" : undefined}>{label}</span>
     </label>
   )
@@ -101,7 +101,7 @@ export function FormDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-slate-900/40 sm:items-center sm:p-4"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-charcoal/50 sm:items-center sm:p-4"
       onMouseDown={(e) => e.target === e.currentTarget && onClose()}
     >
       <form
@@ -112,15 +112,15 @@ export function FormDialog({
         aria-labelledby="admin-dialog-title"
         className="flex max-h-[92dvh] w-full max-w-md flex-col rounded-t-2xl bg-white shadow-xl sm:rounded-2xl"
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-          <h2 id="admin-dialog-title" className="font-semibold text-slate-900">
+        <div className="flex items-center justify-between border-b border-line px-5 py-4">
+          <h2 id="admin-dialog-title" className="font-semibold text-charcoal">
             {title}
           </h2>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="grid size-9 place-items-center rounded-lg text-slate-500 hover:bg-slate-100"
+            className="grid size-9 place-items-center rounded-lg text-slate hover:bg-cream"
           >
             <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
               <path d="M6 6l12 12M18 6 6 18" strokeLinecap="round" />
@@ -135,7 +135,7 @@ export function FormDialog({
           )}
           {children}
         </div>
-        <div className="flex items-center gap-2 border-t border-slate-200 px-5 py-4">
+        <div className="flex items-center gap-2 border-t border-line px-5 py-4">
           {footerExtra}
           <div className="ml-auto flex gap-2">
             <button type="button" onClick={onClose} className={btnSecondary}>

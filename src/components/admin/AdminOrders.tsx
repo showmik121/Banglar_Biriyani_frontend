@@ -40,7 +40,7 @@ const STATUS_STYLE: Record<Status, string> = {
   PREPARING: "bg-violet-100 text-violet-800",
   OUT_FOR_DELIVERY: "bg-indigo-100 text-indigo-800",
   DELIVERED: "bg-emerald-100 text-emerald-800",
-  CANCELLED: "bg-slate-200 text-slate-600",
+  CANCELLED: "bg-cream text-slate",
 }
 
 // The one button that moves an order forward
@@ -79,18 +79,29 @@ function SummaryCards({ summary }: { summary: Summary | null }) {
   ]
   return (
     <section aria-label="Sales summary" className="mb-6 grid grid-cols-3 gap-2 sm:gap-3">
-      {cards.map((c) => (
-        <div key={c.label} className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3">
-          <p className="truncate text-xs text-slate-500 sm:text-sm">{c.label}</p>
+      {cards.map((c, i) => (
+        <div
+          key={c.label}
+          className={`min-w-0 rounded-xl px-3 py-2.5 sm:px-4 sm:py-3 ${
+            i === 0 ? "bg-brand text-white shadow-[0_10px_24px_-14px_rgba(214,19,30,0.9)]" : "border border-line bg-white"
+          }`}
+        >
+          <p className={`truncate text-xs sm:text-sm ${i === 0 ? "text-white/80" : "text-slate"}`}>{c.label}</p>
           {c.data ? (
             <>
-              <p className="mt-0.5 truncate text-base font-semibold tabular-nums text-slate-900 sm:mt-1 sm:text-2xl">{taka(c.data.revenueBdt)}</p>
-              <p className="truncate text-xs tabular-nums text-slate-600 sm:text-sm">{plural(c.data.orders)}</p>
+              <p
+                className={`mt-0.5 truncate text-base font-bold tabular-nums sm:mt-1 sm:text-2xl ${i === 0 ? "text-white" : "text-charcoal"}`}
+              >
+                {taka(c.data.revenueBdt)}
+              </p>
+              <p className={`truncate text-xs tabular-nums sm:text-sm ${i === 0 ? "text-white/80" : "text-slate"}`}>
+                {plural(c.data.orders)}
+              </p>
             </>
           ) : (
             <div className="mt-1 space-y-1.5" aria-hidden>
-              <div className="h-6 w-full max-w-28 animate-pulse rounded bg-slate-100 sm:h-7" />
-              <div className="h-4 w-16 animate-pulse rounded bg-slate-100" />
+              <div className="h-6 w-full max-w-28 animate-pulse rounded bg-cream sm:h-7" />
+              <div className="h-4 w-16 animate-pulse rounded bg-cream" />
             </div>
           )}
         </div>
@@ -197,8 +208,8 @@ export function AdminOrders() {
               role="tab"
               aria-selected={filter === f.id}
               onClick={() => setFilter(f.id)}
-              className={`h-9 shrink-0 rounded-full px-3.5 text-sm font-medium transition ${
-                filter === f.id ? "bg-slate-900 text-white" : "bg-white text-slate-600 ring-1 ring-slate-200 hover:bg-slate-100"
+              className={`h-9 shrink-0 rounded-full px-3 text-sm font-medium transition sm:px-3.5 ${
+                filter === f.id ? "bg-brand text-white" : "bg-white text-slate ring-1 ring-line hover:bg-cream"
               }`}
             >
               {f.label}
@@ -235,36 +246,46 @@ export function AdminOrders() {
             const busy = busyId === order.id
             const online = order.paymentMethod !== "COD"
             return (
-              <li key={order.id} className="rounded-xl border border-slate-200 bg-white p-4">
+              <li
+                key={order.id}
+                className={`rounded-xl border border-line bg-white p-4 ${order.status === "PENDING" ? "border-l-4 border-l-brand" : ""}`}
+              >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-                  <span className="font-semibold text-slate-900">{order.customerName}</span>
+                  <span className="font-semibold text-charcoal">{order.customerName}</span>
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_STYLE[order.status]}`}>
                     {STATUS_LABEL[order.status]}
                   </span>
-                  <span className="ml-auto text-sm text-slate-500">
+                  <span className="w-full text-xs text-slate sm:ml-auto sm:w-auto sm:text-sm">
                     {order.orderNumber} · {timeAgo(order.createdAt)}
                   </span>
                 </div>
 
                 <div className="mt-3 grid gap-3 text-sm sm:grid-cols-2">
-                  <div className="space-y-1 text-slate-600">
-                    <a href={`tel:${order.customerPhone}`} className="font-medium text-slate-900 underline-offset-2 hover:underline">
+                  <div className="space-y-1 text-slate">
+                    <a
+                      href={`tel:${order.customerPhone}`}
+                      aria-label={`Call ${order.customerName} at ${order.customerPhone}`}
+                      className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-cream px-3 font-semibold text-charcoal hover:bg-brand-light hover:text-brand"
+                    >
+                      <svg viewBox="0 0 24 24" className="size-4 text-brand" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                        <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" strokeLinejoin="round" />
+                      </svg>
                       {order.customerPhone}
                     </a>
                     <p>
                       {order.deliveryZoneId && zones[order.deliveryZoneId] && (
-                        <span className="font-medium text-slate-800">{zones[order.deliveryZoneId]} · </span>
+                        <span className="font-medium text-charcoal">{zones[order.deliveryZoneId]} · </span>
                       )}
                       {order.customerAddress}
                     </p>
-                    {order.notes && <p className="text-slate-500">Note: {order.notes}</p>}
+                    {order.notes && <p className="text-slate">Note: {order.notes}</p>}
                   </div>
                   <div className="space-y-1">
-                    <p className="text-slate-800">
+                    <p className="text-charcoal">
                       {items.map((i) => `${i.quantity}× ${i.itemNameSnapshot}`).join(", ")}
                     </p>
-                    <p className="text-slate-600">
-                      <span className="font-semibold text-slate-900">{taka(order.totalBdt)}</span>
+                    <p className="text-slate">
+                      <span className="font-semibold text-charcoal">{taka(order.totalBdt)}</span>
                       {order.discountBdt > 0 && ` · ${order.offerCode} −${taka(order.discountBdt)}`}
                       {" · "}
                       {online ? (
@@ -285,9 +306,14 @@ export function AdminOrders() {
                 </div>
 
                 {(next || (online && !order.isPaymentVerified && order.status !== "CANCELLED")) && (
-                  <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-slate-100 pt-3">
+                  <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-line pt-3">
                     {next && (
-                      <button type="button" disabled={busy} onClick={() => setStatus(row, next.to)} className={btnPrimary}>
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => setStatus(row, next.to)}
+                        className={`${btnPrimary} h-11 flex-1 sm:h-10 sm:flex-none`}
+                      >
                         {busy ? "Saving…" : next.label}
                       </button>
                     )}
@@ -298,13 +324,13 @@ export function AdminOrders() {
                         onClick={() =>
                           patch(row, `/api/admin/orders/${order.id}/verify-payment`, { isVerified: true })
                         }
-                        className={btnSecondary}
+                        className={`${btnSecondary} h-11 flex-1 sm:h-10 sm:flex-none`}
                       >
-                        Payment received
+                        Mark as paid
                       </button>
                     )}
                     {next && (
-                      <button type="button" disabled={busy} onClick={() => cancel(row)} className={`${btnDanger} ml-auto`}>
+                      <button type="button" disabled={busy} onClick={() => cancel(row)} className={`${btnDanger} w-full sm:ml-auto sm:w-auto`}>
                         Cancel order
                       </button>
                     )}
@@ -317,7 +343,7 @@ export function AdminOrders() {
       )}
 
       {updatedAt && (
-        <p className="mt-4 text-xs text-slate-400">
+        <p className="mt-4 text-xs text-slate/70">
           Updated {updatedAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · refreshes every 30 seconds
         </p>
       )}

@@ -40,15 +40,15 @@ export function timeAgo(iso: string) {
 }
 
 export const inputClass =
-  "h-11 w-full rounded-lg border border-slate-300 bg-white px-3 text-base text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10 sm:text-sm"
+  "h-11 w-full rounded-lg border border-line bg-white px-3 text-base text-charcoal outline-none transition placeholder:text-slate/50 focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm"
 
-export const labelClass = "mb-1.5 block text-sm font-medium text-slate-700"
+export const labelClass = "mb-1.5 block text-sm font-medium text-charcoal"
 
 export const btnPrimary =
-  "inline-flex h-10 items-center justify-center rounded-lg bg-slate-900 px-4 text-sm font-semibold text-white transition hover:bg-slate-800 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50"
+  "inline-flex h-10 items-center justify-center rounded-lg bg-brand px-4 text-sm font-semibold text-white transition hover:bg-brand-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
 
 export const btnSecondary =
-  "inline-flex h-10 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 disabled:opacity-50"
+  "inline-flex h-10 items-center justify-center rounded-lg border border-line bg-white px-4 text-sm font-medium text-charcoal transition hover:bg-cream focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand disabled:opacity-50"
 
 export const btnDanger =
   "inline-flex h-10 items-center justify-center rounded-lg px-3 text-sm font-medium text-red-600 transition hover:bg-red-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600 disabled:opacity-50"

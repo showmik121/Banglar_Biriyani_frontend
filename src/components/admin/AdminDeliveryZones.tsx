@@ -125,7 +125,7 @@ export function AdminDeliveryZones() {
           )
         }
       />
-      <p className="-mt-3 mb-5 text-sm text-slate-500">Customers pick one of these at checkout. Delivery is free everywhere.</p>
+      <p className="-mt-3 mb-5 text-sm text-slate">Customers pick one of these at checkout. Delivery is free everywhere.</p>
       {notice && <Notice kind="ok">{notice}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
 
@@ -134,12 +134,12 @@ export function AdminDeliveryZones() {
       ) : zones.length === 0 ? (
         <Empty title="No delivery points yet" hint="Add places like DIU campus, Khagan or Birulia." />
       ) : (
-        <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
           {zones.map((z) => (
             <li key={z.id} className="flex items-center gap-3 p-4">
               <div className="min-w-0 flex-1">
-                <p className={`font-medium ${z.isActive ? "text-slate-900" : "text-slate-400"}`}>{z.name}</p>
-                <p className="text-sm text-slate-500">
+                <p className={`font-medium ${z.isActive ? "text-charcoal" : "text-slate/70"}`}>{z.name}</p>
+                <p className="text-sm text-slate">
                   {z.area ? `${z.area} · ` : ""}
                   {z.etaMinutes} min
                 </p>

@@ -46,8 +46,8 @@ export function describeOffer(o: Pick<OfferRecord, "discountType" | "discountVal
 
 function stateOf(o: OfferRecord): { label: string; style: string } {
   const now = Date.now()
-  if (o.endsAt && new Date(o.endsAt).getTime() < now) return { label: "Ended", style: "bg-slate-200 text-slate-600" }
-  if (!o.isActive) return { label: "Paused", style: "bg-slate-200 text-slate-600" }
+  if (o.endsAt && new Date(o.endsAt).getTime() < now) return { label: "Ended", style: "bg-cream text-slate" }
+  if (!o.isActive) return { label: "Paused", style: "bg-cream text-slate" }
   if (o.startsAt && new Date(o.startsAt).getTime() > now) return { label: "Starts later", style: "bg-sky-100 text-sky-800" }
   return { label: "Live", style: "bg-emerald-100 text-emerald-800" }
 }
@@ -190,18 +190,18 @@ export function AdminOffers() {
       ) : offers.length === 0 ? (
         <Empty title="No offers yet" hint="Create a promo code like DIU10 that customers type at checkout." />
       ) : (
-        <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+        <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
           {offers.map((o) => {
             const st = stateOf(o)
             return (
               <li key={o.id} className="flex flex-wrap items-center gap-3 p-4 sm:flex-nowrap">
                 <div className="min-w-0 flex-1">
                   <p className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono font-semibold text-slate-900">{o.code}</span>
+                    <span className="font-mono font-semibold text-charcoal">{o.code}</span>
                     <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${st.style}`}>{st.label}</span>
                   </p>
-                  <p className="mt-0.5 text-sm text-slate-600">{describeOffer(o)}</p>
-                  {o.endsAt && <p className="text-sm text-slate-500">Until {prettyDate(o.endsAt)}</p>}
+                  <p className="mt-0.5 text-sm text-slate">{describeOffer(o)}</p>
+                  {o.endsAt && <p className="text-sm text-slate">Until {prettyDate(o.endsAt)}</p>}
                 </div>
                 {isAdmin && (
                   <div className="flex gap-2">

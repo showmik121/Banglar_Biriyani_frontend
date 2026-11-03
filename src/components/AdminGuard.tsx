@@ -14,8 +14,8 @@ export function AdminGuard({ children }: { children: ReactNode }) {
 
   if (isLoading) {
     return (
-      <div className="grid min-h-screen place-items-center bg-slate-50" role="status" aria-live="polite">
-        <div className="size-8 animate-spin rounded-full border-2 border-slate-300 border-t-slate-900" />
+      <div className="grid min-h-screen place-items-center bg-alabaster" role="status" aria-live="polite">
+        <div className="size-8 animate-spin rounded-full border-2 border-line border-t-brand" />
         <span className="sr-only">Loading</span>
       </div>
     )
@@ -32,13 +32,13 @@ export function AdminGuard({ children }: { children: ReactNode }) {
     }
 
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-12">
+      <div className="flex min-h-screen items-center justify-center bg-alabaster px-4 py-12">
         <div className="w-full max-w-sm">
           <div className="mb-6 text-center">
             <img src="/logo-mark.png" alt="" className="mx-auto size-14 rounded-full" />
-            <h1 className="mt-3 text-xl font-semibold text-slate-900">Banglar Biriyani Admin</h1>
+            <h1 className="mt-3 text-xl font-semibold text-charcoal">Banglar Biriyani Admin</h1>
           </div>
-          <form onSubmit={submit} className="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
+          <form onSubmit={submit} className="space-y-4 rounded-2xl border border-line bg-white p-6">
             {error && (
               <p role="alert" className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">
                 {error}
@@ -63,7 +63,7 @@ export function AdminGuard({ children }: { children: ReactNode }) {
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
-                  className="-mt-1.5 px-1 text-sm text-slate-500 hover:text-slate-900"
+                  className="-mt-1.5 px-1 text-sm text-slate hover:text-charcoal"
                 >
                   {showPassword ? "Hide" : "Show"}
                 </button>
@@ -83,7 +83,7 @@ export function AdminGuard({ children }: { children: ReactNode }) {
             </button>
           </form>
           <p className="mt-4 text-center">
-            <button type="button" onClick={() => navigateTo("/")} className="text-sm text-slate-500 hover:text-slate-900">
+            <button type="button" onClick={() => navigateTo("/")} className="text-sm text-slate hover:text-charcoal">
               ← Back to the website
             </button>
           </p>
@@ -94,10 +94,10 @@ export function AdminGuard({ children }: { children: ReactNode }) {
 
   if (user.role === "CUSTOMER") {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4" role="alert">
+      <div className="flex min-h-screen items-center justify-center bg-alabaster px-4" role="alert">
         <div className="max-w-sm text-center">
-          <h1 className="text-xl font-semibold text-slate-900">This account can't open the admin panel</h1>
-          <p className="mt-2 text-sm text-slate-600">
+          <h1 className="text-xl font-semibold text-charcoal">This account can't open the admin panel</h1>
+          <p className="mt-2 text-sm text-slate">
             <strong>{user.email ?? user.phone}</strong> is a customer account. Sign out and sign in with an admin or staff account.
           </p>
           <div className="mt-6 flex justify-center gap-2">

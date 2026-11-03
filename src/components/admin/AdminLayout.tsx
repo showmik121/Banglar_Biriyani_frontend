@@ -3,10 +3,10 @@ import { useAuth } from "../../context/AuthContext"
 import { navigateTo, useCurrentPath } from "../../utils/navigation"
 
 const TABS = [
-  { label: "Orders", path: "/admin/orders" },
-  { label: "Menu", path: "/admin/menu" },
-  { label: "Offers", path: "/admin/offers" },
-  { label: "Delivery points", path: "/admin/delivery" },
+  { label: "Orders", short: "Orders", path: "/admin/orders" },
+  { label: "Menu", short: "Menu", path: "/admin/menu" },
+  { label: "Offers", short: "Offers", path: "/admin/offers" },
+  { label: "Delivery points", short: "Delivery", path: "/admin/delivery" },
 ]
 
 export function AdminLayout({ children }: { children: ReactNode }) {
@@ -16,8 +16,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const active = TABS.find((t) => path.startsWith(t.path))?.path ?? TABS[0].path
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-800">
-      <header className="sticky top-0 z-30 border-b border-slate-200 bg-white">
+    <div className="min-h-screen bg-alabaster text-charcoal">
+      <header className="sticky top-0 z-30 bg-maroon text-white shadow-[0_6px_20px_-12px_rgba(60,0,0,0.6)]">
         <div className="mx-auto flex h-14 max-w-5xl items-center gap-3 px-4">
           <a
             href="/admin"
@@ -25,37 +25,39 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               e.preventDefault()
               navigateTo("/admin")
             }}
-            className="flex items-center gap-2 font-semibold text-slate-900"
+            className="flex min-w-0 items-center gap-2.5"
           >
-            <img src="/logo-mark.png" alt="" className="size-7 rounded-full" />
-            <span className="hidden sm:inline">Banglar Biriyani</span>
-            <span className="text-sm font-normal text-slate-500">Admin</span>
+            <img src="/logo-mark.png" alt="" className="size-8 shrink-0 rounded-full bg-white ring-2 ring-saffron/70" />
+            <span className="truncate font-bold">Banglar Biriyani</span>
+            <span className="shrink-0 rounded-full bg-saffron px-2 py-0.5 text-[11px] font-bold uppercase tracking-wide text-maroon">
+              Admin
+            </span>
           </a>
-          <div className="ml-auto flex items-center gap-1">
+          <div className="ml-auto flex shrink-0 items-center gap-1">
             <a
               href="/"
               onClick={(e) => {
                 e.preventDefault()
                 navigateTo("/")
               }}
-              className="hidden h-9 items-center rounded-lg px-3 text-sm text-slate-600 hover:bg-slate-100 sm:inline-flex"
+              className="hidden h-9 items-center rounded-lg px-3 text-sm text-white/80 hover:bg-white/10 hover:text-white sm:inline-flex"
             >
               View site
             </a>
-            <span className="hidden max-w-48 truncate px-2 text-sm text-slate-500 md:inline" title={user?.email ?? undefined}>
+            <span className="hidden max-w-48 truncate px-2 text-sm text-white/70 md:inline" title={user?.email ?? undefined}>
               {user?.email ?? user?.phone}
             </span>
             <button
               type="button"
               onClick={() => logout().then(() => navigateTo("/admin"))}
-              className="inline-flex h-9 items-center rounded-lg px-3 text-sm font-medium text-slate-700 hover:bg-slate-100"
+              className="inline-flex h-9 items-center rounded-lg px-3 text-sm font-semibold text-white hover:bg-white/10"
             >
               Sign out
             </button>
           </div>
         </div>
-        <nav aria-label="Admin sections" className="mx-auto max-w-5xl overflow-x-auto px-2">
-          <ul className="flex min-w-max">
+        <nav aria-label="Admin sections" className="mx-auto max-w-5xl px-1 sm:px-2">
+          <ul className="grid grid-cols-4 sm:flex">
             {TABS.map((t) => {
               const isActive = t.path === active
               return (
@@ -67,13 +69,14 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                       navigateTo(t.path)
                     }}
                     aria-current={isActive ? "page" : undefined}
-                    className={`inline-flex h-11 items-center border-b-2 px-3 text-sm font-medium transition ${
+                    className={`flex h-11 items-center justify-center border-b-[3px] px-2 text-sm font-semibold transition sm:px-3 ${
                       isActive
-                        ? "border-slate-900 text-slate-900"
-                        : "border-transparent text-slate-500 hover:text-slate-800"
+                        ? "border-saffron text-white"
+                        : "border-transparent text-white/65 hover:text-white"
                     }`}
                   >
-                    {t.label}
+                    <span className="sm:hidden">{t.short}</span>
+                    <span className="hidden sm:inline">{t.label}</span>
                   </a>
                 </li>
               )
@@ -81,7 +84,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           </ul>
         </nav>
       </header>
-      <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>
+      <main className="mx-auto max-w-5xl px-4 pb-10 pt-5 sm:pt-6">{children}</main>
     </div>
   )
 }

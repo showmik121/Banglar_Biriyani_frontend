@@ -187,21 +187,21 @@ export function AdminMenu() {
         <div className="space-y-6">
           {groups.map((g) => (
             <section key={g.id} aria-labelledby={`cat-${g.id}`}>
-              <h2 id={`cat-${g.id}`} className="mb-2 text-sm font-medium text-slate-500">
+              <h2 id={`cat-${g.id}`} className="mb-2 text-sm font-medium text-slate">
                 {g.name}
               </h2>
-              <ul className="divide-y divide-slate-100 overflow-hidden rounded-xl border border-slate-200 bg-white">
+              <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
                 {g.dishes.map((d) => (
                   <li key={d.id} className="flex items-center gap-3 p-3">
                     <img
                       src={d.imageUrl}
                       alt=""
                       loading="lazy"
-                      className={`size-12 shrink-0 rounded-lg bg-slate-100 object-cover ${d.isAvailable ? "" : "opacity-40"}`}
+                      className={`size-12 shrink-0 rounded-lg bg-cream object-cover ${d.isAvailable ? "" : "opacity-40"}`}
                     />
                     <div className="min-w-0 flex-1">
-                      <p className={`truncate font-medium ${d.isAvailable ? "text-slate-900" : "text-slate-400"}`}>{d.name}</p>
-                      <p className="text-sm text-slate-500">{taka(d.basePriceBdt)}</p>
+                      <p className={`truncate font-medium ${d.isAvailable ? "text-charcoal" : "text-slate/70"}`}>{d.name}</p>
+                      <p className="text-sm text-slate">{taka(d.basePriceBdt)}</p>
                     </div>
                     <Toggle
                       checked={d.isAvailable}
@@ -238,7 +238,7 @@ export function AdminMenu() {
           }
         >
           <div className="flex items-start gap-3">
-            <div className="size-20 shrink-0 overflow-hidden rounded-lg bg-slate-100">
+            <div className="size-20 shrink-0 overflow-hidden rounded-lg bg-cream">
               {form.imageUrl && <img src={form.imageUrl} alt="Photo preview" className="size-full object-cover" />}
             </div>
             <label className="min-w-0 flex-1">
