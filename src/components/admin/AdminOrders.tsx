@@ -61,7 +61,46 @@ const FILTERS: { id: Filter; label: string }[] = [
   { id: "all", label: "All" },
 ]
 
+interface Summary {
+  today: { orders: number; revenueBdt: number }
+  month: { orders: number; revenueBdt: number }
+  allTime: { orders: number; revenueBdt: number }
+  activeOrders: number
+}
+
+const plural = (n: number) => `${n.toLocaleString("en-IN")} ${n === 1 ? "order" : "orders"}`
+
+/** Today / this month / all time at a glance. Cancelled orders are not counted. */
+function SummaryCards({ summary }: { summary: Summary | null }) {
+  const cards = [
+    { label: "Today", data: summary?.today },
+    { label: "This month", data: summary?.month },
+    { label: "All time", data: summary?.allTime },
+  ]
+  return (
+    <section aria-label="Sales summary" className="mb-6 grid grid-cols-3 gap-2 sm:gap-3">
+      {cards.map((c) => (
+        <div key={c.label} className="min-w-0 rounded-xl border border-slate-200 bg-white px-3 py-2.5 sm:px-4 sm:py-3">
+          <p className="truncate text-xs text-slate-500 sm:text-sm">{c.label}</p>
+          {c.data ? (
+            <>
+              <p className="mt-0.5 truncate text-base font-semibold tabular-nums text-slate-900 sm:mt-1 sm:text-2xl">{taka(c.data.revenueBdt)}</p>
+              <p className="truncate text-xs tabular-nums text-slate-600 sm:text-sm">{plural(c.data.orders)}</p>
+            </>
+          ) : (
+            <div className="mt-1 space-y-1.5" aria-hidden>
+              <div className="h-6 w-full max-w-28 animate-pulse rounded bg-slate-100 sm:h-7" />
+              <div className="h-4 w-16 animate-pulse rounded bg-slate-100" />
+            </div>
+          )}
+        </div>
+      ))}
+    </section>
+  )
+}
+
 export function AdminOrders() {
+  const [summary, setSummary] = useState<Summary | null>(null)
   const [rows, setRows] = useState<OrderRow[]>([])
   const [zones, setZones] = useState<Record<number, string>>({})
   const [loading, setLoading] = useState(true)
@@ -73,7 +112,13 @@ export function AdminOrders() {
 
   const load = useCallback(async () => {
     try {
-      setRows(await adminFetch<OrderRow[]>("/api/admin/orders?limit=100"))
+      const [orderRows, stats] = await Promise.all([
+        adminFetch<OrderRow[]>("/api/admin/orders?limit=100"),
+        // The summary is a bonus: if it fails, the orders still show
+        adminFetch<Summary>("/api/admin/stats").catch(() => null),
+      ])
+      setRows(orderRows)
+      if (stats) setSummary(stats)
       setUpdatedAt(new Date())
       setError(null)
     } catch (e) {
@@ -140,6 +185,8 @@ export function AdminOrders() {
           </button>
         }
       />
+
+      <SummaryCards summary={summary} />
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
         <div role="tablist" aria-label="Filter orders" className="flex gap-1 overflow-x-auto">
