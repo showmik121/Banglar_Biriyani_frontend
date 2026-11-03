@@ -38,16 +38,25 @@ const ADDRESSES_STORAGE_KEY = "banglar_biriyani_addresses_v2"
 const SELECTED_ADDRESS_ID_KEY = "banglar_biriyani_selected_address_id_v2"
 
 export const POPULAR_DHAKA_AREAS = [
-  "Daffodil Smart City",
-  "Birulia",
-  "Khagan",
-  "Ashulia",
-  "Savar",
-  "Zirabo",
-  "Baipail",
-  "Nabinagar",
-  "Gazirchat",
-  "Diabari",
+  "ড্যাফোডিল স্মার্ট সিটি (ডিআইইউ)",
+  "খাগান (সাভার)",
+  "বিরুলিয়া (সাভার)",
+  "আশুলিয়া",
+  "সাভার",
+  "বনানী",
+  "গুলশান ১",
+  "গুলশান ২",
+  "ধানমন্ডি",
+  "উত্তরা",
+  "বসুন্ধরা আ/এ",
+  "মিরপুর",
+  "মহাখালী",
+  "মোহাম্মদপুর",
+  "লালমাটিয়া",
+  "বাড্ডা",
+  "বারিধারা",
+  "মতিঝিল",
+  "পুরান ঢাকা",
 ] as const
 
 function getStoredAddresses(): Address[] {
@@ -121,12 +130,12 @@ export function AddressProvider({ children }: { children: ReactNode }) {
   const setFreeformAddress = (fullAddressText: string, label: string = "Delivery"): Address => {
     const trimmed = fullAddressText.trim()
     if (!trimmed) {
-      throw new Error("Please write your address")
+      throw new Error("আপনার ঠিকানা লিখুন")
     }
 
     // Auto-detect matching area from text, or default to general area
     const detectedArea =
-      POPULAR_DHAKA_AREAS.find((a) => trimmed.toLowerCase().includes(a.toLowerCase())) || "Savar"
+      POPULAR_DHAKA_AREAS.find((a) => trimmed.toLowerCase().includes(a.toLowerCase())) || "ঢাকা"
 
     const newAddress: Address = {
       id: `addr_${Date.now()}_${Math.floor(Math.random() * 1000)}`,

@@ -78,28 +78,28 @@ export async function fetchDbHealth(): Promise<DbHealth> {
     const json = await res.json()
     return json.data ?? json
   } catch (err: any) {
-    return { ok: false, error: err.message || "Failed to reach database API" }
+    return { ok: false, error: err.message || "সার্ভারের সাথে সংযোগ করা যায়নি" }
   }
 }
 
 export async function fetchMenu(day?: string): Promise<MenuResponse> {
   const url = day ? `/api/menu?day=${encodeURIComponent(day)}` : "/api/menu"
   const res = await fetch(url)
-  if (!res.ok) throw new Error(`Failed to fetch menu: ${res.status}`)
+  if (!res.ok) throw new Error(`মেনু আনা যায়নি: ${res.status}`)
   const json = await res.json()
   return json.data ?? json
 }
 
 export async function fetchDailyMenu(day: string): Promise<{ day: string; items: Product[] }> {
   const res = await fetch(`/api/menu/${encodeURIComponent(day.toLowerCase())}`)
-  if (!res.ok) throw new Error(`Failed to fetch daily menu: ${res.status}`)
+  if (!res.ok) throw new Error(`দৈনিক মেনু আনা যায়নি: ${res.status}`)
   const json = await res.json()
   return json.data ?? json
 }
 
 export async function fetchOrderByNumber(orderNumber: string): Promise<any> {
   const res = await fetch(`/api/orders/${encodeURIComponent(orderNumber)}`)
-  if (!res.ok) throw new Error(`Order #${orderNumber} not found.`)
+  if (!res.ok) throw new Error(`অর্ডার #${orderNumber} পাওয়া যায়নি।`)
   const json = await res.json()
   return json.data ?? json
 }
@@ -125,9 +125,7 @@ export async function placeOrder(order: CreateOrderPayload): Promise<OrderRespon
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}))
     throw new Error(
-      errorData.error?.message ||
-        errorData.error ||
-        `Failed to create order (status: ${res.status})`,
+      errorData.error?.message || errorData.error || `অর্ডার তৈরি করা যায়নি (স্ট্যাটাস: ${res.status})`,
     )
   }
   const json = await res.json()
@@ -140,6 +138,6 @@ export async function updateOrderStatus(orderId: string | number, status: string
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ status }),
   })
-  if (!res.ok) throw new Error(`Failed to update order status`)
+  if (!res.ok) throw new Error(`অর্ডারের স্ট্যাটাস আপডেট করা যায়নি`)
   return await res.json()
 }

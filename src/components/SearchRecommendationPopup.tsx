@@ -1,3 +1,4 @@
+import { dayLabelBn, formatBdt, matchesSearch, toBengaliNumber } from "../utils/bengali"
 import React, { useEffect, useRef } from "react"
 
 export type SearchableDish = {
@@ -22,14 +23,14 @@ type Props = {
 }
 
 const POPULAR_SEARCH_PILLS = [
-  "Kacchi Biriyani",
-  "Beef Tehari",
-  "Chicken Polao",
-  "Borhani",
-  "Chicken Roast",
-  "Jali Kabab",
-  "Khichuri",
-  "Firni Cup",
+  "কাচ্চি বিরিয়ানি",
+  "বিফ তেহারি",
+  "মোরগ পোলাও",
+  "বোরহানি",
+  "চিকেন রোস্ট",
+  "জালি কাবাব",
+  "খিচুড়ি",
+  "ফিরনি",
 ]
 
 export function SearchRecommendationPopup({
@@ -78,9 +79,9 @@ export function SearchRecommendationPopup({
   const filteredDishes = cleanQuery
     ? dishes.filter(
         (d) =>
-          d.name.toLowerCase().includes(cleanQuery) ||
-          d.description?.toLowerCase().includes(cleanQuery) ||
-          d.categoryName?.toLowerCase().includes(cleanQuery),
+          matchesSearch(d.name, cleanQuery) ||
+          matchesSearch(d.description, cleanQuery) ||
+          matchesSearch(d.categoryName, cleanQuery),
       )
     : dishes.slice(0, 5) // Top 5 recommended when empty
 
@@ -89,7 +90,7 @@ export function SearchRecommendationPopup({
       ref={popupRef}
       className="absolute left-0 right-0 top-full z-50 mt-2 max-h-[420px] overflow-hidden rounded-2xl border border-line bg-white shadow-2xl transition-all animate-in fade-in duration-150"
       role="dialog"
-      aria-label="Search Recommendations"
+      aria-label="খোঁজার পরামর্শ"
     >
       <div className="max-h-[410px] overflow-y-auto p-3 space-y-3">
         {/* If query has text, show "Search for exact query" action at top */}
@@ -100,10 +101,10 @@ export function SearchRecommendationPopup({
               onExecuteSearch(query)
               onClose()
             }}
-            className="flex w-full items-center justify-between rounded-xl bg-brand/5 border border-brand/30 p-2.5 text-left text-xs font-semibold text-brand transition hover:bg-brand/10 cursor-pointer"
+            className="flex w-full items-center justify-between rounded-xl bg-[#E4002B]/5 border border-[#E4002B]/30 p-2.5 text-left text-xs font-semibold text-[#E4002B] transition hover:bg-[#E4002B]/10 cursor-pointer"
           >
             <div className="flex items-center gap-2">
-              <span className="grid size-6 place-items-center rounded-full bg-brand text-white">
+              <span className="grid size-6 place-items-center rounded-full bg-[#E4002B] text-white">
                 <svg
                   className="size-3"
                   viewBox="0 0 24 24"
@@ -115,10 +116,10 @@ export function SearchRecommendationPopup({
                 </svg>
               </span>
               <span>
-                Search menu for "<span className="underline font-bold">{query}</span>"
+                মেনুতে "<span className="underline font-bold">{query}</span>" খুঁজুন
               </span>
             </div>
-            <span className="text-[11px] font-bold">Jump to results →</span>
+            <span className="text-[11px] font-bold">ফলাফলে যান →</span>
           </button>
         )}
 
@@ -126,7 +127,7 @@ export function SearchRecommendationPopup({
         {!cleanQuery && (
           <div>
             <span className="block text-[11px] font-bold uppercase tracking-wider text-slate mb-1.5 px-1">
-              🔥 Trending Dishes & Searches
+              🔥 জনপ্রিয় খাবার ও খোঁজ
             </span>
             <div className="flex flex-wrap gap-1.5">
               {POPULAR_SEARCH_PILLS.map((pill) => (
@@ -137,7 +138,7 @@ export function SearchRecommendationPopup({
                     onExecuteSearch(pill)
                     onClose()
                   }}
-                  className="rounded-full border border-line bg-alabaster px-2.5 py-1 text-xs text-charcoal transition hover:border-brand hover:bg-brand/10 hover:text-brand cursor-pointer"
+                  className="rounded-full border border-line bg-alabaster px-2.5 py-1 text-xs text-charcoal transition hover:border-[#E4002B] hover:bg-[#E4002B]/10 hover:text-[#E4002B] cursor-pointer"
                 >
                   {pill}
                 </button>
@@ -151,10 +152,10 @@ export function SearchRecommendationPopup({
           <div className="flex items-center justify-between px-1 pb-1.5 pt-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate">
               {cleanQuery
-                ? `Dish Recommendations (${filteredDishes.length})`
-                : "Popular Recommendations"}
+                ? `প্রস্তাবিত খাবার (${toBengaliNumber(filteredDishes.length)})`
+                : "জনপ্রিয় খাবার"}
             </span>
-            <span className="text-[11px] font-semibold text-brand">Banglar Biriyani</span>
+            <span className="text-[10px] font-semibold text-[#E4002B]">বাংলার বিরিয়ানি</span>
           </div>
 
           {filteredDishes.length > 0 ? (
@@ -178,8 +179,8 @@ export function SearchRecommendationPopup({
                         className="size-full object-cover transition group-hover:scale-105"
                       />
                     ) : (
-                      <div className="grid size-full place-items-center text-xs font-bold text-brand">
-                        <img src="/logo-mark.png" alt="" className="size-3/4 object-contain opacity-60" />
+                      <div className="grid size-full place-items-center text-xs font-bold text-[#E4002B]">
+                        BB
                       </div>
                     )}
                   </div>
@@ -187,12 +188,12 @@ export function SearchRecommendationPopup({
                   {/* Details */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="truncate text-xs font-bold text-charcoal group-hover:text-brand transition-colors">
+                      <span className="truncate text-xs font-bold text-charcoal group-hover:text-[#E4002B] transition-colors">
                         {dish.name}
                       </span>
                       {dish.day && (
                         <span className="rounded-full bg-slate/10 px-1.5 py-0.2 text-[9px] font-semibold text-slate">
-                          {dish.day}
+                          {dayLabelBn(dish.day)}
                         </span>
                       )}
                     </div>
@@ -203,9 +204,11 @@ export function SearchRecommendationPopup({
 
                   {/* Price & Action */}
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-bold text-brand">৳{dish.price}</span>
-                    <span className="block text-[11px] text-slate group-hover:text-charcoal transition-colors">
-                      View →
+                    <span className="text-xs font-bold text-[#E4002B]">
+                      {formatBdt(dish.price)}
+                    </span>
+                    <span className="block text-[10px] text-slate group-hover:text-charcoal transition-colors">
+                      দেখুন →
                     </span>
                   </div>
                 </button>
@@ -214,7 +217,7 @@ export function SearchRecommendationPopup({
           ) : (
             <div className="p-4 text-center">
               <p className="text-xs text-slate">
-                No matching dishes found for "{query}". Try "Kacchi", "Tehari", or "Borhani".
+                "{query}" এর সাথে মিলে এমন খাবার নেই। "কাচ্চি", "তেহারি" বা "বোরহানি" লিখে দেখুন।
               </p>
             </div>
           )}

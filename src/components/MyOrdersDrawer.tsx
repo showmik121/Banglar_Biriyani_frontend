@@ -1,395 +1,500 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from "react"
+import {
+  dayLabelBn,
+  deliverySlotLabelBn,
+  formatBdt,
+  orderStatusLabelBn,
+  paymentMethodLabelBn,
+  toBengaliNumber,
+} from "../utils/bengali"
+import { useState, useEffect, useCallback, useRef } from "react"
 import { useAuth } from "../context/AuthContext"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
-import { forgetTrackedOrder, getTrackedOrders, saveTrackedOrder } from "../lib/trackedOrders"
 
-type Status = "PENDING" | "CONFIRMED" | "PREPARING" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
+interface OrderItem {
+  id: number
+  orderId: number
+  menuItemId: number
+  scheduledDay: string
+  itemNameSnapshot: string
+  quantity: number
+  unitPriceBdt: number
+  lineTotalBdt: number
+  imageUrl?: string | null
+  portionSize?: string | null
+}
+
+interface OrderRecord {
+  id: number
+  orderNumber: string
+  userId: number | null
+  customerName: string
+  customerPhone: string
+  customerAddress: string
+  scheduledDay: string
+  deliverySlot: string
+  paymentMethod: string
+  subtotalBdt: number
+  deliveryFeeBdt: number
+  totalBdt: number
+  status: "PENDING" | "CONFIRMED" | "PREPARING" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
+  paymentTrxId?: string | null
+  isPaymentVerified?: boolean
+  notes: string | null
+  createdAt: string
+}
 
 interface OrderGroup {
-  order: {
-    id: number
-    orderNumber: string
-    customerPhone: string
-    customerAddress: string
-    paymentMethod: string
-    paymentTrxId?: string | null
-    isPaymentVerified?: boolean
-    totalBdt: number
-    discountBdt?: number
-    status: Status
-    createdAt: string
-  }
-  items: { id: number; itemNameSnapshot: string; quantity: number; lineTotalBdt: number }[]
+  order: OrderRecord
+  items: OrderItem[]
 }
 
-const STEPS: { status: Status; label: string }[] = [
-  { status: "PENDING", label: "Placed" },
-  { status: "CONFIRMED", label: "Confirmed" },
-  { status: "PREPARING", label: "Cooking" },
-  { status: "OUT_FOR_DELIVERY", label: "On the way" },
-  { status: "DELIVERED", label: "Delivered" },
-]
+const ORDER_STEPS = [
+  { key: "PENDING", label: "অপেক্ষমান" },
+  { key: "CONFIRMED", label: "নিশ্চিত" },
+  { key: "PREPARING", label: "রান্না চলছে" },
+  { key: "OUT_FOR_DELIVERY", label: "পথে" },
+  { key: "DELIVERED", label: "সম্পন্ন" },
+] as const
 
-const MESSAGE: Record<Status, { title: string; detail: string }> = {
-  PENDING: { title: "Order received", detail: "Waiting for the restaurant to confirm it. This usually takes a few minutes." },
-  CONFIRMED: { title: "Order confirmed", detail: "We'll start cooking your food shortly." },
-  PREPARING: { title: "Cooking your food", detail: "Your biriyani is in the handi." },
-  OUT_FOR_DELIVERY: { title: "On the way", detail: "The rider is bringing your order. Keep your phone close." },
-  DELIVERED: { title: "Delivered", detail: "Enjoy your meal!" },
-  CANCELLED: { title: "Cancelled", detail: "This order was cancelled." },
-}
-
-const isActive = (s: Status) => s !== "DELIVERED" && s !== "CANCELLED"
-const taka = (n: number) => `৳${n.toLocaleString("en-IN")}`
-const when = (iso: string) =>
-  new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })
-const paymentLabel = (o: OrderGroup["order"]) =>
-  o.paymentMethod === "COD"
-    ? "Cash on delivery"
-    : `${o.paymentMethod === "BKASH" ? "bKash" : "Nagad"}${o.isPaymentVerified ? " · paid ✓" : " · payment being checked"}`
-
-async function fetchTracked(orderNumber: string, phone: string): Promise<OrderGroup | "gone" | null> {
-  try {
-    const res = await fetch(`/api/orders/${encodeURIComponent(orderNumber)}?phone=${encodeURIComponent(phone)}`, {
-      credentials: "include",
-    })
-    if (res.status === 404) return "gone"
-    if (!res.ok) return null
-    return (await res.json()).data as OrderGroup
-  } catch {
-    return null
+function getStepIndex(status: string): number {
+  switch (status) {
+    case "PENDING":
+      return 0
+    case "CONFIRMED":
+      return 1
+    case "PREPARING":
+      return 2
+    case "OUT_FOR_DELIVERY":
+      return 3
+    case "DELIVERED":
+      return 4
+    default:
+      return -1
   }
 }
 
 export function MyOrdersDrawer() {
-  const { isMyOrdersOpen, closeMyOrders, user, openAuthModal } = useAuth()
+  const { isMyOrdersOpen, closeMyOrders, user } = useAuth()
   const drawerRef = useRef<HTMLDivElement>(null)
+
   useBodyScrollLock(isMyOrdersOpen)
   useFocusTrap(drawerRef, isMyOrdersOpen)
 
   const [orders, setOrders] = useState<OrderGroup[]>([])
-  const [loading, setLoading] = useState(false)
-  const [loaded, setLoaded] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  const load = useCallback(async () => {
-    setLoading(true)
+  const fetchOrders = useCallback(async () => {
+    if (!user) return
+    setIsLoading(true)
+    setError(null)
+
     try {
-      const found = new Map<string, OrderGroup>()
-      if (user) {
-        const res = await fetch("/api/orders/my-orders", { credentials: "include" })
-        if (!res.ok) throw new Error("Could not load your orders. Please try again.")
-        for (const g of ((await res.json()).data || []) as OrderGroup[]) found.set(g.order.orderNumber, g)
-      }
-      // Orders placed on this device (for example without signing in)
-      const tracked = getTrackedOrders().filter((t) => !found.has(t.orderNumber))
-      const results = await Promise.all(tracked.map((t) => fetchTracked(t.orderNumber, t.phone)))
-      results.forEach((r, i) => {
-        if (r === "gone") forgetTrackedOrder(tracked[i].orderNumber)
-        else if (r) found.set(r.order.orderNumber, r)
+      const res = await fetch("/api/orders/my-orders", {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
       })
-      setOrders([...found.values()].sort((a, b) => b.order.createdAt.localeCompare(a.order.createdAt)))
-      setError(null)
-    } catch (e) {
-      setError((e as Error).message || "Could not load your orders. Please try again.")
+
+      if (res.ok) {
+        const body = await res.json()
+        setOrders(body.data || [])
+      } else {
+        const body = await res.json().catch(() => null)
+        setError(body?.error?.message || "অর্ডারের তালিকা লোড করা যায়নি")
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "নেটওয়ার্ক সমস্যার কারণে অর্ডার আনা যায়নি")
     } finally {
-      setLoading(false)
-      setLoaded(true)
+      setIsLoading(false)
     }
   }, [user])
 
-  // Load when opened, then keep the status fresh every 20 seconds
+  useEffect(() => {
+    if (isMyOrdersOpen) {
+      fetchOrders()
+    }
+  }, [isMyOrdersOpen, fetchOrders])
+
+  // Listen for new orders placed during this session so they appear immediately
+  useEffect(() => {
+    const handleOrderPlaced = (e: Event) => {
+      const customEvent = e as CustomEvent<OrderGroup>
+      if (customEvent.detail?.order) {
+        setOrders((prev) => [
+          customEvent.detail,
+          ...prev.filter((g) => g.order.id !== customEvent.detail.order.id),
+        ])
+      }
+      fetchOrders()
+    }
+    window.addEventListener("banglar-biriyani:order-placed", handleOrderPlaced)
+    return () => window.removeEventListener("banglar-biriyani:order-placed", handleOrderPlaced)
+  }, [fetchOrders])
+
+  // Escape key handler
   useEffect(() => {
     if (!isMyOrdersOpen) return
-    load()
-    const timer = window.setInterval(() => {
-      if (document.visibilityState === "visible") load()
-    }, 20000)
-    return () => window.clearInterval(timer)
-  }, [isMyOrdersOpen, load])
-
-  // A new order placed in this tab shows up right away
-  useEffect(() => {
-    const onPlaced = () => isMyOrdersOpen && load()
-    window.addEventListener("banglar-biriyani:order-placed", onPlaced)
-    return () => window.removeEventListener("banglar-biriyani:order-placed", onPlaced)
-  }, [isMyOrdersOpen, load])
-
-  useEffect(() => {
-    if (!isMyOrdersOpen) return
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeMyOrders()
-    window.addEventListener("keydown", onKey)
-    return () => window.removeEventListener("keydown", onKey)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeMyOrders()
+    }
+    window.addEventListener("keydown", handleKeyDown)
+    return () => window.removeEventListener("keydown", handleKeyDown)
   }, [isMyOrdersOpen, closeMyOrders])
-
-  const active = useMemo(() => orders.filter((g) => isActive(g.order.status)), [orders])
-  const previous = useMemo(() => orders.filter((g) => !isActive(g.order.status)), [orders])
 
   if (!isMyOrdersOpen) return null
 
   return (
-    <div className="fixed inset-0 z-50" role="dialog" aria-modal="true" aria-labelledby="my-orders-title">
-      <div className="fixed inset-0 bg-charcoal/50" onClick={closeMyOrders} aria-hidden="true" />
+    <div
+      className="fixed inset-0 z-50 overflow-hidden"
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="my-orders-drawer-title"
+    >
+      {/* Backdrop */}
       <div
-        ref={drawerRef}
-        className="fixed inset-y-0 right-0 flex w-full max-w-md flex-col bg-alabaster pb-[env(safe-area-inset-bottom)] shadow-2xl"
-      >
-        <div className="flex items-center justify-between border-b border-line bg-white px-5 py-4">
-          <div>
-            <h2 id="my-orders-title" className="text-lg font-bold text-charcoal">
-              My orders
-            </h2>
-            <p className="text-xs text-slate" aria-live="polite">
-              {loading ? "Updating…" : "Status updates automatically"}
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={closeMyOrders}
-            aria-label="Close my orders"
-            className="grid size-10 place-items-center rounded-full text-slate hover:bg-cream hover:text-charcoal"
-          >
-            <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
-              <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
-            </svg>
-          </button>
-        </div>
+        className="fixed inset-0 bg-charcoal/50 backdrop-blur-xs transition-opacity"
+        onClick={closeMyOrders}
+        aria-hidden="true"
+      />
 
-        <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5">
-          {error && (
-            <div role="alert" className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
-              {error}{" "}
-              <button type="button" onClick={load} className="font-semibold underline">
-                Try again
-              </button>
+      <div className="fixed inset-y-0 right-0 flex max-w-full pl-10">
+        <div ref={drawerRef} className="w-screen max-w-lg bg-white shadow-2xl flex flex-col">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-line px-6 py-4.5 bg-gradient-to-r from-white via-[#FFF0F3]/40 to-white">
+            <div className="flex items-center gap-3">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-[#E4002B]/10 text-[#E4002B]">
+                <svg
+                  className="size-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                  <path d="M3 6h18" />
+                  <path d="M16 10a4 4 0 0 1-8 0" />
+                </svg>
+              </span>
+              <div>
+                <h2 id="my-orders-drawer-title" className="text-lg font-bold text-charcoal">
+                  আমার অর্ডারসমূহ
+                </h2>
+                <p className="text-xs text-slate">
+                  {user ? `লগইন করেছেন: ${user.fullName}` : "অর্ডার ট্র্যাকিং"}
+                </p>
+              </div>
             </div>
-          )}
 
-          {!loaded ? (
-            <div className="space-y-3" aria-hidden>
-              <div className="h-40 animate-pulse rounded-2xl bg-white" />
-              <div className="h-16 animate-pulse rounded-2xl bg-white" />
-            </div>
-          ) : orders.length === 0 && !error ? (
-            <div className="rounded-2xl bg-white px-5 py-10 text-center">
-              <p className="font-bold text-charcoal">No orders yet</p>
-              <p className="mt-1 text-sm text-slate">Orders you place on this phone will show up here.</p>
+            <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={() => {
-                  closeMyOrders()
-                  document.getElementById("menu")?.scrollIntoView({ behavior: "smooth" })
-                }}
-                className="mt-4 rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-hover"
+                onClick={fetchOrders}
+                disabled={isLoading}
+                className="grid size-9 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+                aria-label="অর্ডার রিফ্রেশ করুন"
               >
-                Browse the menu
+                <svg
+                  className={`size-4 ${isLoading ? "animate-spin text-[#E4002B]" : ""}`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
+                </svg>
+              </button>
+
+              <button
+                type="button"
+                onClick={closeMyOrders}
+                className="grid size-9 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+                aria-label="আমার অর্ডার বন্ধ করুন"
+              >
+                <svg
+                  className="size-5"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
               </button>
             </div>
-          ) : null}
+          </div>
 
-          {active.length > 0 && (
-            <section aria-labelledby="active-orders" className="space-y-3">
-              <h3 id="active-orders" className="text-sm font-bold text-charcoal">
-                Current order{active.length > 1 ? "s" : ""}
-              </h3>
-              {active.map((g) => (
-                <ActiveOrderCard key={g.order.orderNumber} group={g} />
-              ))}
-            </section>
-          )}
-
-          {previous.length > 0 && (
-            <section aria-labelledby="previous-orders" className="space-y-2">
-              <h3 id="previous-orders" className="text-sm font-bold text-charcoal">
-                Previous orders
-              </h3>
-              <ul className="divide-y divide-line overflow-hidden rounded-2xl bg-white">
-                {previous.map(({ order, items }) => (
-                  <li key={order.orderNumber} className="px-4 py-3">
-                    <div className="flex items-baseline justify-between gap-3">
-                      <span className="text-sm font-semibold text-charcoal">{when(order.createdAt)}</span>
-                      <span className="text-sm font-bold text-charcoal">{taka(order.totalBdt)}</span>
-                    </div>
-                    <p className="mt-0.5 truncate text-sm text-slate">
-                      {items.map((i) => `${i.quantity}× ${i.itemNameSnapshot}`).join(", ")}
-                    </p>
-                    <p className="mt-1 flex items-center gap-2 text-xs text-slate">
-                      <span
-                        className={`rounded-full px-2 py-0.5 font-semibold ${
-                          order.status === "DELIVERED" ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"
-                        }`}
-                      >
-                        {MESSAGE[order.status].title}
-                      </span>
-                      <span className="font-mono">{order.orderNumber}</span>
-                    </p>
-                  </li>
+          {/* Drawer Body */}
+          <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            {isLoading && orders.length === 0 ? (
+              <div className="space-y-4">
+                {[1, 2].map((n) => (
+                  <div
+                    key={n}
+                    className="animate-pulse rounded-2xl border border-line p-4 space-y-3"
+                  >
+                    <div className="h-4 w-1/3 bg-slate/20 rounded" />
+                    <div className="h-10 w-full bg-slate/10 rounded-xl" />
+                    <div className="h-20 w-full bg-slate/10 rounded-xl" />
+                  </div>
                 ))}
-              </ul>
-            </section>
-          )}
+              </div>
+            ) : error ? (
+              <div className="rounded-xl border border-rose-200 bg-rose-50 p-4 text-center">
+                <p className="text-xs font-semibold text-rose-700">{error}</p>
+                <button
+                  type="button"
+                  onClick={fetchOrders}
+                  className="mt-3 inline-flex items-center rounded-lg bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-700"
+                >
+                  আবার চেষ্টা করুন
+                </button>
+              </div>
+            ) : orders.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-16 text-center">
+                <span className="flex size-16 items-center justify-center rounded-full bg-[#FFF0F3] text-[#E4002B]">
+                  <svg
+                    className="size-8"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.75"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z" />
+                    <path d="M3 6h18" />
+                    <path d="M16 10a4 4 0 0 1-8 0" />
+                  </svg>
+                </span>
+                <h3 className="mt-4 text-base font-bold text-charcoal">এখনো কোনো অর্ডার নেই</h3>
+                <p className="mt-1 max-w-xs text-xs text-slate">
+                  এই অ্যাকাউন্ট থেকে এখনো কোনো অর্ডার করা হয়নি। আমাদের সিগনেচার শাহী বিরিয়ানি বা দৈনিক ঘরোয়া খাবার
+                  থেকে বেছে নিন!
+                </p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMyOrders()
+                    const menuEl = document.getElementById("menu")
+                    menuEl?.scrollIntoView({ behavior: "smooth" })
+                  }}
+                  className="mt-5 rounded-full bg-[#E4002B] px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#B80022]"
+                >
+                  মেনু দেখে অর্ডার করুন
+                </button>
+              </div>
+            ) : (
+              orders.map(({ order, items }) => {
+                const currentStepIndex = getStepIndex(order.status)
+                const isCancelled = order.status === "CANCELLED"
 
-          <TrackForm
-            onFound={(g, phone) => {
-              saveTrackedOrder({ orderNumber: g.order.orderNumber, phone })
-              setOrders((list) =>
-                [g, ...list.filter((x) => x.order.orderNumber !== g.order.orderNumber)].sort((a, b) =>
-                  b.order.createdAt.localeCompare(a.order.createdAt),
-                ),
-              )
-            }}
-          />
+                return (
+                  <div
+                    key={order.id}
+                    className="rounded-2xl border border-line bg-white shadow-xs transition hover:border-[#E4002B]/40 hover:shadow-md"
+                  >
+                    {/* Order Top Summary */}
+                    <div className="border-b border-line bg-alabaster/40 p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <span className="font-mono text-sm font-bold text-charcoal">
+                              #{order.orderNumber}
+                            </span>
+                            <span className="rounded-full bg-[#E4002B]/10 px-2.5 py-0.5 text-[11px] font-bold text-[#E4002B]">
+                              {dayLabelBn(order.scheduledDay)}
+                            </span>
+                          </div>
+                          <p className="mt-0.5 text-[11px] text-slate">
+                            {new Date(order.createdAt).toLocaleDateString("bn-BD", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
 
-          {!user && (
-            <p className="text-center text-xs text-slate">
-              <button type="button" onClick={() => openAuthModal("login")} className="font-semibold text-brand underline">
-                Sign in
-              </button>{" "}
-              to see your orders on any device.
-            </p>
-          )}
+                        <span
+                          className={`rounded-full px-2.5 py-1 text-xs font-bold ${
+                            order.status === "DELIVERED"
+                              ? "bg-emerald-100 text-emerald-800"
+                              : order.status === "CANCELLED"
+                                ? "bg-rose-100 text-rose-800"
+                                : "bg-amber-100 text-amber-800"
+                          }`}
+                        >
+                          {orderStatusLabelBn(order.status)}
+                        </span>
+                      </div>
+
+                      {/* Delivery Slot info */}
+                      <div className="mt-2.5 flex items-center gap-1.5 text-xs text-charcoal/80">
+                        <svg
+                          className="size-3.5 text-[#E4002B]"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          aria-hidden="true"
+                        >
+                          <circle cx="12" cy="12" r="10" />
+                          <polyline points="12 6 12 12 16 14" />
+                        </svg>
+                        <span>
+                          সময়: <strong>{deliverySlotLabelBn(order.deliverySlot)}</strong>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Status Stepper (if not cancelled) */}
+                    {!isCancelled ? (
+                      <div className="border-b border-line bg-white px-4 py-3">
+                        <div className="flex items-center justify-between text-[11px] font-semibold text-slate">
+                          {ORDER_STEPS.map((step, idx) => {
+                            const isPassed = idx <= currentStepIndex
+                            const isCurrent = idx === currentStepIndex
+
+                            return (
+                              <div
+                                key={step.key}
+                                className="flex flex-col items-center flex-1 text-center"
+                              >
+                                <div
+                                  className={`size-6 rounded-full flex items-center justify-center text-[10px] font-bold transition ${
+                                    isPassed
+                                      ? "bg-[#E4002B] text-white shadow-xs"
+                                      : "bg-alabaster text-slate border border-line"
+                                  } ${isCurrent ? "ring-4 ring-[#E4002B]/20 animate-pulse" : ""}`}
+                                >
+                                  {isPassed ? "✓" : idx + 1}
+                                </div>
+                                <span
+                                  className={`mt-1 text-[10px] leading-tight ${
+                                    isPassed ? "text-charcoal font-bold" : "text-slate"
+                                  }`}
+                                >
+                                  {step.label}
+                                </span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="border-b border-rose-100 bg-rose-50/50 px-4 py-2 text-xs font-semibold text-rose-700">
+                        এই অর্ডারটি বাতিল করা হয়েছে।
+                      </div>
+                    )}
+
+                    {/* Itemized Receipt */}
+                    <div className="p-4 space-y-2.5">
+                      <p className="text-[11px] font-bold uppercase tracking-wider text-slate">
+                        অর্ডার করা আইটেম ({toBengaliNumber(items.length)})
+                      </p>
+                      <div className="divide-y divide-line/60">
+                        {items.map((it) => (
+                          <div
+                            key={it.id}
+                            className="flex items-center justify-between py-2 text-xs"
+                          >
+                            <div className="flex items-center gap-2.5">
+                              {it.imageUrl && (
+                                <img
+                                  src={it.imageUrl}
+                                  alt={it.itemNameSnapshot}
+                                  className="size-9 rounded-lg object-cover"
+                                />
+                              )}
+                              <div>
+                                <p className="font-semibold text-charcoal">{it.itemNameSnapshot}</p>
+                                <p className="text-[11px] text-slate">
+                                  {formatBdt(it.unitPriceBdt)} × {toBengaliNumber(it.quantity)}
+                                </p>
+                              </div>
+                            </div>
+                            <span className="font-bold text-charcoal">
+                              {formatBdt(it.lineTotalBdt)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Payment & Price Summary */}
+                      <div className="border-t border-line pt-3 text-xs space-y-1 text-slate">
+                        <div className="flex justify-between">
+                          <span>সাবটোটাল</span>
+                          <span>{formatBdt(order.subtotalBdt)}</span>
+                        </div>
+                        <div className="flex justify-between">
+                          <span>ডেলিভারি চার্জ</span>
+                          <span>{formatBdt(order.deliveryFeeBdt)}</span>
+                        </div>
+                        <div className="flex justify-between items-baseline pt-1 text-sm font-bold text-charcoal">
+                          <span>সর্বমোট</span>
+                          <span className="text-[#E4002B] text-base">
+                            {formatBdt(order.totalBdt)}
+                          </span>
+                        </div>
+
+                        <div className="mt-2 flex flex-wrap items-center justify-between gap-1 pt-2 border-t border-line/60 text-[11px]">
+                          <div className="flex flex-wrap items-center gap-1.5">
+                            <span>
+                              পেমেন্ট: <strong>{paymentMethodLabelBn(order.paymentMethod)}</strong>
+                            </span>
+                            {order.paymentTrxId && (
+                              <span className="font-mono text-[10px] font-bold text-[#E4002B] bg-[#FFF0F3] px-1.5 py-0.5 rounded border border-[#E4002B]/20">
+                                TrxID: {order.paymentTrxId}
+                              </span>
+                            )}
+                            {(order.paymentMethod === "BKASH" ||
+                              order.paymentMethod === "NAGAD" ||
+                              order.paymentTrxId) && (
+                              <span
+                                className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                                  order.isPaymentVerified
+                                    ? "bg-emerald-100 text-emerald-800"
+                                    : "bg-amber-100 text-amber-800"
+                                }`}
+                              >
+                                {order.isPaymentVerified ? "পেমেন্ট যাচাই হয়েছে ✓" : "যাচাই অপেক্ষমান"}
+                              </span>
+                            )}
+                          </div>
+                          <span className="max-w-[180px] truncate text-slate">
+                            {order.customerAddress}
+                          </span>
+                        </div>
+
+                        {order.notes && (
+                          <p className="mt-1 text-[11px] italic text-slate/90">
+                            নির্দেশনা: "{order.notes}"
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                )
+              })
+            )}
+          </div>
         </div>
       </div>
     </div>
-  )
-}
-
-function ActiveOrderCard({ group: { order, items } }: { group: OrderGroup }) {
-  const step = STEPS.findIndex((s) => s.status === order.status)
-  const msg = MESSAGE[order.status]
-  return (
-    <article className="rounded-2xl bg-white p-4 shadow-xs ring-1 ring-line">
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="text-base font-bold text-brand">{msg.title}</p>
-        <span className="font-mono text-xs text-slate">{order.orderNumber}</span>
-      </div>
-      <p className="mt-0.5 text-sm text-slate">{msg.detail}</p>
-
-      <ol className="mt-4 grid grid-cols-5 gap-1" aria-label="Order progress">
-        {STEPS.map((s, i) => {
-          const done = i <= step
-          return (
-            <li key={s.status} aria-current={i === step ? "step" : undefined}>
-              <span className={`block h-1.5 rounded-full ${done ? "bg-brand" : "bg-line"}`} />
-              <span className={`mt-1.5 block text-[11px] leading-tight ${done ? "font-semibold text-charcoal" : "text-slate"}`}>
-                {s.label}
-              </span>
-            </li>
-          )
-        })}
-      </ol>
-
-      <div className="mt-4 space-y-1 border-t border-line pt-3 text-sm">
-        {items.map((i) => (
-          <div key={i.id} className="flex justify-between gap-3 text-charcoal">
-            <span>
-              {i.quantity}× {i.itemNameSnapshot}
-            </span>
-            <span>{taka(i.lineTotalBdt)}</span>
-          </div>
-        ))}
-        <div className="flex justify-between gap-3 pt-1 font-bold text-charcoal">
-          <span>Total · free delivery</span>
-          <span>{taka(order.totalBdt)}</span>
-        </div>
-        <p className="pt-1 text-xs text-slate">
-          {paymentLabel(order)} · Ordered {when(order.createdAt)}
-        </p>
-        <p className="text-xs text-slate">Deliver to: {order.customerAddress}</p>
-      </div>
-    </article>
-  )
-}
-
-/** Find an order placed on another phone with its order number and phone number. */
-function TrackForm({ onFound }: { onFound: (g: OrderGroup, phone: string) => void }) {
-  const [open, setOpen] = useState(false)
-  const [orderNumber, setOrderNumber] = useState("")
-  const [phone, setPhone] = useState("")
-  const [busy, setBusy] = useState(false)
-  const [message, setMessage] = useState<string | null>(null)
-
-  const submit = async (e: FormEvent) => {
-    e.preventDefault()
-    setBusy(true)
-    setMessage(null)
-    const result = await fetchTracked(orderNumber.trim().toUpperCase(), phone.trim())
-    setBusy(false)
-    if (result && result !== "gone") {
-      onFound(result, phone.trim())
-      setOrderNumber("")
-      setOpen(false)
-    } else {
-      setMessage(
-        result === "gone"
-          ? "We couldn't find that order. Check the order number and the phone number you used."
-          : "Couldn't check right now. Please try again.",
-      )
-    }
-  }
-
-  if (!open) {
-    return (
-      <button
-        type="button"
-        onClick={() => setOpen(true)}
-        className="w-full rounded-2xl border border-dashed border-line bg-white px-4 py-3 text-sm font-semibold text-charcoal hover:border-brand hover:text-brand"
-      >
-        Track an order with its order number
-      </button>
-    )
-  }
-
-  const field =
-    "mt-1 h-11 w-full rounded-xl border border-line bg-white px-3 text-base text-charcoal outline-none focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm"
-  return (
-    <form onSubmit={submit} className="space-y-3 rounded-2xl bg-white p-4 ring-1 ring-line">
-      <p className="text-sm font-bold text-charcoal">Track an order</p>
-      <label className="block text-sm text-charcoal">
-        Order number
-        <input
-          className={`${field} font-mono uppercase`}
-          value={orderNumber}
-          onChange={(e) => setOrderNumber(e.target.value)}
-          placeholder="BB-20261103-1234567"
-          required
-        />
-      </label>
-      <label className="block text-sm text-charcoal">
-        Phone number used for the order
-        <input
-          className={field}
-          type="tel"
-          inputMode="tel"
-          autoComplete="tel"
-          value={phone}
-          onChange={(e) => setPhone(e.target.value)}
-          placeholder="01XXXXXXXXX"
-          required
-        />
-      </label>
-      {message && (
-        <p role="alert" className="text-sm text-rose-700">
-          {message}
-        </p>
-      )}
-      <div className="flex gap-2">
-        <button
-          type="submit"
-          disabled={busy}
-          className="h-11 flex-1 rounded-full bg-brand text-sm font-bold text-white hover:bg-brand-hover disabled:opacity-60"
-        >
-          {busy ? "Checking…" : "Find order"}
-        </button>
-        <button
-          type="button"
-          onClick={() => setOpen(false)}
-          className="h-11 rounded-full px-4 text-sm font-semibold text-slate hover:bg-cream"
-        >
-          Cancel
-        </button>
-      </div>
-    </form>
   )
 }

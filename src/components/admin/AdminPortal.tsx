@@ -1,28 +1,34 @@
 import { useCurrentPath } from "../../utils/navigation"
 import { AdminGuard } from "../AdminGuard"
 import { AdminLayout } from "./AdminLayout"
+import { AdminOverview } from "./AdminOverview"
+import { AdminScheduleMatrix } from "./AdminScheduleMatrix"
 import { AdminOrders } from "./AdminOrders"
-import { AdminMenu } from "./AdminMenu"
-import { AdminOffers } from "./AdminOffers"
-import { AdminDeliveryZones } from "./AdminDeliveryZones"
+import { AdminMenuCrud } from "./AdminMenuCrud"
+import { AdminUsers } from "./AdminUsers"
 
 export function AdminPortal() {
-  const path = useCurrentPath()
+  const currentPath = useCurrentPath()
 
-  const view = path.startsWith("/admin/menu") ? (
-    <AdminMenu />
-  ) : path.startsWith("/admin/offers") ? (
-    <AdminOffers />
-  ) : path.startsWith("/admin/delivery") ? (
-    <AdminDeliveryZones />
-  ) : (
-    // /admin and /admin/orders
-    <AdminOrders />
-  )
+  const renderActiveView = () => {
+    if (currentPath.startsWith("/admin/schedule")) {
+      return <AdminScheduleMatrix />
+    }
+    if (currentPath.startsWith("/admin/orders")) {
+      return <AdminOrders />
+    }
+    if (currentPath.startsWith("/admin/menu")) {
+      return <AdminMenuCrud />
+    }
+    if (currentPath.startsWith("/admin/users")) {
+      return <AdminUsers />
+    }
+    return <AdminOverview />
+  }
 
   return (
     <AdminGuard>
-      <AdminLayout>{view}</AdminLayout>
+      <AdminLayout>{renderActiveView()}</AdminLayout>
     </AdminGuard>
   )
 }

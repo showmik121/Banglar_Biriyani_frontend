@@ -253,8 +253,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [items],
   )
 
-  // Delivery is free for every order.
-  const deliveryFeeBdt = 0
+  const deliveryFeeBdt = totalItems > 0 ? 60 : 0
   const totalBdt = subtotalBdt + deliveryFeeBdt
 
   const value = {
