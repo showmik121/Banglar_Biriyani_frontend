@@ -1,10 +1,11 @@
-import { useState, useEffect, useRef, type FormEvent } from "react"
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react"
 import { saveTrackedOrder } from "../lib/trackedOrders"
 import { useCart } from "../context/CartContext"
 import { useAddress } from "../context/AddressContext"
 import { useAuth } from "../context/AuthContext"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
+import { STORE } from "../config/store"
 import type { DayOfWeek, OrderDTO, OrderItemDTO } from "../types/menu"
 
 type Props = {
@@ -14,73 +15,91 @@ type Props = {
 
 type DeliveryZone = { id: number; name: string; area: string; etaMinutes: string }
 type AppliedOffer = { code: string; title: string; discountBdt: number }
-
-
 type PaymentMethod = "COD" | "BKASH" | "NAGAD"
+type FieldKey = "customerName" | "customerPhone" | "customerAddress" | "deliveryZoneId" | "paymentTrxId"
 
 interface PlacedOrderState {
   order: OrderDTO
   items: OrderItemDTO[]
 }
 
+// Online payment shows only when the restaurant's number is set in src/config/store.ts
+type PaymentOption = { id: PaymentMethod; label: string; number: string }
+const ALL_PAYMENT_OPTIONS: PaymentOption[] = [
+  { id: "COD", label: "Cash on delivery", number: "" },
+  { id: "BKASH", label: "bKash", number: STORE.bkashNumber },
+  { id: "NAGAD", label: "Nagad", number: STORE.nagadNumber },
+]
+const PAYMENT_OPTIONS = ALL_PAYMENT_OPTIONS.filter((p) => p.id === "COD" || p.number !== "")
+
+/** "+880 1711-000001" -> "01711000001" */
+const normalizePhone = (v: string) => {
+  const digits = v.replace(/\D/g, "")
+  return digits.startsWith("880") ? digits.slice(2) : digits
+}
+const taka = (n: number) => `৳${n.toLocaleString("en-IN")}`
+
+const inputClass = (invalid?: boolean) =>
+  `mt-1.5 block w-full rounded-xl border bg-white px-3.5 text-base text-charcoal outline-none transition placeholder:text-slate/50 focus:ring-2 sm:text-sm ${
+    invalid ? "border-rose-400 focus:border-rose-500 focus:ring-rose-200" : "border-line focus:border-brand focus:ring-brand/15"
+  }`
+
+function Section({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="space-y-3">
+      <h3 className="text-sm font-bold text-charcoal">{title}</h3>
+      {children}
+    </section>
+  )
+}
+
+function FieldError({ id, message }: { id: string; message?: string }) {
+  if (!message) return null
+  return (
+    <p id={id} className="mt-1.5 text-xs font-medium text-rose-600">
+      {message}
+    </p>
+  )
+}
+
 export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Props) {
-  const {
-    items,
-    activeDay,
-    subtotalBdt,
-    totalBdt,
-    clearCart,
-    isCheckoutOpen,
-    setIsCheckoutOpen,
-  } = useCart()
-  const { selectedAddress, setIsAddressModalOpen, setFreeformAddress } = useAddress()
+  const { items, activeDay, subtotalBdt, clearCart, isCheckoutOpen, setIsCheckoutOpen } = useCart()
+  const { selectedAddress, setFreeformAddress } = useAddress()
   const { user, openAuthModal, openMyOrders } = useAuth()
 
   const isOpen = propIsOpen ?? isCheckoutOpen
   const handleClose = propOnClose ?? (() => setIsCheckoutOpen(false))
   const modalRef = useRef<HTMLDivElement>(null)
-
   useBodyScrollLock(isOpen)
   useFocusTrap(modalRef, isOpen)
 
   const [customerName, setCustomerName] = useState(user?.fullName || "")
-  const [customerPhone, setCustomerPhone] = useState(
-    user?.phone || selectedAddress?.contactPhone || "",
-  )
-  const [customerAddress, setCustomerAddress] = useState(
-    user?.defaultAddress || selectedAddress?.details || "",
-  )
-  const [saveForFuture, setSaveForFuture] = useState(true)
+  const [customerPhone, setCustomerPhone] = useState(user?.phone || selectedAddress?.contactPhone || "")
+  const [customerAddress, setCustomerAddress] = useState(selectedAddress?.details || user?.defaultAddress || "")
 
-  // Pre-fill / synchronize customer info with auth user or selected address
+  // Fill in what we already know about the customer
   useEffect(() => {
-    if (isOpen) {
-      if (user) {
-        if (user.fullName) setCustomerName(user.fullName)
-        if (user.phone) setCustomerPhone(user.phone)
-        if (selectedAddress?.details) {
-          setCustomerAddress(selectedAddress.details)
-        } else if (user.defaultAddress) {
-          setCustomerAddress(user.defaultAddress)
-        }
-      } else if (selectedAddress) {
-        if (selectedAddress.details) setCustomerAddress(selectedAddress.details)
-        if (selectedAddress.contactPhone) setCustomerPhone(selectedAddress.contactPhone)
-      }
-    }
+    if (!isOpen) return
+    if (user?.fullName) setCustomerName((v) => v || user.fullName)
+    if (user?.phone) setCustomerPhone((v) => v || user.phone)
+    else if (selectedAddress?.contactPhone) setCustomerPhone((v) => v || selectedAddress.contactPhone || "")
+    const address = selectedAddress?.details || user?.defaultAddress
+    if (address) setCustomerAddress((v) => v || address)
   }, [isOpen, user, selectedAddress])
 
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD")
   const [paymentTrxId, setPaymentTrxId] = useState("")
   const [notes, setNotes] = useState("")
+  const [showNote, setShowNote] = useState(false)
   const [submitting, setSubmitting] = useState(false)
   const [generalError, setGeneralError] = useState<string | null>(null)
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string[] | undefined>>({})
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<FieldKey, string>>>({})
   const [placedOrder, setPlacedOrder] = useState<PlacedOrderState | null>(null)
 
   // Delivery points and promo code
   const [zones, setZones] = useState<DeliveryZone[]>([])
   const [zoneId, setZoneId] = useState<number | null>(null)
+  const [showPromo, setShowPromo] = useState(false)
   const [promoInput, setPromoInput] = useState("")
   const [appliedOffer, setAppliedOffer] = useState<AppliedOffer | null>(null)
   const [promoError, setPromoError] = useState<string | null>(null)
@@ -92,7 +111,10 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
     fetch("/api/delivery-zones")
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {
-        if (alive && Array.isArray(json?.data)) setZones(json.data)
+        if (!alive || !Array.isArray(json?.data)) return
+        setZones(json.data)
+        // Only one place to deliver to? Pick it.
+        if (json.data.length === 1) setZoneId(json.data[0].id)
       })
       .catch(() => {})
     return () => {
@@ -106,10 +128,10 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
   }, [subtotalBdt])
 
   const selectedZone = zones.find((z) => z.id === zoneId) || null
-  // Delivery is free.
-  const checkoutFeeBdt = 0
   const discountBdt = appliedOffer?.discountBdt ?? 0
-  const checkoutTotalBdt = Math.max(0, subtotalBdt - discountBdt) + checkoutFeeBdt
+  const checkoutTotalBdt = Math.max(0, subtotalBdt - discountBdt) // delivery is free
+  const payment = PAYMENT_OPTIONS.find((p) => p.id === paymentMethod) || PAYMENT_OPTIONS[0]
+  const online = payment.id !== "COD"
 
   const applyPromo = async () => {
     const code = promoInput.trim()
@@ -139,28 +161,19 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
   const nameInputRef = useRef<HTMLInputElement>(null)
   const closeBtnRef = useRef<HTMLButtonElement>(null)
 
-  // Escape key handler and focus management
   useEffect(() => {
     if (!isOpen) return
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
-        if (placedOrder) {
-          handleResetAndClose()
-        } else {
-          handleClose()
-        }
+        if (placedOrder) handleResetAndClose()
+        else handleClose()
       }
     }
     window.addEventListener("keydown", onKeyDown)
-
-    // Set initial focus
-    if (placedOrder) {
-      closeBtnRef.current?.focus()
-    } else {
-      nameInputRef.current?.focus()
-    }
-
+    if (placedOrder) closeBtnRef.current?.focus()
+    else if (!customerName) nameInputRef.current?.focus()
     return () => window.removeEventListener("keydown", onKeyDown)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isOpen, placedOrder, handleClose])
 
   if (!isOpen) return null
@@ -170,71 +183,56 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
     setGeneralError(null)
     setFieldErrors({})
     setPaymentTrxId("")
+    setNotes("")
     handleClose()
+  }
+
+  const clearError = (k: FieldKey) => setFieldErrors((e) => ({ ...e, [k]: undefined }))
+
+  const validate = () => {
+    const errors: Partial<Record<FieldKey, string>> = {}
+    if (customerName.trim().length < 2) errors.customerName = "Enter your name"
+    if (!/^01[3-9]\d{8}$/.test(normalizePhone(customerPhone)))
+      errors.customerPhone = "Enter an 11-digit mobile number starting with 01"
+    if (zones.length > 0 && !selectedZone) errors.deliveryZoneId = "Choose where we should deliver"
+    if (customerAddress.trim().length < 5) errors.customerAddress = "Add your room, house or landmark"
+    if (online && paymentTrxId.trim().length < 4) errors.paymentTrxId = "Enter the Transaction ID from your payment"
+    return errors
   }
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     if (submitting) return
     setGeneralError(null)
-    setFieldErrors({})
 
     if (items.length === 0) {
-      setGeneralError("Your cart is empty. Please add items to checkout.")
+      setGeneralError("Your cart is empty. Add something tasty first.")
       return
     }
-
-    if (zones.length > 0 && !selectedZone) {
-      setFieldErrors({ deliveryZoneId: ["Choose where we should deliver"] })
-      setGeneralError("Choose a delivery point to continue.")
+    const errors = validate()
+    setFieldErrors(errors)
+    if (Object.keys(errors).length > 0) {
+      setGeneralError("Please check the highlighted fields.")
+      // Take the customer to the first problem
+      const first = Object.keys(errors)[0]
+      document.querySelector<HTMLElement>(`[data-field="${first}"]`)?.scrollIntoView?.({ block: "center", behavior: "smooth" })
       return
     }
-
-    // Phone validation for Bangladesh (01XXXXXXXXX)
-    const cleanPhone = customerPhone.replace(/[\s-]/g, "")
-    const bdPhoneRegex = /^(?:\+?88)?01[3-9]\d{8}$/
-    if (!bdPhoneRegex.test(cleanPhone)) {
-      setFieldErrors({
-        customerPhone: [
-          "Please enter a valid 11-digit Bangladesh phone number (e.g., 01712345678).",
-        ],
-      })
-      return
-    }
-
-    // Transaction ID validation for bKash and Nagad
-    if (
-      (paymentMethod === "BKASH" || paymentMethod === "NAGAD") &&
-      (!paymentTrxId.trim() || paymentTrxId.trim().length < 4)
-    ) {
-      setFieldErrors({
-        paymentTrxId: ["Please enter the valid Transaction ID (TrxID) received from your payment."],
-      })
-      return
-    }
-
-    const scheduledDayEnum = activeDay.toUpperCase() as DayOfWeek
 
     setSubmitting(true)
-
     try {
+      const cleanPhone = normalizePhone(customerPhone)
       const payload = {
         customerName: customerName.trim(),
         customerPhone: cleanPhone,
         customerAddress: customerAddress.trim(),
-        scheduledDay: scheduledDayEnum,
+        scheduledDay: activeDay.toUpperCase() as DayOfWeek,
         paymentMethod,
-        paymentTrxId:
-          paymentMethod === "BKASH" || paymentMethod === "NAGAD"
-            ? paymentTrxId.trim().toUpperCase()
-            : undefined,
+        paymentTrxId: online ? paymentTrxId.trim().toUpperCase() : undefined,
         notes: notes.trim() || undefined,
         deliveryZoneId: selectedZone?.id ?? null,
         offerCode: appliedOffer?.code ?? null,
-        items: items.map((i) => ({
-          menuItemId: i.menuItemId,
-          quantity: i.quantity,
-        })),
+        items: items.map((i) => ({ menuItemId: i.menuItemId, quantity: i.quantity })),
       }
 
       const res = await fetch("/api/orders", {
@@ -243,52 +241,39 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
         credentials: "include",
         body: JSON.stringify(payload),
       })
+      const json = await res.json().catch(() => ({}))
 
-      const json = await res.json()
-
-      if (res.status === 422 && json.error?.details) {
-        setFieldErrors(json.error.details)
-        setGeneralError(json.error.message || "Please correct the highlighted fields.")
+      if (res.status === 422 && json.error?.details && typeof json.error.details === "object") {
+        const details = json.error.details as Record<string, string[] | undefined>
+        const mapped: Partial<Record<FieldKey, string>> = {}
+        for (const k of ["customerName", "customerPhone", "customerAddress", "deliveryZoneId", "paymentTrxId"] as FieldKey[]) {
+          if (details[k]?.[0]) mapped[k] = details[k]![0]
+        }
+        setFieldErrors(mapped)
+        setGeneralError(json.error.message || "Please check the highlighted fields.")
         return
       }
-
       if (!res.ok) {
-        const errorMsg =
-          json.error?.message ||
-          (typeof json.error === "string" ? json.error : null) ||
-          `Failed to place order (HTTP ${res.status})`
-        throw new Error(errorMsg)
+        throw new Error(json.error?.message || "Couldn't place your order. Please try again.")
       }
 
-      // Success: 201 Created
       const orderData: OrderDTO = json.data?.order || json.order
       const orderItemsList: OrderItemDTO[] = json.data?.items || json.items || []
-
-      setPlacedOrder({
-        order: orderData,
-        items: orderItemsList,
-      })
+      setPlacedOrder({ order: orderData, items: orderItemsList })
       // Remember it on this device so "My orders" can show it, even without an account
-      saveTrackedOrder({ orderNumber: orderData.orderNumber, phone: orderData.customerPhone || customerPhone })
+      saveTrackedOrder({ orderNumber: orderData.orderNumber, phone: orderData.customerPhone || cleanPhone })
       clearCart()
-
-      // Notify order listeners (e.g. MyOrdersDrawer) immediately without page reload
       window.dispatchEvent(
-        new CustomEvent("banglar-biriyani:order-placed", {
-          detail: { order: orderData, items: orderItemsList },
-        }),
+        new CustomEvent("banglar-biriyani:order-placed", { detail: { order: orderData, items: orderItemsList } }),
       )
-
-      if (saveForFuture && customerAddress.trim()) {
-        try {
-          setFreeformAddress(customerAddress.trim(), "Home")
-        } catch {}
+      // Next time the address is already filled in
+      try {
+        setFreeformAddress(customerAddress.trim(), "Home")
+      } catch {
+        // not important
       }
-    } catch (err: any) {
-      console.error("Order submission error:", err)
-      setGeneralError(
-        err.message || "Failed to submit order. Please check your connection and try again.",
-      )
+    } catch (err) {
+      setGeneralError(err instanceof Error ? err.message : "Couldn't place your order. Please check your connection.")
     } finally {
       setSubmitting(false)
     }
@@ -296,23 +281,16 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4 transition-opacity duration-200"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 sm:items-center sm:p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby={placedOrder ? "order-confirmation-title" : "checkout-modal-title"}
     >
-      {/* Backdrop overlay */}
-      <div
-        className="fixed inset-0"
-        onClick={placedOrder ? handleResetAndClose : handleClose}
-        aria-hidden="true"
-      />
-
+      <div className="fixed inset-0" onClick={placedOrder ? handleResetAndClose : handleClose} aria-hidden="true" />
       <div
         ref={modalRef}
-        className="relative flex max-h-[94dvh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[92vh] sm:rounded-card"
+        className="relative flex max-h-[94dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[92vh] sm:rounded-2xl"
       >
-        {/* If order has been placed, show Celebratory Confirmation Receipt view */}
         {placedOrder ? (
           <div className="flex flex-col overflow-y-auto p-6 sm:p-8">
             <div className="text-center">
@@ -475,488 +453,265 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
             </div>
           </div>
         ) : (
-          /* Checkout Form */
-          <>
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-line bg-brand px-6 py-4 text-white">
-              <div>
-                <h2 id="checkout-modal-title" className="text-display text-xl text-white">
-                  Complete Your Order
-                </h2>
-                <p className="text-xs text-white/80">
-                  Hot from our handi, straight to your door
-                </p>
-              </div>
+          <form onSubmit={handleSubmit} noValidate className="flex min-h-0 flex-1 flex-col">
+            <div className="flex items-center justify-between border-b border-line px-5 py-4">
+              <h2 id="checkout-modal-title" className="text-lg font-bold text-charcoal">
+                Checkout
+              </h2>
               <button
                 type="button"
                 onClick={handleClose}
-                className="grid size-10 place-items-center rounded-full bg-white/10 text-white transition hover:bg-white/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white cursor-pointer"
-                aria-label="Close checkout modal"
+                aria-label="Close checkout"
+                className="grid size-10 place-items-center rounded-full text-slate hover:bg-cream hover:text-charcoal"
               >
-                ✕
+                <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+                  <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
+                </svg>
               </button>
             </div>
 
-            {/* Form */}
-            <form
-              id="checkout-form"
-              onSubmit={handleSubmit}
-              className="flex-1 overflow-y-auto p-6 space-y-4"
-              noValidate
-            >
+            <div className="flex-1 space-y-6 overflow-y-auto px-5 py-5">
               {generalError && (
-                <div
-                  role="alert"
-                  className="rounded-lg border border-rose-200 bg-rose-50 p-3 text-xs text-rose-700"
-                >
+                <p role="alert" className="rounded-xl bg-rose-50 px-3.5 py-2.5 text-sm text-rose-700">
                   {generalError}
-                </div>
+                </p>
               )}
 
-              {/* Account Quick Sign-in Prompt for Guest Users */}
-              {!user && (
-                <div className="flex items-center justify-between rounded-xl border border-brand/20 bg-brand-light px-3.5 py-2.5 text-xs transition">
-                  <div className="flex items-center gap-2 text-charcoal">
-                    <svg
-                      className="size-4 shrink-0 text-brand"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      aria-hidden="true"
-                    >
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                      <circle cx="12" cy="7" r="4" />
-                    </svg>
-                    <span>
-                      Have an account?{" "}
-                      <span className="font-semibold text-brand">
-                        Sign in for 1-click checkout
+              {/* 1. Order */}
+              <Section title="Your order">
+                <ul className="space-y-1.5 text-sm">
+                  {items.map((i) => (
+                    <li key={`${i.menuItemId}-${i.scheduledDay}`} className="flex justify-between gap-3 text-charcoal">
+                      <span>
+                        {i.quantity}× {i.name}
                       </span>
-                    </span>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => openAuthModal("login")}
-                    className="inline-flex h-9 shrink-0 items-center rounded-full bg-brand px-4 text-xs font-semibold text-white shadow-xs transition hover:bg-brand-hover cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
-                  >
-                    Sign In
-                  </button>
-                </div>
-              )}
+                      <span className="shrink-0">{taka(i.priceBdt * i.quantity)}</span>
+                    </li>
+                  ))}
+                </ul>
+                <button type="button" onClick={handleClose} className="text-sm font-semibold text-brand hover:underline">
+                  Edit cart
+                </button>
+              </Section>
 
-              {/* Logged-in User Indicator */}
-              {user && (
-                <div className="flex items-center justify-between rounded-xl border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs text-emerald-800">
-                  <span className="flex items-center gap-2 font-medium">
-                    <span className="size-2 rounded-full bg-emerald-500 animate-pulse" />
-                    Ordering as{" "}
-                    <strong className="font-semibold text-charcoal">{user.fullName}</strong> (
-                    {user.phone})
-                  </span>
-                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 uppercase tracking-wider">
-                    Auto-Filled
-                  </span>
-                </div>
-              )}
-
-              {/* Customer info */}
-              <div className="space-y-3">
-                <h3 className="text-display text-sm tracking-wider text-charcoal">
-                  1. Customer Details
-                </h3>
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="checkout-customer-name"
-                      className="mb-1 block text-xs font-semibold text-slate"
-                    >
-                      Customer Name *
+              {/* 2. Contact */}
+              <Section title="Your details">
+                {!user && (
+                  <p className="text-sm text-slate">
+                    Have an account?{" "}
+                    <button type="button" onClick={() => openAuthModal("login")} className="font-semibold text-brand hover:underline">
+                      Sign in
+                    </button>{" "}
+                    to fill this in.
+                  </p>
+                )}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div data-field="customerName">
+                    <label htmlFor="checkout-customer-name" className="block text-sm font-medium text-charcoal">
+                      Name
                     </label>
                     <input
                       ref={nameInputRef}
                       id="checkout-customer-name"
-                      name="customerName"
-                      type="text"
-                      required
+                      autoComplete="name"
                       value={customerName}
                       onChange={(e) => {
                         setCustomerName(e.target.value)
-                        if (fieldErrors.customerName) {
-                          setFieldErrors((prev) => ({
-                            ...prev,
-                            customerName: undefined,
-                          }))
-                        }
+                        clearError("customerName")
                       }}
                       aria-invalid={!!fieldErrors.customerName}
-                      aria-describedby={
-                        fieldErrors.customerName ? "error-customer-name" : undefined
-                      }
-                      className={`w-full rounded-lg border bg-alabaster px-3 py-2 text-sm outline-none transition focus:bg-white ${
-                        fieldErrors.customerName
-                          ? "border-rose-500 focus:border-rose-500"
-                          : "border-line focus:border-brand"
-                      }`}
-                      placeholder="e.g. Zahid Hassan"
+                      aria-describedby={fieldErrors.customerName ? "err-name" : undefined}
+                      className={`${inputClass(!!fieldErrors.customerName)} h-12`}
                     />
-                    {fieldErrors.customerName && (
-                      <p
-                        id="error-customer-name"
-                        role="alert"
-                        className="mt-1 text-xs font-medium text-rose-600"
-                      >
-                        {fieldErrors.customerName[0]}
-                      </p>
-                    )}
+                    <FieldError id="err-name" message={fieldErrors.customerName} />
                   </div>
-
-                  <div>
-                    <label
-                      htmlFor="checkout-customer-phone"
-                      className="mb-1 block text-xs font-semibold text-slate"
-                    >
-                      Bangladesh Phone Number (01XXXXXXXXX) *
+                  <div data-field="customerPhone">
+                    <label htmlFor="checkout-customer-phone" className="block text-sm font-medium text-charcoal">
+                      Mobile number
                     </label>
                     <input
                       id="checkout-customer-phone"
-                      name="customerPhone"
                       type="tel"
-                      required
+                      inputMode="tel"
+                      autoComplete="tel"
+                      placeholder="01XXXXXXXXX"
                       value={customerPhone}
                       onChange={(e) => {
                         setCustomerPhone(e.target.value)
-                        if (fieldErrors.customerPhone) {
-                          setFieldErrors((prev) => ({
-                            ...prev,
-                            customerPhone: undefined,
-                          }))
-                        }
+                        clearError("customerPhone")
                       }}
                       aria-invalid={!!fieldErrors.customerPhone}
-                      aria-describedby={
-                        fieldErrors.customerPhone ? "error-customer-phone" : undefined
-                      }
-                      className={`w-full rounded-lg border bg-alabaster px-3 py-2 text-sm outline-none transition focus:bg-white ${
-                        fieldErrors.customerPhone
-                          ? "border-rose-500 focus:border-rose-500"
-                          : "border-line focus:border-brand"
-                      }`}
-                      placeholder="017XXXXXXXX"
+                      aria-describedby={fieldErrors.customerPhone ? "err-phone" : undefined}
+                      className={`${inputClass(!!fieldErrors.customerPhone)} h-12`}
                     />
-                    {fieldErrors.customerPhone && (
-                      <p
-                        id="error-customer-phone"
-                        role="alert"
-                        className="mt-1 text-xs font-medium text-rose-600"
-                      >
-                        {fieldErrors.customerPhone[0]}
-                      </p>
-                    )}
+                    <FieldError id="err-phone" message={fieldErrors.customerPhone} />
                   </div>
                 </div>
+              </Section>
 
-                <div>
-                  <div className="mb-1 flex items-center justify-between">
-                    <label
-                      htmlFor="checkout-customer-address"
-                      className="text-xs font-semibold text-slate"
-                    >
-                      Full Delivery Address *
-                    </label>
-                    <button
-                      type="button"
-                      onClick={() => setIsAddressModalOpen(true)}
-                      className="cursor-pointer py-2 text-xs font-semibold text-brand hover:underline"
-                    >
-                      {selectedAddress
-                        ? `📍 Change Address (${selectedAddress.label})`
-                        : "📍 Choose Saved Address"}
-                    </button>
-                  </div>
+              {/* 3. Delivery */}
+              <Section title="Delivery · free">
+                {zones.length > 0 && (
+                  <fieldset data-field="deliveryZoneId">
+                    <legend className="text-sm font-medium text-charcoal">Delivery point</legend>
+                    <div className="mt-1.5 grid gap-2">
+                      {zones.map((z) => {
+                        const active = z.id === zoneId
+                        return (
+                          <label
+                            key={z.id}
+                            className={`flex cursor-pointer items-center justify-between gap-3 rounded-xl border px-3.5 py-3 text-sm transition ${
+                              active ? "border-brand bg-brand-light/60 ring-1 ring-brand" : "border-line hover:border-brand/50"
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="delivery-zone"
+                              className="sr-only"
+                              checked={active}
+                              onChange={() => {
+                                setZoneId(z.id)
+                                clearError("deliveryZoneId")
+                              }}
+                            />
+                            <span className="min-w-0">
+                              <span className="block font-semibold text-charcoal">{z.name}</span>
+                              {z.area && <span className="block text-slate">{z.area}</span>}
+                            </span>
+                            <span className="shrink-0 text-slate">{z.etaMinutes} min</span>
+                          </label>
+                        )
+                      })}
+                    </div>
+                    <FieldError id="err-zone" message={fieldErrors.deliveryZoneId} />
+                  </fieldset>
+                )}
+                <div data-field="customerAddress">
+                  <label htmlFor="checkout-customer-address" className="block text-sm font-medium text-charcoal">
+                    Room, house or landmark
+                  </label>
                   <textarea
                     id="checkout-customer-address"
-                    name="customerAddress"
-                    required
                     rows={2}
+                    autoComplete="street-address"
+                    placeholder="e.g. Room 304, YKSG-1 Hall"
                     value={customerAddress}
                     onChange={(e) => {
                       setCustomerAddress(e.target.value)
-                      if (fieldErrors.customerAddress) {
-                        setFieldErrors((prev) => ({
-                          ...prev,
-                          customerAddress: undefined,
-                        }))
-                      }
+                      clearError("customerAddress")
                     }}
                     aria-invalid={!!fieldErrors.customerAddress}
-                    aria-describedby={
-                      fieldErrors.customerAddress ? "error-customer-address" : undefined
-                    }
-                    className={`w-full rounded-lg border bg-alabaster px-3 py-2 text-sm outline-none transition focus:bg-white ${
-                      fieldErrors.customerAddress
-                        ? "border-rose-500 focus:border-rose-500"
-                        : "border-line focus:border-brand"
-                    }`}
-                    placeholder="House, road, flat no, area..."
+                    aria-describedby={fieldErrors.customerAddress ? "err-address" : undefined}
+                    className={`${inputClass(!!fieldErrors.customerAddress)} resize-none py-2.5`}
                   />
-                  {fieldErrors.customerAddress && (
-                    <p
-                      id="error-customer-address"
-                      role="alert"
-                      className="mt-1 text-xs font-medium text-rose-600"
-                    >
-                      {fieldErrors.customerAddress[0]}
-                    </p>
-                  )}
-                  <label
-                    htmlFor="checkout-save-future"
-                    className="mt-1.5 flex cursor-pointer items-center gap-1.5"
-                  >
-                    <input
-                      id="checkout-save-future"
-                      type="checkbox"
-                      checked={saveForFuture}
-                      onChange={(e) => setSaveForFuture(e.target.checked)}
-                      className="size-5 rounded border-line text-brand focus:ring-brand"
-                    />
-                    <span className="text-[11px] text-slate">
-                      Save this address to my saved locations
-                    </span>
-                  </label>
+                  <FieldError id="err-address" message={fieldErrors.customerAddress} />
                 </div>
-              </div>
-
-              {/* Delivery Point */}
-              {zones.length > 0 && (
-                <fieldset className="space-y-2 border-t border-line pt-2">
-                  <legend className="text-display text-sm tracking-wider text-charcoal">
-                    Delivery Point *
-                  </legend>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-2" role="radiogroup">
-                    {zones.map((z) => {
-                      const active = z.id === zoneId
-                      return (
-                        <label
-                          key={z.id}
-                          className={`flex min-h-12 cursor-pointer items-center justify-between gap-2 rounded-lg border p-2.5 text-xs transition ${
-                            active
-                              ? "border-brand bg-brand-light text-brand"
-                              : "border-line bg-white text-charcoal hover:border-brand/40"
-                          }`}
-                        >
-                          <input
-                            type="radio"
-                            name="delivery-zone"
-                            className="sr-only"
-                            checked={active}
-                            onChange={() => {
-                              setZoneId(z.id)
-                              setFieldErrors((prev) => ({ ...prev, deliveryZoneId: undefined }))
-                            }}
-                          />
-                          <span className="min-w-0">
-                            <span className="block font-bold">{z.name}</span>
-                            {z.area && <span className="block text-slate">{z.area}</span>}
-                          </span>
-                          <span className="shrink-0 text-right text-slate">{z.etaMinutes} min</span>
-                        </label>
-                      )
-                    })}
+                {showNote ? (
+                  <div>
+                    <label htmlFor="checkout-notes" className="block text-sm font-medium text-charcoal">
+                      Note for the kitchen or rider
+                    </label>
+                    <input
+                      id="checkout-notes"
+                      value={notes}
+                      onChange={(e) => setNotes(e.target.value)}
+                      placeholder="e.g. less spicy, call at the gate"
+                      className={`${inputClass()} h-12`}
+                      autoFocus
+                    />
                   </div>
-                  {fieldErrors.deliveryZoneId && (
-                    <p role="alert" className="text-xs font-medium text-rose-600">
-                      {fieldErrors.deliveryZoneId[0]}
-                    </p>
-                  )}
-                </fieldset>
-              )}
+                ) : (
+                  <button type="button" onClick={() => setShowNote(true)} className="text-sm font-semibold text-brand hover:underline">
+                    + Add a note
+                  </button>
+                )}
+              </Section>
 
-              {/* Payment Method */}
-              <fieldset className="border-t border-line pt-2 space-y-2">
-                <legend className="text-display text-sm tracking-wider text-charcoal">
-                  2. Payment Method
-                </legend>
-                <div className="grid grid-cols-3 gap-2">
-                  <label
-                    htmlFor="pay-cod"
-                    className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border p-2.5 text-center text-xs transition ${
-                      paymentMethod === "COD"
-                        ? "border-brand bg-brand-light font-bold text-brand"
-                        : "border-line bg-alabaster text-charcoal hover:border-slate/40"
-                    }`}
-                  >
-                    <input
-                      id="pay-cod"
-                      type="radio"
-                      name="paymentMethod"
-                      value="COD"
-                      checked={paymentMethod === "COD"}
-                      onChange={() => setPaymentMethod("COD")}
-                      className="sr-only"
-                    />
-                    <span>Cash on Delivery</span>
-                  </label>
-
-                  <label
-                    htmlFor="pay-bkash"
-                    className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border p-2.5 text-center text-xs transition ${
-                      paymentMethod === "BKASH"
-                        ? "border-brand bg-brand-light font-bold text-brand"
-                        : "border-line bg-alabaster text-charcoal hover:border-slate/40"
-                    }`}
-                  >
-                    <input
-                      id="pay-bkash"
-                      type="radio"
-                      name="paymentMethod"
-                      value="BKASH"
-                      checked={paymentMethod === "BKASH"}
-                      onChange={() => setPaymentMethod("BKASH")}
-                      className="sr-only"
-                    />
-                    <span className="font-bold text-brand">bKash</span>
-                  </label>
-
-                  <label
-                    htmlFor="pay-nagad"
-                    className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border p-2.5 text-center text-xs transition ${
-                      paymentMethod === "NAGAD"
-                        ? "border-gold bg-orange-50 font-bold text-gold"
-                        : "border-line bg-alabaster text-charcoal hover:border-slate/40"
-                    }`}
-                  >
-                    <input
-                      id="pay-nagad"
-                      type="radio"
-                      name="paymentMethod"
-                      value="NAGAD"
-                      checked={paymentMethod === "NAGAD"}
-                      onChange={() => setPaymentMethod("NAGAD")}
-                      className="sr-only"
-                    />
-                    <span className="font-bold text-gold">Nagad</span>
-                  </label>
-                </div>
-
-                {/* bKash / Nagad Send Money Instructions & Required TrxID Field */}
-                {(paymentMethod === "BKASH" || paymentMethod === "NAGAD") && (
-                  <div className="mt-3 rounded-xl border border-brand/20 bg-brand-light p-3.5 space-y-3 transition animate-in fade-in">
-                    <div className="flex items-start gap-2.5">
-                      <div className="grid size-7 shrink-0 place-items-center rounded-full bg-brand text-xs font-bold text-white shadow-xs">
-                        ৳
-                      </div>
-                      <div className="text-xs">
-                        <p className="font-bold text-charcoal">
-                          Send Money to Banglar Biriyani{" "}
-                          {paymentMethod === "BKASH" ? "bKash" : "Nagad"} Account:
-                        </p>
-                        <div className="mt-1 flex items-center gap-2">
-                          <span className="rounded-md border border-brand/30 bg-white px-2.5 py-0.5 font-mono text-sm font-bold text-brand select-all">
-                            01711-000001
-                          </span>
-                          <span className="text-[11px] text-slate">(Personal / Send Money)</span>
-                        </div>
-                        <p className="mt-1 text-[11px] text-slate leading-relaxed">
-                          Please send the exact total of{" "}
-                          <strong className="font-bold text-charcoal">৳{checkoutTotalBdt}</strong> to the
-                          number above and enter your Transaction ID (TrxID) below.
-                        </p>
-                      </div>
-                    </div>
-
-                    <div>
+              {/* 4. Payment */}
+              <Section title="Payment">
+                {PAYMENT_OPTIONS.length > 1 ? (
+                  <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Payment method">
+                    {PAYMENT_OPTIONS.map((p) => (
                       <label
-                        htmlFor="checkout-payment-trxid"
-                        className="mb-1 block text-xs font-bold text-charcoal"
+                        key={p.id}
+                        className={`flex h-12 cursor-pointer items-center justify-center rounded-xl border text-sm font-semibold transition ${
+                          paymentMethod === p.id
+                            ? "border-brand bg-brand-light/60 text-brand ring-1 ring-brand"
+                            : "border-line text-charcoal hover:border-brand/50"
+                        }`}
                       >
-                        {paymentMethod === "BKASH" ? "bKash" : "Nagad"} Transaction ID (TrxID) *
+                        <input
+                          type="radio"
+                          name="payment"
+                          className="sr-only"
+                          checked={paymentMethod === p.id}
+                          onChange={() => {
+                            setPaymentMethod(p.id)
+                            clearError("paymentTrxId")
+                          }}
+                        />
+                        {p.label}
+                      </label>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="rounded-xl border border-line px-3.5 py-3 text-sm text-charcoal">
+                    <span className="font-semibold">Cash on delivery</span>
+                    <span className="text-slate"> · pay when your food arrives</span>
+                  </p>
+                )}
+                {online && (
+                  <div data-field="paymentTrxId" className="space-y-3 rounded-xl bg-cream/60 p-3.5 text-sm">
+                    <p className="text-charcoal">
+                      Send <strong>{taka(checkoutTotalBdt)}</strong> with {payment.label} "Send Money" to{" "}
+                      <strong className="font-mono">{payment.number}</strong>, then enter the Transaction ID.
+                    </p>
+                    <div>
+                      <label htmlFor="checkout-payment-trxid" className="block text-sm font-medium text-charcoal">
+                        Transaction ID (TrxID)
                       </label>
                       <input
                         id="checkout-payment-trxid"
-                        name="paymentTrxId"
-                        type="text"
-                        required
                         value={paymentTrxId}
                         onChange={(e) => {
-                          setPaymentTrxId(e.target.value.toUpperCase())
-                          if (fieldErrors.paymentTrxId) {
-                            setFieldErrors((prev) => ({
-                              ...prev,
-                              paymentTrxId: undefined,
-                            }))
-                          }
+                          setPaymentTrxId(e.target.value)
+                          clearError("paymentTrxId")
                         }}
+                        placeholder="e.g. 8N7A6KX2Q1"
+                        autoCapitalize="characters"
                         aria-invalid={!!fieldErrors.paymentTrxId}
-                        aria-describedby={
-                          fieldErrors.paymentTrxId ? "error-payment-trxid" : undefined
-                        }
-                        placeholder={
-                          paymentMethod === "BKASH" ? "e.g. 9J4K2L8M1N" : "e.g. 7B9X2Y4Z"
-                        }
-                        className={`w-full rounded-lg border bg-white px-3 py-2 font-mono text-sm uppercase tracking-wider outline-none transition ${
-                          fieldErrors.paymentTrxId
-                            ? "border-rose-500 focus:border-rose-500"
-                            : "border-line focus:border-brand"
-                        }`}
+                        aria-describedby={fieldErrors.paymentTrxId ? "err-trx" : undefined}
+                        className={`${inputClass(!!fieldErrors.paymentTrxId)} h-12 font-mono uppercase`}
                       />
-                      {fieldErrors.paymentTrxId && (
-                        <p
-                          id="error-payment-trxid"
-                          role="alert"
-                          className="mt-1 text-xs font-medium text-rose-600"
-                        >
-                          {fieldErrors.paymentTrxId[0]}
-                        </p>
-                      )}
+                      <FieldError id="err-trx" message={fieldErrors.paymentTrxId} />
                     </div>
                   </div>
                 )}
-              </fieldset>
-
-              {/* Order Notes */}
-              <div className="border-t border-line pt-2">
-                <label
-                  htmlFor="checkout-notes"
-                  className="mb-1 block text-xs font-semibold text-slate"
-                >
-                  Special Notes (Optional)
-                </label>
-                <input
-                  id="checkout-notes"
-                  name="notes"
-                  type="text"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="w-full rounded-lg border border-line bg-alabaster px-3 py-2 text-sm outline-none transition focus:border-brand focus:bg-white"
-                  placeholder="e.g. Less spicy, extra cucumber salad, pack spoons"
-                />
-              </div>
+              </Section>
 
               {/* Promo code */}
-              <div>
-                <label htmlFor="promo-code" className="mb-1 block text-xs font-semibold text-charcoal">
-                  Promo code
-                </label>
-                {appliedOffer ? (
-                  <div className="flex items-center justify-between gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs">
-                    <span className="text-emerald-800">
-                      <strong className="font-mono">{appliedOffer.code}</strong> applied · you save ৳
-                      {appliedOffer.discountBdt}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setAppliedOffer(null)
-                        setPromoInput("")
-                      }}
-                      className="py-2 font-semibold text-emerald-800 underline"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
+              {appliedOffer ? (
+                <p className="flex items-center justify-between rounded-xl bg-emerald-50 px-3.5 py-3 text-sm text-emerald-800">
+                  <span>
+                    <strong className="font-mono">{appliedOffer.code}</strong> applied · −{taka(discountBdt)}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setAppliedOffer(null)
+                      setPromoInput("")
+                    }}
+                    className="font-semibold underline"
+                  >
+                    Remove
+                  </button>
+                </p>
+              ) : showPromo ? (
+                <div>
+                  <label htmlFor="promo-code" className="block text-sm font-medium text-charcoal">
+                    Promo code
+                  </label>
+                  <div className="mt-1.5 flex gap-2">
                     <input
                       id="promo-code"
                       value={promoInput}
@@ -970,84 +725,60 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                           applyPromo()
                         }
                       }}
-                      placeholder="e.g. DIU10"
-                      className="h-11 min-w-0 flex-1 rounded-lg border border-line bg-white px-3 font-mono text-sm uppercase outline-none transition focus:border-brand"
+                      placeholder="DIU10"
+                      autoCapitalize="characters"
+                      className={`${inputClass(!!promoError)} mt-0 h-12 flex-1 font-mono uppercase`}
                     />
                     <button
                       type="button"
                       onClick={applyPromo}
                       disabled={promoLoading || !promoInput.trim()}
-                      className="h-11 shrink-0 rounded-lg bg-charcoal px-4 text-sm font-bold text-white disabled:opacity-50"
+                      className="h-12 rounded-xl bg-charcoal px-5 text-sm font-semibold text-white disabled:opacity-40"
                     >
-                      {promoLoading ? "Checking…" : "Apply"}
+                      {promoLoading ? "…" : "Apply"}
                     </button>
                   </div>
-                )}
-                {promoError && (
-                  <p role="alert" className="mt-1 text-xs font-medium text-rose-600">
-                    {promoError}
-                  </p>
-                )}
-              </div>
+                  {promoError && <p className="mt-1.5 text-xs font-medium text-rose-600">{promoError}</p>}
+                </div>
+              ) : (
+                <button type="button" onClick={() => setShowPromo(true)} className="text-sm font-semibold text-brand hover:underline">
+                  Have a promo code?
+                </button>
+              )}
 
-              {/* Breakdown */}
-              <div className="space-y-1.5 rounded-lg border border-line bg-alabaster p-3 text-xs">
+              {/* Totals */}
+              <div className="space-y-1.5 border-t border-line pt-4 text-sm">
                 <div className="flex justify-between text-slate">
-                  <span>Subtotal ({items.length} items)</span>
-                  <span className="font-mono">৳{subtotalBdt}</span>
+                  <span>Subtotal</span>
+                  <span>{taka(subtotalBdt)}</span>
                 </div>
                 {discountBdt > 0 && (
-                  <div className="flex justify-between font-semibold text-emerald-700">
+                  <div className="flex justify-between text-emerald-700">
                     <span>Discount ({appliedOffer?.code})</span>
-                    <span className="font-mono">−৳{discountBdt}</span>
+                    <span>−{taka(discountBdt)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-slate">
-                  <span>Delivery{selectedZone ? ` (${selectedZone.name})` : ""}</span>
+                  <span>Delivery</span>
                   <span className="font-semibold text-emerald-700">Free</span>
                 </div>
-                <div className="flex justify-between border-t border-line/60 pt-1 text-sm font-bold text-charcoal">
-                  <span>Total Due</span>
-                  <span className="text-display text-brand">৳{checkoutTotalBdt}</span>
+                <div className="flex justify-between pt-1 text-base font-bold text-charcoal">
+                  <span>Total</span>
+                  <span>{taka(checkoutTotalBdt)}</span>
                 </div>
               </div>
-            </form>
+            </div>
 
-            {/* Actions */}
-            <div className="flex gap-3 border-t border-line bg-white p-4">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="flex-1 rounded-full border border-line py-2.5 text-sm font-semibold text-charcoal transition hover:bg-alabaster cursor-pointer"
-              >
-                Back to Cart
-              </button>
+            <div className="border-t border-line bg-white px-5 pb-[calc(1rem+env(safe-area-inset-bottom))] pt-3 sm:pb-4">
               <button
                 type="submit"
-                form="checkout-form"
-                disabled={submitting}
-                className="flex-[2] flex items-center justify-center gap-2 rounded-full bg-brand py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-brand-hover disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30"
+                disabled={submitting || items.length === 0}
+                className="flex h-12 w-full items-center justify-center rounded-xl bg-brand text-base font-bold text-white transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 disabled:opacity-60"
               >
-                {submitting ? (
-                  <>
-                    <svg
-                      className="size-4 animate-spin"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2.5"
-                      aria-hidden="true"
-                    >
-                      <circle cx="12" cy="12" r="10" strokeDasharray="32" strokeLinecap="round" />
-                    </svg>
-                    <span>Placing Order in Neon...</span>
-                  </>
-                ) : (
-                  <span>Confirm Order (৳{checkoutTotalBdt})</span>
-                )}
+                {submitting ? "Placing your order…" : `Place order · ${taka(checkoutTotalBdt)}`}
               </button>
             </div>
-          </>
+          </form>
         )}
       </div>
     </div>

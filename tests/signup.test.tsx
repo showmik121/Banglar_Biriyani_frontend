@@ -18,22 +18,24 @@ beforeEach(() => signup.mockReset())
 const fill = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), { target: { value } })
 
 describe("sign up", () => {
-  test("asks only for name, mobile number and password", () => {
+  test("asks for name, mobile number, email and password only", () => {
     render(<AuthModal />)
     expect(screen.getByLabelText("Your name")).toBeInTheDocument()
     expect(screen.getByLabelText("Mobile number")).toBeInTheDocument()
+    expect(screen.getByLabelText("Email")).toBeInTheDocument()
     expect(screen.getByLabelText("Password")).toBeInTheDocument()
-    expect(screen.queryByLabelText(/email/i)).not.toBeInTheDocument()
     expect(screen.queryByLabelText(/address/i)).not.toBeInTheDocument()
   })
 
   test("shows what is wrong under each field and does not submit", () => {
     render(<AuthModal />)
     fill("Mobile number", "12345")
+    fill("Email", "rahim@")
     fill("Password", "short")
     fireEvent.click(screen.getByRole("button", { name: "Create account" }))
     expect(screen.getByText("Enter your name")).toBeInTheDocument()
     expect(screen.getByText("Enter an 11-digit mobile number starting with 01")).toBeInTheDocument()
+    expect(screen.getByText("Enter a valid email, e.g. name@gmail.com")).toBeInTheDocument()
     expect(screen.getByText("Use at least 8 characters")).toBeInTheDocument()
     expect(signup).not.toHaveBeenCalled()
   })
@@ -43,10 +45,16 @@ describe("sign up", () => {
     render(<AuthModal />)
     fill("Your name", "Rahim Uddin")
     fill("Mobile number", "+880 1711-000009")
+    fill("Email", " Rahim@Gmail.com ")
     fill("Password", "biriyani123")
     fireEvent.click(screen.getByRole("button", { name: "Create account" }))
     await waitFor(() =>
-      expect(signup).toHaveBeenCalledWith({ fullName: "Rahim Uddin", phone: "01711000009", password: "biriyani123" }),
+      expect(signup).toHaveBeenCalledWith({
+        fullName: "Rahim Uddin",
+        phone: "01711000009",
+        email: "rahim@gmail.com",
+        password: "biriyani123",
+      }),
     )
     expect(await screen.findByRole("alert")).toHaveTextContent("already exists")
   })

@@ -4,7 +4,7 @@ import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
 
 type Tab = "login" | "signup"
-type SignupField = "fullName" | "phone" | "password"
+type SignupField = "fullName" | "phone" | "email" | "password"
 
 /** "+880 1711-000001" -> "01711000001" */
 const normalizePhone = (v: string) => {
@@ -12,10 +12,11 @@ const normalizePhone = (v: string) => {
   return digits.startsWith("880") ? digits.slice(2) : digits
 }
 
-function validateSignup(name: string, phone: string, password: string): Partial<Record<SignupField, string>> {
+function validateSignup(name: string, phone: string, email: string, password: string): Partial<Record<SignupField, string>> {
   const errors: Partial<Record<SignupField, string>> = {}
   if (name.trim().length < 2) errors.fullName = "Enter your name"
   if (!/^01[3-9]\d{8}$/.test(normalizePhone(phone))) errors.phone = "Enter an 11-digit mobile number starting with 01"
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errors.email = "Enter a valid email, e.g. name@gmail.com"
   if (password.length < 8) errors.password = "Use at least 8 characters"
   return errors
 }
@@ -41,9 +42,10 @@ export function AuthModal() {
   const [identifier, setIdentifier] = useState("")
   const [loginPassword, setLoginPassword] = useState("")
 
-  // Sign up: name, mobile number, password
+  // Sign up: name, mobile number, email, password
   const [fullName, setFullName] = useState("")
   const [phone, setPhone] = useState("")
+  const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [touched, setTouched] = useState<Partial<Record<SignupField, boolean>>>({})
   const [serverErrors, setServerErrors] = useState<Partial<Record<SignupField, string>>>({})
@@ -73,7 +75,7 @@ export function AuthModal() {
 
   if (!isAuthModalOpen) return null
 
-  const clientErrors = validateSignup(fullName, phone, password)
+  const clientErrors = validateSignup(fullName, phone, email, password)
   // Show a field's problem after the customer leaves it (or presses the button)
   const fieldError = (f: SignupField) => serverErrors[f] || (touched[f] ? clientErrors[f] : undefined)
 
@@ -92,16 +94,21 @@ export function AuthModal() {
     if (busy) return
     setFormError(null)
     setServerErrors({})
-    setTouched({ fullName: true, phone: true, password: true })
+    setTouched({ fullName: true, phone: true, email: true, password: true })
     if (Object.keys(clientErrors).length > 0) return
 
     setBusy(true)
-    const result = await signup({ fullName: fullName.trim(), phone: normalizePhone(phone), password })
+    const result = await signup({
+      fullName: fullName.trim(),
+      phone: normalizePhone(phone),
+      email: email.trim().toLowerCase(),
+      password,
+    })
     setBusy(false)
     if (!result.ok) {
       const fe = result.fieldErrors || {}
       const mapped: Partial<Record<SignupField, string>> = {}
-      for (const f of ["fullName", "phone", "password"] as SignupField[]) if (fe[f]?.[0]) mapped[f] = fe[f]![0]
+      for (const f of ["fullName", "phone", "email", "password"] as SignupField[]) if (fe[f]?.[0]) mapped[f] = fe[f]![0]
       setServerErrors(mapped)
       if (Object.keys(mapped).length === 0) setFormError(result.error || "Couldn't create your account. Please try again.")
     }
@@ -186,6 +193,25 @@ export function AuthModal() {
               />
             </Field>
 
+            <Field id="signup-email" label="Email" error={fieldError("email")} hint="We'll send your order updates here">
+              <input
+                id="signup-email"
+                type="email"
+                inputMode="email"
+                autoComplete="email"
+                placeholder="name@gmail.com"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value)
+                  setServerErrors((s) => ({ ...s, email: undefined }))
+                }}
+                onBlur={() => setTouched((t) => ({ ...t, email: true }))}
+                aria-invalid={!!fieldError("email")}
+                aria-describedby={fieldError("email") ? "signup-email-error" : undefined}
+                className={inputClass(!!fieldError("email"))}
+              />
+            </Field>
+
             <Field id="signup-password" label="Password" error={fieldError("password")} hint="At least 8 characters">
               <PasswordInput
                 id="signup-password"
@@ -203,7 +229,7 @@ export function AuthModal() {
             </Field>
 
             <SubmitButton busy={busy} label="Create account" busyLabel="Creating account…" />
-            <p className="text-center text-xs text-slate">We only use your number for order updates.</p>
+            <p className="text-center text-xs text-slate">We use your number and email only for your orders.</p>
           </form>
         ) : (
           <form onSubmit={submitLogin} className="mt-5 space-y-4">

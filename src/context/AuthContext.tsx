@@ -19,7 +19,7 @@ export interface AuthUser {
 
 export interface SignupInput {
   fullName: string
-  email?: string | null
+  email: string
   phone: string
   password: string
   defaultAddress?: string | null
