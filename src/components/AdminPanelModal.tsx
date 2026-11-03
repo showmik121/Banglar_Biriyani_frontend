@@ -347,7 +347,6 @@ export function AdminPanelModal() {
                             <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand">
                               {order.scheduledDay}
                             </span>
-                            <p className="mt-0.5 text-[10px] text-slate">{order.deliverySlot}</p>
                           </td>
                           <td className="p-3 font-bold text-brand">৳{order.totalBdt}</td>
                           <td className="p-3">

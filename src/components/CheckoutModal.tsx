@@ -15,7 +15,6 @@ type Props = {
 type DeliveryZone = { id: number; name: string; area: string; etaMinutes: string }
 type AppliedOffer = { code: string; title: string; discountBdt: number }
 
-type DeliverySlot = "Lunch 12:30 PM - 2:30 PM" | "Dinner 7:30 PM - 9:30 PM" | "Express 45-60 mins"
 
 type PaymentMethod = "COD" | "BKASH" | "NAGAD"
 
@@ -71,7 +70,6 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
     }
   }, [isOpen, user, selectedAddress])
 
-  const [deliverySlot, setDeliverySlot] = useState<DeliverySlot>("Lunch 12:30 PM - 2:30 PM")
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("COD")
   const [paymentTrxId, setPaymentTrxId] = useState("")
   const [notes, setNotes] = useState("")
@@ -225,7 +223,6 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
         customerPhone: cleanPhone,
         customerAddress: customerAddress.trim(),
         scheduledDay: scheduledDayEnum,
-        deliverySlot,
         paymentMethod,
         paymentTrxId:
           paymentMethod === "BKASH" || paymentMethod === "NAGAD"
@@ -775,81 +772,10 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 </fieldset>
               )}
 
-              {/* Delivery Slot */}
-              <fieldset className="border-t border-line pt-2 space-y-2">
-                <legend className="text-display text-sm tracking-wider text-charcoal">
-                  2. Delivery Time Slot
-                </legend>
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                  <label
-                    htmlFor="slot-lunch"
-                    className={`flex cursor-pointer flex-col rounded-lg border p-2.5 text-xs transition ${
-                      deliverySlot === "Lunch 12:30 PM - 2:30 PM"
-                        ? "border-brand bg-brand-light font-bold text-brand"
-                        : "border-line bg-alabaster text-charcoal hover:border-slate/40"
-                    }`}
-                  >
-                    <input
-                      id="slot-lunch"
-                      type="radio"
-                      name="deliverySlot"
-                      value="Lunch 12:30 PM - 2:30 PM"
-                      checked={deliverySlot === "Lunch 12:30 PM - 2:30 PM"}
-                      onChange={() => setDeliverySlot("Lunch 12:30 PM - 2:30 PM")}
-                      className="sr-only"
-                    />
-                    <span>Lunch</span>
-                    <span className="text-xs font-normal text-slate">12:30 PM – 2:30 PM</span>
-                  </label>
-
-                  <label
-                    htmlFor="slot-dinner"
-                    className={`flex cursor-pointer flex-col rounded-lg border p-2.5 text-xs transition ${
-                      deliverySlot === "Dinner 7:30 PM - 9:30 PM"
-                        ? "border-brand bg-brand-light font-bold text-brand"
-                        : "border-line bg-alabaster text-charcoal hover:border-slate/40"
-                    }`}
-                  >
-                    <input
-                      id="slot-dinner"
-                      type="radio"
-                      name="deliverySlot"
-                      value="Dinner 7:30 PM - 9:30 PM"
-                      checked={deliverySlot === "Dinner 7:30 PM - 9:30 PM"}
-                      onChange={() => setDeliverySlot("Dinner 7:30 PM - 9:30 PM")}
-                      className="sr-only"
-                    />
-                    <span>Dinner</span>
-                    <span className="text-xs font-normal text-slate">7:30 PM – 9:30 PM</span>
-                  </label>
-
-                  <label
-                    htmlFor="slot-express"
-                    className={`flex cursor-pointer flex-col rounded-lg border p-2.5 text-xs transition ${
-                      deliverySlot === "Express 45-60 mins"
-                        ? "border-brand bg-brand-light font-bold text-brand"
-                        : "border-line bg-alabaster text-charcoal hover:border-slate/40"
-                    }`}
-                  >
-                    <input
-                      id="slot-express"
-                      type="radio"
-                      name="deliverySlot"
-                      value="Express 45-60 mins"
-                      checked={deliverySlot === "Express 45-60 mins"}
-                      onChange={() => setDeliverySlot("Express 45-60 mins")}
-                      className="sr-only"
-                    />
-                    <span>Express</span>
-                    <span className="text-xs font-normal text-slate">45-60 mins</span>
-                  </label>
-                </div>
-              </fieldset>
-
               {/* Payment Method */}
               <fieldset className="border-t border-line pt-2 space-y-2">
                 <legend className="text-display text-sm tracking-wider text-charcoal">
-                  3. Payment Method
+                  2. Payment Method
                 </legend>
                 <div className="grid grid-cols-3 gap-2">
                   <label
