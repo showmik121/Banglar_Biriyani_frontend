@@ -251,7 +251,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
         {placedOrder ? (
           <div className="flex flex-col overflow-y-auto p-6 sm:p-8">
             <div className="text-center">
-              <div className="mx-auto mb-4 grid size-16 place-items-center rounded-full bg-[#FFF0F3] text-[#E4002B] shadow-sm">
+              <div className="mx-auto mb-4 grid size-16 place-items-center rounded-full bg-[#FFF0F3] text-[#D7232B] shadow-sm">
                 <svg
                   className="size-8"
                   viewBox="0 0 24 24"
@@ -269,12 +269,12 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
               >
                 অর্ডার সফলভাবে সম্পন্ন হয়েছে!
               </h2>
-              <p className="mt-1 text-sm font-medium text-[#E4002B]">অর্ডার সফলভাবে গ্রহণ করা হয়েছে</p>
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#E4002B]/30 bg-[#FFF0F3] px-4 py-1.5">
+              <p className="mt-1 text-sm font-medium text-[#D7232B]">অর্ডার সফলভাবে গ্রহণ করা হয়েছে</p>
+              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#D7232B]/30 bg-[#FFF0F3] px-4 py-1.5">
                 <span className="text-xs text-slate">অর্ডার নম্বর:</span>
                 <span
                   id="confirmation-order-number"
-                  className="font-mono text-sm font-bold text-[#E4002B]"
+                  className="font-mono text-sm font-bold text-[#D7232B]"
                 >
                   {placedOrder.order.orderNumber}
                 </span>
@@ -287,7 +287,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 <span className="font-semibold uppercase tracking-wider text-slate">
                   নির্ধারিত ডেলিভারি
                 </span>
-                <span className="rounded-full bg-[#E4002B] px-2.5 py-0.5 font-bold text-white">
+                <span className="rounded-full bg-[#D7232B] px-2.5 py-0.5 font-bold text-white">
                   {dayLabelBn(placedOrder.order.scheduledDay)} •{" "}
                   {deliverySlotLabelBn(placedOrder.order.deliverySlot)}
                 </span>
@@ -331,7 +331,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 </div>
                 <div className="flex justify-between border-t border-line/40 pt-1 text-sm font-bold text-charcoal">
                   <span>সর্বমোট</span>
-                  <span className="text-display text-base text-[#E4002B]">
+                  <span className="text-display text-base text-[#D7232B]">
                     {formatBdt(placedOrder.order.totalBdt)}
                   </span>
                 </div>
@@ -348,7 +348,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 {placedOrder.order.paymentTrxId && (
                   <div className="flex flex-wrap items-center gap-2 pt-1 border-t border-line/40">
                     <span className="font-semibold text-charcoal">TrxID:</span>
-                    <span className="font-mono font-bold text-[#E4002B] tracking-wider">
+                    <span className="font-mono font-bold text-[#D7232B] tracking-wider">
                       {placedOrder.order.paymentTrxId}
                     </span>
                     <span
@@ -373,7 +373,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     handleResetAndClose()
                     openMyOrders()
                   }}
-                  className="flex-1 rounded-full border border-[#E4002B] py-3 text-center text-sm font-semibold text-[#E4002B] transition hover:bg-[#FFF0F3] cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#E4002B]/30"
+                  className="flex-1 rounded-full border border-[#D7232B] py-3 text-center text-sm font-semibold text-[#D7232B] transition hover:bg-[#FFF0F3] cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/30"
                 >
                   আমার অর্ডারে দেখুন
                 </button>
@@ -382,7 +382,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 ref={closeBtnRef}
                 type="button"
                 onClick={handleResetAndClose}
-                className={`${user ? "flex-1" : "w-full"} rounded-full bg-[#E4002B] py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-[#B80022] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#E4002B]/30 cursor-pointer`}
+                className={`${user ? "flex-1" : "w-full"} rounded-full bg-[#D7232B] py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-[#B80022] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/30 cursor-pointer`}
               >
                 সম্পন্ন / মেনু দেখা চালিয়ে যান
               </button>
@@ -392,7 +392,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
           /* Checkout Form */
           <>
             {/* Header */}
-            <div className="flex items-center justify-between border-b border-line bg-[#E4002B] px-6 py-4 text-white">
+            <div className="flex items-center justify-between border-b border-line bg-[#D7232B] px-6 py-4 text-white">
               <div>
                 <h2 id="checkout-modal-title" className="text-display text-xl text-white">
                   অর্ডার চেকআউট
@@ -430,10 +430,10 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
 
               {/* Account Quick Sign-in Prompt for Guest Users */}
               {!user && (
-                <div className="flex items-center justify-between rounded-xl border border-[#E4002B]/20 bg-[#FFF0F3] px-3.5 py-2.5 text-xs transition">
+                <div className="flex items-center justify-between rounded-xl border border-[#D7232B]/20 bg-[#FFF0F3] px-3.5 py-2.5 text-xs transition">
                   <div className="flex items-center gap-2 text-charcoal">
                     <svg
-                      className="size-4 shrink-0 text-[#E4002B]"
+                      className="size-4 shrink-0 text-[#D7232B]"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"
@@ -445,7 +445,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     </svg>
                     <span>
                       অ্যাকাউন্ট আছে?{" "}
-                      <span className="font-semibold text-[#E4002B]">
+                      <span className="font-semibold text-[#D7232B]">
                         ১ ক্লিকে চেকআউট করতে লগইন করুন
                       </span>
                     </span>
@@ -453,7 +453,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                   <button
                     type="button"
                     onClick={() => openAuthModal("login")}
-                    className="shrink-0 rounded-full bg-[#E4002B] px-3 py-1 text-xs font-semibold text-white shadow-xs transition hover:bg-[#B80022] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]/40"
+                    className="shrink-0 rounded-full bg-[#D7232B] px-3 py-1 text-xs font-semibold text-white shadow-xs transition hover:bg-[#B80022] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]/40"
                   >
                     লগইন
                   </button>
@@ -509,7 +509,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                       className={`w-full rounded-lg border bg-alabaster px-3 py-2 text-sm outline-none transition focus:bg-white ${
                         fieldErrors.customerName
                           ? "border-rose-500 focus:border-rose-500"
-                          : "border-line focus:border-[#E4002B]"
+                          : "border-line focus:border-[#D7232B]"
                       }`}
                       placeholder="যেমন: জাহিদ হাসান"
                     />
@@ -553,7 +553,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                       className={`w-full rounded-lg border bg-alabaster px-3 py-2 text-sm outline-none transition focus:bg-white ${
                         fieldErrors.customerPhone
                           ? "border-rose-500 focus:border-rose-500"
-                          : "border-line focus:border-[#E4002B]"
+                          : "border-line focus:border-[#D7232B]"
                       }`}
                       placeholder="017XXXXXXXX"
                     />
@@ -580,7 +580,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     <button
                       type="button"
                       onClick={() => setIsAddressModalOpen(true)}
-                      className="cursor-pointer text-xs font-semibold text-[#E4002B] hover:underline"
+                      className="cursor-pointer text-xs font-semibold text-[#D7232B] hover:underline"
                     >
                       {selectedAddress
                         ? `📍 ঠিকানা পরিবর্তন (${addressLabelBn(selectedAddress.label)})`
@@ -609,7 +609,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     className={`w-full rounded-lg border bg-alabaster px-3 py-2 text-sm outline-none transition focus:bg-white ${
                       fieldErrors.customerAddress
                         ? "border-rose-500 focus:border-rose-500"
-                        : "border-line focus:border-[#E4002B]"
+                        : "border-line focus:border-[#D7232B]"
                     }`}
                     placeholder="বাসা, রোড, ফ্ল্যাট নম্বর, এলাকা..."
                   />
@@ -631,7 +631,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                       type="checkbox"
                       checked={saveForFuture}
                       onChange={(e) => setSaveForFuture(e.target.checked)}
-                      className="size-3.5 rounded border-line text-[#E4002B] focus:ring-[#E4002B]"
+                      className="size-3.5 rounded border-line text-[#D7232B] focus:ring-[#D7232B]"
                     />
                     <span className="text-[11px] text-slate">এই ঠিকানাটি আমার সংরক্ষিত ঠিকানায় রাখুন</span>
                   </label>
@@ -648,7 +648,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     htmlFor="slot-lunch"
                     className={`flex cursor-pointer flex-col rounded-lg border p-2.5 text-xs transition ${
                       deliverySlot === "Lunch 12:30 PM - 2:30 PM"
-                        ? "border-[#E4002B] bg-[#FFF0F3] font-bold text-[#E4002B]"
+                        ? "border-[#D7232B] bg-[#FFF0F3] font-bold text-[#D7232B]"
                         : "border-line bg-alabaster text-charcoal hover:border-slate/40"
                     }`}
                   >
@@ -669,7 +669,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     htmlFor="slot-dinner"
                     className={`flex cursor-pointer flex-col rounded-lg border p-2.5 text-xs transition ${
                       deliverySlot === "Dinner 7:30 PM - 9:30 PM"
-                        ? "border-[#E4002B] bg-[#FFF0F3] font-bold text-[#E4002B]"
+                        ? "border-[#D7232B] bg-[#FFF0F3] font-bold text-[#D7232B]"
                         : "border-line bg-alabaster text-charcoal hover:border-slate/40"
                     }`}
                   >
@@ -690,7 +690,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     htmlFor="slot-express"
                     className={`flex cursor-pointer flex-col rounded-lg border p-2.5 text-xs transition ${
                       deliverySlot === "Express 45-60 mins"
-                        ? "border-[#E4002B] bg-[#FFF0F3] font-bold text-[#E4002B]"
+                        ? "border-[#D7232B] bg-[#FFF0F3] font-bold text-[#D7232B]"
                         : "border-line bg-alabaster text-charcoal hover:border-slate/40"
                     }`}
                   >
@@ -719,7 +719,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     htmlFor="pay-cod"
                     className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border p-2.5 text-center text-xs transition ${
                       paymentMethod === "COD"
-                        ? "border-[#E4002B] bg-[#FFF0F3] font-bold text-[#E4002B]"
+                        ? "border-[#D7232B] bg-[#FFF0F3] font-bold text-[#D7232B]"
                         : "border-line bg-alabaster text-charcoal hover:border-slate/40"
                     }`}
                   >
@@ -739,7 +739,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     htmlFor="pay-bkash"
                     className={`flex cursor-pointer flex-col items-center justify-center rounded-lg border p-2.5 text-center text-xs transition ${
                       paymentMethod === "BKASH"
-                        ? "border-[#E4002B] bg-[#FFF0F3] font-bold text-[#E4002B]"
+                        ? "border-[#D7232B] bg-[#FFF0F3] font-bold text-[#D7232B]"
                         : "border-line bg-alabaster text-charcoal hover:border-slate/40"
                     }`}
                   >
@@ -752,7 +752,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                       onChange={() => setPaymentMethod("BKASH")}
                       className="sr-only"
                     />
-                    <span className="font-bold text-[#E4002B]">বিকাশ</span>
+                    <span className="font-bold text-[#D7232B]">বিকাশ</span>
                   </label>
 
                   <label
@@ -778,9 +778,9 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
 
                 {/* bKash / Nagad Send Money Instructions & Required TrxID Field */}
                 {(paymentMethod === "BKASH" || paymentMethod === "NAGAD") && (
-                  <div className="mt-3 rounded-xl border border-[#E4002B]/20 bg-[#FFF0F3] p-3.5 space-y-3 transition animate-in fade-in">
+                  <div className="mt-3 rounded-xl border border-[#D7232B]/20 bg-[#FFF0F3] p-3.5 space-y-3 transition animate-in fade-in">
                     <div className="flex items-start gap-2.5">
-                      <div className="grid size-7 shrink-0 place-items-center rounded-full bg-[#E4002B] text-xs font-bold text-white shadow-xs">
+                      <div className="grid size-7 shrink-0 place-items-center rounded-full bg-[#D7232B] text-xs font-bold text-white shadow-xs">
                         ৳
                       </div>
                       <div className="text-xs">
@@ -789,7 +789,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                           করুন:
                         </p>
                         <div className="mt-1 flex items-center gap-2">
-                          <span className="rounded-md border border-[#E4002B]/30 bg-white px-2.5 py-0.5 font-mono text-sm font-bold text-[#E4002B] select-all">
+                          <span className="rounded-md border border-[#D7232B]/30 bg-white px-2.5 py-0.5 font-mono text-sm font-bold text-[#D7232B] select-all">
                             01711-000001
                           </span>
                           <span className="text-[11px] text-slate">(পার্সোনাল / সেন্ড মানি)</span>
@@ -834,7 +834,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                         className={`w-full rounded-lg border bg-white px-3 py-2 font-mono text-sm uppercase tracking-wider outline-none transition ${
                           fieldErrors.paymentTrxId
                             ? "border-rose-500 focus:border-rose-500"
-                            : "border-line focus:border-[#E4002B]"
+                            : "border-line focus:border-[#D7232B]"
                         }`}
                       />
                       {fieldErrors.paymentTrxId && (
@@ -865,7 +865,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                   type="text"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full rounded-lg border border-line bg-alabaster px-3 py-2 text-sm outline-none transition focus:border-[#E4002B] focus:bg-white"
+                  className="w-full rounded-lg border border-line bg-alabaster px-3 py-2 text-sm outline-none transition focus:border-[#D7232B] focus:bg-white"
                   placeholder="যেমন: ঝাল কম, বাড়তি শসার সালাদ, চামচ দেবেন"
                 />
               </div>
@@ -882,7 +882,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 </div>
                 <div className="flex justify-between border-t border-line/60 pt-1 text-sm font-bold text-charcoal">
                   <span>সর্বমোট</span>
-                  <span className="text-display text-[#E4002B]">{formatBdt(totalBdt)}</span>
+                  <span className="text-display text-[#D7232B]">{formatBdt(totalBdt)}</span>
                 </div>
               </div>
             </form>
@@ -900,7 +900,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 type="submit"
                 form="checkout-form"
                 disabled={submitting}
-                className="flex-[2] flex items-center justify-center gap-2 rounded-full bg-[#E4002B] py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#B80022] disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#E4002B]/30"
+                className="flex-[2] flex items-center justify-center gap-2 rounded-full bg-[#D7232B] py-2.5 text-sm font-semibold text-white shadow-md transition hover:bg-[#B80022] disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/30"
               >
                 {submitting ? (
                   <>

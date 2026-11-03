@@ -94,13 +94,13 @@ export function Hero({
           {title} <span className="text-saffron">{highlight}</span>
         </h2>
         <p className="text-display mt-4 text-xl text-white/80 sm:text-2xl">
-          <span className="text-[#E4002B]">—</span> {subtitle}
+          <span className="text-[#D7232B]">—</span> {subtitle}
         </p>
         <p className="mt-4 max-w-md text-white/70">{body}</p>
         <div className="mt-8 flex flex-wrap gap-3">
           <a
             href={primary.href}
-            className="inline-flex h-12 items-center rounded-full bg-[#E4002B] px-7 text-sm font-semibold text-white transition hover:bg-[#B80022]"
+            className="inline-flex h-12 items-center rounded-full bg-[#D7232B] px-7 text-sm font-semibold text-white transition hover:bg-[#B80022]"
           >
             {primary.label}
           </a>

@@ -133,7 +133,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                 }
               }}
               placeholder="এলাকা, রোড খুঁজুন বা যেকোনো ঠিকানা লিখুন..."
-              className="w-full rounded-xl border border-line bg-white py-2.5 pl-9 pr-8 text-sm text-charcoal outline-none transition focus:border-[#E4002B] focus:ring-2 focus:ring-[#E4002B]/20"
+              className="w-full rounded-xl border border-line bg-white py-2.5 pl-9 pr-8 text-sm text-charcoal outline-none transition focus:border-[#D7232B] focus:ring-2 focus:ring-[#D7232B]/20"
             />
             {query && (
               <button
@@ -155,18 +155,18 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
             <button
               type="button"
               onClick={handleSelectCustomQuery}
-              className="flex w-full items-center gap-3 rounded-xl border border-[#E4002B]/30 bg-[#E4002B]/5 p-3 text-left transition hover:bg-[#E4002B]/10 cursor-pointer"
+              className="flex w-full items-center gap-3 rounded-xl border border-[#D7232B]/30 bg-[#D7232B]/5 p-3 text-left transition hover:bg-[#D7232B]/10 cursor-pointer"
             >
-              <div className="grid size-8 shrink-0 place-items-center rounded-full bg-[#E4002B] text-white">
+              <div className="grid size-8 shrink-0 place-items-center rounded-full bg-[#D7232B] text-white">
                 <Icon d={ICONS.pin} className="size-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="block text-xs font-bold text-[#E4002B]">
+                <span className="block text-xs font-bold text-[#D7232B]">
                   হুবহু এই ঠিকানা ব্যবহার করুন
                 </span>
                 <p className="truncate text-sm font-medium text-charcoal">"{query}"</p>
               </div>
-              <span className="rounded-full bg-[#E4002B] px-2.5 py-1 text-[11px] font-bold text-white">
+              <span className="rounded-full bg-[#D7232B] px-2.5 py-1 text-[11px] font-bold text-white">
                 এখানে ডেলিভারি দিন
               </span>
             </button>
@@ -191,13 +191,13 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                       }}
                       className={`flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition cursor-pointer ${
                         isSelected
-                          ? "bg-[#E4002B]/10 border border-[#E4002B]/30"
+                          ? "bg-[#D7232B]/10 border border-[#D7232B]/30"
                           : "hover:bg-alabaster"
                       }`}
                     >
                       <div
                         className={`grid size-7 shrink-0 place-items-center rounded-full text-xs ${
-                          isSelected ? "bg-[#E4002B] text-white" : "bg-slate/10 text-slate"
+                          isSelected ? "bg-[#D7232B] text-white" : "bg-slate/10 text-slate"
                         }`}
                       >
                         {addr.label === "Work" ? (
@@ -213,7 +213,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                           </span>
                           <span className="text-[10px] text-slate font-medium">{addr.area}</span>
                           {isSelected && (
-                            <span className="text-[10px] font-bold text-[#E4002B]">• সক্রিয়</span>
+                            <span className="text-[10px] font-bold text-[#D7232B]">• সক্রিয়</span>
                           )}
                         </div>
                         <p className="truncate text-xs text-slate">{addr.details}</p>
@@ -231,7 +231,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate">
                 {query ? `প্রস্তাবিত ঠিকানা (${toBengaliNumber(results.length)})` : "জনপ্রিয় ডেলিভারি এলাকা"}
               </span>
-              <span className="flex items-center gap-1 text-[10px] font-semibold text-[#E4002B]">
+              <span className="flex items-center gap-1 text-[10px] font-semibold text-[#D7232B]">
                 <Icon d={ICONS.sparkles} className="size-3" />
                 ঢাকা
               </span>
@@ -246,12 +246,12 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                     onClick={() => handleSelectRecommendation(item)}
                     className="flex w-full items-start gap-3 rounded-xl p-2.5 text-left transition hover:bg-alabaster group cursor-pointer"
                   >
-                    <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-[#E4002B]/10 text-[#E4002B] group-hover:bg-[#E4002B] group-hover:text-white transition-colors">
+                    <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-[#D7232B]/10 text-[#D7232B] group-hover:bg-[#D7232B] group-hover:text-white transition-colors">
                       <Icon d={ICONS.pin} className="size-3.5" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-charcoal group-hover:text-[#E4002B] transition-colors">
+                        <span className="text-xs font-bold text-charcoal group-hover:text-[#D7232B] transition-colors">
                           {item.name}
                         </span>
                         {item.tag && (
@@ -284,7 +284,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
               onClose()
               onOpenDetailedModal()
             }}
-            className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-[#E4002B] hover:underline cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-[#D7232B] hover:underline cursor-pointer"
           >
             <Icon d={ICONS.edit} className="size-3.5" />+ ফ্ল্যাট, তলা ও ডেলিভারি নির্দেশনাসহ পুরো ঠিকানা লিখুন
           </button>

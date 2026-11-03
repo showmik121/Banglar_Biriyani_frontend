@@ -167,7 +167,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-line px-6 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="grid size-9 place-items-center rounded-full bg-[#E4002B]/10 text-[#E4002B]">
+            <div className="grid size-9 place-items-center rounded-full bg-[#D7232B]/10 text-[#D7232B]">
               <Icon d={ICONS.pin} className="size-5" />
             </div>
             <div>
@@ -208,7 +208,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                     if (error) setError(null)
                   }}
                   placeholder="যেমন: রোড ২৭, বাসা ৪৫, ফ্ল্যাট ৪বি, ধানমন্ডি, ঢাকা (বা অন্য যেকোনো ঠিকানা)..."
-                  className="w-full rounded-xl border border-line bg-white p-3.5 text-sm text-charcoal placeholder:text-slate/60 shadow-xs transition focus:border-[#E4002B] focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                  className="w-full rounded-xl border border-line bg-white p-3.5 text-sm text-charcoal placeholder:text-slate/60 shadow-xs transition focus:border-[#D7232B] focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                   autoFocus
                 />
                 {addressInput && (
@@ -225,9 +225,9 @@ export function AddressModal({ isOpen, onClose }: Props) {
 
               {/* Live matching recommendations popup */}
               {liveRecommendations.length > 0 && (
-                <div className="mt-2 rounded-xl border border-[#E4002B]/30 bg-[#FFF0F3] p-2.5 space-y-1.5 shadow-xs">
+                <div className="mt-2 rounded-xl border border-[#D7232B]/30 bg-[#FFF0F3] p-2.5 space-y-1.5 shadow-xs">
                   <div className="flex items-center justify-between px-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#E4002B]">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#D7232B]">
                       ✨ "{addressInput}" এর জন্য প্রস্তাবিত ঠিকানা:
                     </span>
                     <span className="text-[10px] text-slate">বেছে নিতে ক্লিক করুন</span>
@@ -238,7 +238,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                         key={rec.id}
                         type="button"
                         onClick={() => setAddressInput(rec.details)}
-                        className="flex w-full items-center justify-between rounded-lg bg-white p-2 text-left text-xs transition hover:border-[#E4002B] hover:shadow-xs border border-transparent cursor-pointer"
+                        className="flex w-full items-center justify-between rounded-lg bg-white p-2 text-left text-xs transition hover:border-[#D7232B] hover:shadow-xs border border-transparent cursor-pointer"
                       >
                         <div className="min-w-0 flex-1">
                           <span className="font-bold text-charcoal">{rec.name}</span>
@@ -246,7 +246,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                             {rec.details}
                           </span>
                         </div>
-                        <span className="ml-2 rounded-full bg-[#E4002B]/10 px-2 py-0.5 text-[10px] font-bold text-[#E4002B] shrink-0">
+                        <span className="ml-2 rounded-full bg-[#D7232B]/10 px-2 py-0.5 text-[10px] font-bold text-[#D7232B] shrink-0">
                           এটি ব্যবহার করুন
                         </span>
                       </button>
@@ -269,7 +269,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                     key={areaName}
                     type="button"
                     onClick={() => handleAppendArea(areaName)}
-                    className="rounded-full border border-line/80 bg-alabaster px-2.5 py-1 text-xs text-charcoal transition hover:border-[#E4002B] hover:bg-[#E4002B]/10 hover:text-[#E4002B] cursor-pointer"
+                    className="rounded-full border border-line/80 bg-alabaster px-2.5 py-1 text-xs text-charcoal transition hover:border-[#D7232B] hover:bg-[#D7232B]/10 hover:text-[#D7232B] cursor-pointer"
                   >
                     + {areaName}
                   </button>
@@ -287,7 +287,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                   onClick={() => setTag(t)}
                   className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition cursor-pointer ${
                     tag === t
-                      ? "bg-[#E4002B] text-white"
+                      ? "bg-[#D7232B] text-white"
                       : "bg-alabaster text-charcoal hover:bg-slate/15"
                   }`}
                 >
@@ -302,7 +302,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => setShowDetailedFields((prev) => !prev)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#E4002B] hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D7232B] hover:underline cursor-pointer"
               >
                 <Icon d={showDetailedFields ? ICONS.close : ICONS.plus} className="size-3.5" />
                 {showDetailedFields ? "অতিরিক্ত তথ্য লুকান" : "ফোন ও ডেলিভারি নির্দেশনা যোগ করুন (ঐচ্ছিক)"}
@@ -319,7 +319,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="017XXXXXXXX"
-                      className="w-full rounded-lg border border-line bg-white px-3 py-2 text-xs text-charcoal outline-none focus:border-[#E4002B]"
+                      className="w-full rounded-lg border border-line bg-white px-3 py-2 text-xs text-charcoal outline-none focus:border-[#D7232B]"
                     />
                   </div>
                   <div>
@@ -331,7 +331,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                       value={instructions}
                       onChange={(e) => setInstructions(e.target.value)}
                       placeholder="যেমন: সিকিউরিটি গার্ডের কাছে রাখবেন, আসার আগে ফোন করবেন..."
-                      className="w-full rounded-lg border border-line bg-white px-3 py-2 text-xs text-charcoal outline-none focus:border-[#E4002B]"
+                      className="w-full rounded-lg border border-line bg-white px-3 py-2 text-xs text-charcoal outline-none focus:border-[#D7232B]"
                     />
                   </div>
                 </div>
@@ -341,7 +341,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
             {/* Primary Action Button */}
             <button
               type="submit"
-              className="w-full rounded-full bg-[#E4002B] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#B80022] active:scale-[0.99] cursor-pointer"
+              className="w-full rounded-full bg-[#D7232B] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#B80022] active:scale-[0.99] cursor-pointer"
             >
               ✓ আমার ডেলিভারি ঠিকানা হিসেবে সেট করুন
             </button>
@@ -366,14 +366,14 @@ export function AddressModal({ isOpen, onClose }: Props) {
                       onClick={() => selectAddress(addr.id)}
                       className={`group relative flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition ${
                         isSelected
-                          ? "border-[#E4002B] bg-[#E4002B]/5 ring-2 ring-[#E4002B]/20"
+                          ? "border-[#D7232B] bg-[#D7232B]/5 ring-2 ring-[#D7232B]/20"
                           : "border-line bg-white hover:border-slate/40 hover:bg-alabaster/40"
                       }`}
                     >
                       <div
                         className={`mt-0.5 grid size-8 shrink-0 place-items-center rounded-full ${
                           isSelected
-                            ? "bg-[#E4002B] text-white"
+                            ? "bg-[#D7232B] text-white"
                             : "bg-alabaster text-slate group-hover:text-charcoal"
                         }`}
                       >
@@ -389,7 +389,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                             {addr.area}
                           </span>
                           {isSelected && (
-                            <span className="rounded-full bg-[#E4002B] px-2 py-0.2 text-[10px] font-bold text-white">
+                            <span className="rounded-full bg-[#D7232B] px-2 py-0.2 text-[10px] font-bold text-white">
                               সক্রিয়
                             </span>
                           )}

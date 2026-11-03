@@ -145,7 +145,7 @@ export function AuthModal() {
           <button
             type="button"
             onClick={closeAuthModal}
-            className="absolute right-4 top-4 grid size-9 place-items-center rounded-full text-slate transition hover:bg-slate/10 hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+            className="absolute right-4 top-4 grid size-9 place-items-center rounded-full text-slate transition hover:bg-slate/10 hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]"
             aria-label="লগইন উইন্ডো বন্ধ করুন"
           >
             <svg
@@ -163,10 +163,10 @@ export function AuthModal() {
           </button>
 
           <div className="flex items-center gap-2">
-            <span className="flex size-7 items-center justify-center rounded-full bg-[#E4002B] text-xs font-bold text-white shadow-xs">
+            <span className="flex size-7 items-center justify-center rounded-full bg-[#D7232B] text-xs font-bold text-white shadow-xs">
               BB
             </span>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#E4002B]">
+            <span className="text-xs font-bold uppercase tracking-wider text-[#D7232B]">
               বাংলার বিরিয়ানি
             </span>
           </div>
@@ -193,7 +193,7 @@ export function AuthModal() {
               }}
               className={`flex-1 rounded-lg py-1.5 transition ${
                 activeTab === "login"
-                  ? "bg-white text-[#E4002B] shadow-xs"
+                  ? "bg-white text-[#D7232B] shadow-xs"
                   : "text-slate hover:text-charcoal"
               }`}
             >
@@ -207,7 +207,7 @@ export function AuthModal() {
               }}
               className={`flex-1 rounded-lg py-1.5 transition ${
                 activeTab === "signup"
-                  ? "bg-white text-[#E4002B] shadow-xs"
+                  ? "bg-white text-[#D7232B] shadow-xs"
                   : "text-slate hover:text-charcoal"
               }`}
             >
@@ -260,7 +260,7 @@ export function AuthModal() {
                     value={loginIdentifier}
                     onChange={(e) => setLoginIdentifier(e.target.value)}
                     required
-                    className="block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2.5 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#E4002B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                    className="block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2.5 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#D7232B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                   />
                 </div>
               </div>
@@ -281,7 +281,7 @@ export function AuthModal() {
                     value={loginPassword}
                     onChange={(e) => setLoginPassword(e.target.value)}
                     required
-                    className="block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2.5 pr-10 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#E4002B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                    className="block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2.5 pr-10 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#D7232B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                   />
                   <button
                     type="button"
@@ -313,7 +313,7 @@ export function AuthModal() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#E4002B] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#B80022] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#E4002B]/30 disabled:opacity-70"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#D7232B] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#B80022] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/30 disabled:opacity-70"
               >
                 {isLoading ? (
                   <>
@@ -350,7 +350,7 @@ export function AuthModal() {
                   <button
                     type="button"
                     onClick={() => fillDemoAccount("customer@banglarbiriyani.com", "Customer@1234")}
-                    className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-[#E4002B] hover:bg-[#FFF0F3]"
+                    className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-[#D7232B] hover:bg-[#FFF0F3]"
                   >
                     <span className="text-xs font-bold text-charcoal">গ্রাহক</span>
                     <span className="text-[10px] text-slate">তানভীর আহমেদ</span>
@@ -359,7 +359,7 @@ export function AuthModal() {
                   <button
                     type="button"
                     onClick={() => fillDemoAccount("kitchen@banglarbiriyani.com", "Staff@1234")}
-                    className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-[#E4002B] hover:bg-[#FFF0F3]"
+                    className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-[#D7232B] hover:bg-[#FFF0F3]"
                   >
                     <span className="text-xs font-bold text-charcoal">কিচেন স্টাফ</span>
                     <span className="text-[10px] text-slate">শেফ রহিম</span>
@@ -368,7 +368,7 @@ export function AuthModal() {
                   <button
                     type="button"
                     onClick={() => fillDemoAccount("admin@banglarbiriyani.com", "Admin@1234")}
-                    className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-[#E4002B] hover:bg-[#FFF0F3]"
+                    className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-[#D7232B] hover:bg-[#FFF0F3]"
                   >
                     <span className="text-xs font-bold text-charcoal">অ্যাডমিন</span>
                     <span className="text-[10px] text-slate">মালিক</span>
@@ -393,7 +393,7 @@ export function AuthModal() {
                   value={signupFullName}
                   onChange={(e) => setSignupFullName(e.target.value)}
                   required
-                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#E4002B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#D7232B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                 />
               </div>
 
@@ -408,7 +408,7 @@ export function AuthModal() {
                   value={signupEmail}
                   onChange={(e) => setSignupEmail(e.target.value)}
                   required
-                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#E4002B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#D7232B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                 />
               </div>
 
@@ -423,7 +423,7 @@ export function AuthModal() {
                   value={signupPhone}
                   onChange={(e) => setSignupPhone(e.target.value)}
                   required
-                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#E4002B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#D7232B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                 />
               </div>
 
@@ -440,7 +440,7 @@ export function AuthModal() {
                   placeholder="বাসা, রোড, এলাকা (যেমন: ধানমন্ডি, ঢাকা)"
                   value={signupAddress}
                   onChange={(e) => setSignupAddress(e.target.value)}
-                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#E4002B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#D7232B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                 />
               </div>
 
@@ -460,7 +460,7 @@ export function AuthModal() {
                     onChange={(e) => setSignupPassword(e.target.value)}
                     required
                     minLength={8}
-                    className="block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 pr-10 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#E4002B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                    className="block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 pr-10 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-[#D7232B] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                   />
                   <button
                     type="button"
@@ -492,7 +492,7 @@ export function AuthModal() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#E4002B] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#B80022] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#E4002B]/30 disabled:opacity-70"
+                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-[#D7232B] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#B80022] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/30 disabled:opacity-70"
               >
                 {isLoading ? "অ্যাকাউন্ট তৈরি হচ্ছে..." : "অ্যাকাউন্ট তৈরি করুন"}
               </button>

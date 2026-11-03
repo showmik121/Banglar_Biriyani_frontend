@@ -52,11 +52,11 @@ export function ProductCard({
       id={`dish-${product.id}`}
       className={`group flex flex-col overflow-hidden rounded-card bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 scroll-mt-[calc(var(--header-h,120px)+32px)] ${
         isHighlighted
-          ? "ring-4 ring-[#E4002B] shadow-[0_0_35px_rgba(228,0,43,0.4)] scale-[1.02]"
+          ? "ring-4 ring-[#D7232B] shadow-[0_0_35px_rgba(215,35,43,0.4)] scale-[1.02]"
           : ""
       }`}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-saffron/40 via-alabaster to-[#E4002B]/15">
+      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-saffron/40 via-alabaster to-[#D7232B]/15">
         {product.image ? (
           <img
             src={product.image}
@@ -65,7 +65,7 @@ export function ProductCard({
             className="size-full object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="grid size-full place-items-center text-display text-5xl text-[#E4002B]/20">
+          <div className="grid size-full place-items-center text-display text-5xl text-[#D7232B]/20">
             BB
           </div>
         )}
@@ -85,10 +85,10 @@ export function ProductCard({
         <p className="line-clamp-2 text-sm text-slate">{product.description}</p>
 
         {isLowStock && (
-          <div className="flex items-center gap-1.5 font-sans text-xs font-semibold text-[#E4002B]">
+          <div className="flex items-center gap-1.5 font-sans text-xs font-semibold text-[#D7232B]">
             <span className="relative flex size-2">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#E4002B] opacity-75"></span>
-              <span className="relative inline-flex size-2 rounded-full bg-[#E4002B]"></span>
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#D7232B] opacity-75"></span>
+              <span className="relative inline-flex size-2 rounded-full bg-[#D7232B]"></span>
             </span>
             <span>
               ⚡ {dayLabelBn(currentDayLabel)} এর জন্য মাত্র{" "}
@@ -97,19 +97,19 @@ export function ProductCard({
           </div>
         )}
 
-        <p className="text-display mt-auto pt-1 text-2xl text-[#E4002B]">
+        <p className="text-display mt-auto pt-1 text-2xl text-[#D7232B]">
           {formatBdt(product.price)}
         </p>
         <button
           type="button"
           disabled={isSoldOut}
           onClick={handleAdd}
-          className={`mt-1 h-11 w-full rounded-full text-sm font-semibold transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#E4002B]/30 ${
+          className={`mt-1 h-11 w-full rounded-full text-sm font-semibold transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/30 ${
             isSoldOut
               ? "cursor-not-allowed border border-stone-300 bg-stone-200 text-stone-500"
               : justAdded
-                ? "border-2 border-[#E4002B] bg-[#FFF0F3] text-[#E4002B]"
-                : "bg-[#E4002B] text-white hover:bg-[#B80022]"
+                ? "border-2 border-[#D7232B] bg-[#FFF0F3] text-[#D7232B]"
+                : "bg-[#D7232B] text-white hover:bg-[#B80022]"
           }`}
         >
           {isSoldOut

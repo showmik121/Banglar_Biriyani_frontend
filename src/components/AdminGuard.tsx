@@ -23,7 +23,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
         aria-live="polite"
       >
         <div className="relative mb-4">
-          <div className="size-14 animate-spin rounded-full border-4 border-slate-200 border-t-[#E4002B]" />
+          <div className="size-14 animate-spin rounded-full border-4 border-slate-200 border-t-[#D7232B]" />
         </div>
         <p className="font-display text-lg tracking-wide text-slate-900">বাংলার বিরিয়ানি অপারেশন</p>
         <p className="mt-1 text-xs text-slate-500">অনুমোদিত প্রবেশাধিকার যাচাই করা হচ্ছে...</p>
@@ -55,7 +55,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
       <div className="flex min-h-screen flex-col items-center justify-center bg-slate-50 px-4 py-12 sm:px-6 lg:px-8">
         <div className="w-full max-w-md space-y-6">
           <div className="text-center">
-            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[#E4002B] shadow-lg shadow-[#E4002B]/30">
+            <div className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-[#D7232B] shadow-lg shadow-[#D7232B]/30">
               <svg
                 className="size-7 text-white"
                 viewBox="0 0 24 24"
@@ -74,7 +74,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
             <h1 className="mt-4 font-display text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
               বাংলার বিরিয়ানি
             </h1>
-            <p className="mt-1 text-sm font-semibold text-[#E4002B]">সুরক্ষিত অপারেশন ও কিচেন পোর্টাল</p>
+            <p className="mt-1 text-sm font-semibold text-[#D7232B]">সুরক্ষিত অপারেশন ও কিচেন পোর্টাল</p>
             <p className="mt-1 text-xs text-slate-500">
               এগিয়ে যেতে আপনার অনুমোদিত স্টাফ বা অ্যাডমিন লগইন তথ্য দিন।
             </p>
@@ -105,7 +105,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   placeholder="admin@banglarbiriyani.com"
-                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-[#E4002B] focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-[#D7232B] focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                 />
               </div>
 
@@ -120,7 +120,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
                   <button
                     type="button"
                     onClick={() => setShowPassword((p) => !p)}
-                    className="text-[11px] font-medium text-[#E4002B] hover:underline cursor-pointer"
+                    className="text-[11px] font-medium text-[#D7232B] hover:underline cursor-pointer"
                   >
                     {showPassword ? "লুকান" : "দেখান"}
                   </button>
@@ -132,14 +132,14 @@ export function AdminGuard({ children }: AdminGuardProps) {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-[#E4002B] focus:outline-none focus:ring-2 focus:ring-[#E4002B]/20"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 placeholder-slate-400 transition focus:border-[#D7232B] focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#E4002B] py-3 text-sm font-semibold text-white shadow-lg shadow-[#E4002B]/25 transition hover:bg-[#B80022] active:scale-[0.99] disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+                className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#D7232B] py-3 text-sm font-semibold text-white shadow-lg shadow-[#D7232B]/25 transition hover:bg-[#B80022] active:scale-[0.99] disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]"
               >
                 {isSubmitting ? (
                   <>
@@ -161,14 +161,14 @@ export function AdminGuard({ children }: AdminGuardProps) {
                 <button
                   type="button"
                   onClick={() => fillDemo("admin@banglarbiriyani.com", "Admin@1234")}
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-center text-xs font-medium text-slate-700 transition hover:border-[#E4002B] hover:bg-[#FFF0F3] hover:text-[#E4002B] cursor-pointer"
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-center text-xs font-medium text-slate-700 transition hover:border-[#D7232B] hover:bg-[#FFF0F3] hover:text-[#D7232B] cursor-pointer"
                 >
                   অ্যাডমিন পোর্টাল
                 </button>
                 <button
                   type="button"
                   onClick={() => fillDemo("kitchen@banglarbiriyani.com", "Staff@1234")}
-                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-center text-xs font-medium text-slate-700 transition hover:border-[#E4002B] hover:bg-[#FFF0F3] hover:text-[#E4002B] cursor-pointer"
+                  className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-2 text-center text-xs font-medium text-slate-700 transition hover:border-[#D7232B] hover:bg-[#FFF0F3] hover:text-[#D7232B] cursor-pointer"
                 >
                   প্রধান শেফ (স্টাফ)
                 </button>
@@ -244,7 +244,7 @@ export function AdminGuard({ children }: AdminGuardProps) {
             <button
               type="button"
               onClick={() => navigateTo("/")}
-              className="rounded-xl bg-[#E4002B] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#E4002B]/25 transition hover:bg-[#B80022] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B] cursor-pointer"
+              className="rounded-xl bg-[#D7232B] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#D7232B]/25 transition hover:bg-[#B80022] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B] cursor-pointer"
             >
               ওয়েবসাইটে ফিরে যান
             </button>

@@ -230,7 +230,7 @@ export function AdminMenu() {
           <button
             type="button"
             onClick={() => setIsCreateOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl bg-[#E4002B] px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#E4002B]/25 transition hover:bg-[#B80022] cursor-pointer"
+            className="inline-flex items-center gap-2 rounded-xl bg-[#D7232B] px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#D7232B]/25 transition hover:bg-[#B80022] cursor-pointer"
           >
             <svg
               className="size-4"
@@ -254,13 +254,13 @@ export function AdminMenu() {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search by dish name or ingredient..."
-          className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+          className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
         />
 
         <select
           value={selectedCat}
           onChange={(e) => setSelectedCat(e.target.value)}
-          className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none shadow-2xs"
+          className="rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs text-slate-800 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none shadow-2xs"
         >
           <option value="ALL">All Categories ({items.length})</option>
           {categories.map((c) => (
@@ -274,7 +274,7 @@ export function AdminMenu() {
       {/* Menu Grid */}
       {isLoading ? (
         <div className="flex min-h-[300px] flex-col items-center justify-center space-y-3">
-          <div className="size-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#E4002B]" />
+          <div className="size-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#D7232B]" />
           <p className="text-xs text-slate-500">Loading dishes...</p>
         </div>
       ) : filtered.length === 0 ? (
@@ -308,7 +308,7 @@ export function AdminMenu() {
               <div className="flex flex-1 flex-col p-4">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-slate-900 text-sm">{dish.name}</h3>
-                  <span className="font-mono font-bold text-[#E4002B] text-sm shrink-0">
+                  <span className="font-mono font-bold text-[#D7232B] text-sm shrink-0">
                     ৳{dish.basePriceBdt}
                   </span>
                 </div>
@@ -393,7 +393,7 @@ export function AdminMenu() {
                   value={createName}
                   onChange={(e) => setCreateName(e.target.value)}
                   placeholder="e.g. Sultan's Dine Style Kacchi"
-                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                 />
               </div>
 
@@ -408,7 +408,7 @@ export function AdminMenu() {
                     value={createCategory}
                     onChange={(e) => setCreateCategory(e.target.value)}
                     placeholder="Biryani & Tehari"
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                   />
                 </div>
 
@@ -422,7 +422,7 @@ export function AdminMenu() {
                     min="1"
                     value={createPrice}
                     onChange={(e) => setCreatePrice(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                   />
                 </div>
               </div>
@@ -434,7 +434,7 @@ export function AdminMenu() {
                   value={createDescription}
                   onChange={(e) => setCreateDescription(e.target.value)}
                   placeholder="Aromatic spices, tender meat, and basmati rice..."
-                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                 />
               </div>
 
@@ -446,7 +446,7 @@ export function AdminMenu() {
                     value={createPortion}
                     onChange={(e) => setCreatePortion(e.target.value)}
                     placeholder="1:1 Full Plate"
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                   />
                 </div>
 
@@ -455,7 +455,7 @@ export function AdminMenu() {
                   <select
                     value={createSpice}
                     onChange={(e) => setCreateSpice(e.target.value)}
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                   >
                     <option value="Mild">Mild</option>
                     <option value="Medium">Medium</option>
@@ -470,7 +470,7 @@ export function AdminMenu() {
                   type="url"
                   value={createImage}
                   onChange={(e) => setCreateImage(e.target.value)}
-                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                 />
               </div>
 
@@ -479,7 +479,7 @@ export function AdminMenu() {
                   type="checkbox"
                   checked={createIsEveryday}
                   onChange={(e) => setCreateIsEveryday(e.target.checked)}
-                  className="size-3.5 rounded border-slate-300 text-[#E4002B] focus:ring-[#E4002B]"
+                  className="size-3.5 rounded border-slate-300 text-[#D7232B] focus:ring-[#D7232B]"
                 />
                 <span className="text-xs text-slate-700">
                   Everyday staple dish (available all 7 days)
@@ -497,7 +497,7 @@ export function AdminMenu() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="rounded-xl bg-[#E4002B] px-5 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-[#B80022] disabled:opacity-50 cursor-pointer"
+                  className="rounded-xl bg-[#D7232B] px-5 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-[#B80022] disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting ? "Saving Dish..." : "Save Dish"}
                 </button>

@@ -154,7 +154,7 @@ export function AdminPanelModal() {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-line bg-gradient-to-r from-white via-[#FFF0F3]/50 to-white px-6 py-4">
           <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-[#E4002B] text-xs font-bold text-white shadow-xs">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-[#D7232B] text-xs font-bold text-white shadow-xs">
               ADMIN
             </span>
             <div>
@@ -194,7 +194,7 @@ export function AdminPanelModal() {
             onClick={() => setActiveTab("stats")}
             className={`border-b-2 px-4 py-3 transition ${
               activeTab === "stats"
-                ? "border-[#E4002B] text-[#E4002B]"
+                ? "border-[#D7232B] text-[#D7232B]"
                 : "border-transparent text-slate hover:text-charcoal"
             }`}
           >
@@ -205,7 +205,7 @@ export function AdminPanelModal() {
             onClick={() => setActiveTab("orders")}
             className={`border-b-2 px-4 py-3 transition ${
               activeTab === "orders"
-                ? "border-[#E4002B] text-[#E4002B]"
+                ? "border-[#D7232B] text-[#D7232B]"
                 : "border-transparent text-slate hover:text-charcoal"
             }`}
           >
@@ -217,7 +217,7 @@ export function AdminPanelModal() {
               onClick={() => setActiveTab("users")}
               className={`border-b-2 px-4 py-3 transition ${
                 activeTab === "users"
-                  ? "border-[#E4002B] text-[#E4002B]"
+                  ? "border-[#D7232B] text-[#D7232B]"
                   : "border-transparent text-slate hover:text-charcoal"
               }`}
             >
@@ -245,7 +245,7 @@ export function AdminPanelModal() {
               <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 <div className="rounded-xl border border-line bg-white p-4 shadow-xs">
                   <p className="text-xs text-slate">Total Lifetime Revenue</p>
-                  <p className="mt-1 text-2xl font-bold text-[#E4002B]">
+                  <p className="mt-1 text-2xl font-bold text-[#D7232B]">
                     ৳{stats.totalRevenueBdt.toLocaleString()}
                   </p>
                 </div>
@@ -287,7 +287,7 @@ export function AdminPanelModal() {
                         <span className="font-medium text-slate">{d.day}</span>
                         <div className="flex items-center gap-3">
                           <span className="text-[11px] text-slate">{d.orderCount} orders</span>
-                          <span className="font-bold text-[#E4002B]">৳{d.revenueBdt}</span>
+                          <span className="font-bold text-[#D7232B]">৳{d.revenueBdt}</span>
                         </div>
                       </div>
                     ))}
@@ -344,12 +344,12 @@ export function AdminPanelModal() {
                             <p className="text-[11px] text-slate">{order.customerPhone}</p>
                           </td>
                           <td className="p-3">
-                            <span className="rounded bg-[#E4002B]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#E4002B]">
+                            <span className="rounded bg-[#D7232B]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#D7232B]">
                               {order.scheduledDay}
                             </span>
                             <p className="mt-0.5 text-[10px] text-slate">{order.deliverySlot}</p>
                           </td>
-                          <td className="p-3 font-bold text-[#E4002B]">৳{order.totalBdt}</td>
+                          <td className="p-3 font-bold text-[#D7232B]">৳{order.totalBdt}</td>
                           <td className="p-3">
                             <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
                               {order.status}
@@ -399,7 +399,7 @@ export function AdminPanelModal() {
                       </td>
                       <td className="p-3">{u.phone}</td>
                       <td className="p-3 font-bold">{u.orderCount}</td>
-                      <td className="p-3 font-bold text-[#E4002B]">৳{u.totalSpendBdt}</td>
+                      <td className="p-3 font-bold text-[#D7232B]">৳{u.totalSpendBdt}</td>
                       <td className="p-3">
                         {u.id === user?.id ? (
                           <span className="rounded bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-800">

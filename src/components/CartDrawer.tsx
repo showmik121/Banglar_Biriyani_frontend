@@ -175,7 +175,7 @@ export function CartDrawer({
             <h2 id="cart-drawer-title" className="text-display text-2xl text-charcoal">
               আপনার কার্ট
             </h2>
-            <span className="rounded-full bg-[#FFF0F3] px-2.5 py-0.5 text-xs font-bold text-[#E4002B]">
+            <span className="rounded-full bg-[#FFF0F3] px-2.5 py-0.5 text-xs font-bold text-[#D7232B]">
               {totalItems} {totalItems === 1 ? "item" : "items"}
             </span>
           </div>
@@ -183,7 +183,7 @@ export function CartDrawer({
             ref={closeButtonRef}
             type="button"
             onClick={handleClose}
-            className="rounded-full p-2 text-slate transition hover:bg-alabaster hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B] cursor-pointer"
+            className="rounded-full p-2 text-slate transition hover:bg-alabaster hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B] cursor-pointer"
             aria-label="কার্ট বন্ধ করুন"
           >
             <svg
@@ -200,10 +200,10 @@ export function CartDrawer({
         </div>
 
         {/* Scheduled Day Banner */}
-        <div className="flex items-center justify-between border-b border-[#E4002B]/15 bg-[#FFF0F3] px-6 py-2.5">
-          <div className="flex items-center gap-2 text-xs font-semibold text-[#E4002B]">
+        <div className="flex items-center justify-between border-b border-[#D7232B]/15 bg-[#FFF0F3] px-6 py-2.5">
+          <div className="flex items-center gap-2 text-xs font-semibold text-[#D7232B]">
             <svg
-              className="size-4 text-[#E4002B]"
+              className="size-4 text-[#D7232B]"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -217,7 +217,7 @@ export function CartDrawer({
             </svg>
             <span>নির্ধারিত মেনু:</span>
           </div>
-          <span className="text-display rounded-full bg-[#E4002B] px-3 py-1 text-xs font-semibold text-white shadow-xs">
+          <span className="text-display rounded-full bg-[#D7232B] px-3 py-1 text-xs font-semibold text-white shadow-xs">
             {formattedScheduledDay}
           </span>
         </div>
@@ -226,7 +226,7 @@ export function CartDrawer({
         <div className="flex-1 overflow-y-auto p-6" tabIndex={0} aria-label="কার্টের আইটেমের তালিকা">
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="mb-4 grid size-16 place-items-center rounded-full bg-[#FFF0F3] text-[#E4002B]">
+              <div className="mb-4 grid size-16 place-items-center rounded-full bg-[#FFF0F3] text-[#D7232B]">
                 <svg
                   className="size-8"
                   viewBox="0 0 24 24"
@@ -258,7 +258,7 @@ export function CartDrawer({
                     />
                   ) : (
                     <div
-                      className="grid size-16 shrink-0 place-items-center rounded-lg bg-[#FFF0F3] text-display text-xl text-[#E4002B]"
+                      className="grid size-16 shrink-0 place-items-center rounded-lg bg-[#FFF0F3] text-display text-xl text-[#D7232B]"
                       aria-label={item.name}
                     >
                       BB
@@ -268,7 +268,7 @@ export function CartDrawer({
                   <div className="min-w-0 flex-1">
                     <h4 className="truncate text-sm font-semibold text-charcoal">{item.name}</h4>
                     <div className="mt-0.5 flex items-center gap-2">
-                      <span className="text-xs font-bold text-[#E4002B]">
+                      <span className="text-xs font-bold text-[#D7232B]">
                         {formatBdt(item.priceBdt)}
                       </span>
                       <span className="text-[10px] text-slate">
@@ -283,7 +283,7 @@ export function CartDrawer({
                       onClick={() =>
                         updateQuantity(item.menuItemId, item.scheduledDay, item.quantity - 1)
                       }
-                      className="grid size-7 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-[#E4002B] hover:bg-[#E4002B] hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+                      className="grid size-7 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-[#D7232B] hover:bg-[#D7232B] hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]"
                       aria-label={`${item.name} এর পরিমাণ কমান`}
                     >
                       -
@@ -299,7 +299,7 @@ export function CartDrawer({
                       onClick={() =>
                         updateQuantity(item.menuItemId, item.scheduledDay, item.quantity + 1)
                       }
-                      className="grid size-7 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-[#E4002B] hover:bg-[#E4002B] hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+                      className="grid size-7 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-[#D7232B] hover:bg-[#D7232B] hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]"
                       aria-label={`${item.name} এর পরিমাণ বাড়ান`}
                     >
                       +
@@ -307,7 +307,7 @@ export function CartDrawer({
                     <button
                       type="button"
                       onClick={() => removeItem(item.menuItemId, item.scheduledDay)}
-                      className="ml-1 p-1 text-slate transition hover:text-[#E4002B] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+                      className="ml-1 p-1 text-slate transition hover:text-[#D7232B] cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]"
                       title="আইটেম সরান"
                       aria-label={`কার্ট থেকে ${item.name} সরান`}
                     >
@@ -334,11 +334,11 @@ export function CartDrawer({
           <div className="space-y-3 border-t border-line bg-white p-6">
             {/* One-Click "Complete Your Biriyani" Upsell Row */}
             {availableUpsells.length > 0 && (
-              <div className="rounded-xl border border-[#E4002B]/15 bg-[#FFF0F3] p-3">
+              <div className="rounded-xl border border-[#D7232B]/15 bg-[#FFF0F3] p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-bold text-charcoal">আপনার বিরিয়ানি পূর্ণ করুন</span>
-                    <span className="rounded-full bg-[#E4002B] px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider text-white">
+                    <span className="rounded-full bg-[#D7232B] px-1.5 py-0.2 text-[9px] font-bold uppercase tracking-wider text-white">
                       অ্যাড-অন
                     </span>
                   </div>
@@ -364,7 +364,7 @@ export function CartDrawer({
                         >
                           {upsell.name}
                         </p>
-                        <p className="font-mono text-xs font-bold text-[#E4002B]">
+                        <p className="font-mono text-xs font-bold text-[#D7232B]">
                           {formatBdt(upsell.priceBdt)}
                         </p>
                       </div>
@@ -372,7 +372,7 @@ export function CartDrawer({
                         type="button"
                         onClick={() => handleAddUpsell(upsell)}
                         disabled={addingId === upsell.id}
-                        className="shrink-0 rounded-full bg-[#E4002B] px-2.5 py-1 text-[11px] font-bold text-white shadow-2xs transition hover:bg-[#B80022] active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+                        className="shrink-0 rounded-full bg-[#D7232B] px-2.5 py-1 text-[11px] font-bold text-white shadow-2xs transition hover:bg-[#B80022] active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]"
                       >
                         {addingId === upsell.id ? "✓" : "+ যোগ করুন"}
                       </button>
@@ -393,7 +393,7 @@ export function CartDrawer({
               </div>
               <div className="flex justify-between border-t border-line/60 pt-2 text-base font-bold text-charcoal">
                 <span>সর্বমোট</span>
-                <span className="text-display text-xl text-[#E4002B]">{formatBdt(totalBdt)}</span>
+                <span className="text-display text-xl text-[#D7232B]">{formatBdt(totalBdt)}</span>
               </div>
             </div>
 
@@ -404,7 +404,7 @@ export function CartDrawer({
                 setIsCheckoutOpen(true)
                 if (onProceedToCheckout) onProceedToCheckout()
               }}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#E4002B] py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-[#B80022] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#E4002B]/30 cursor-pointer"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#D7232B] py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-[#B80022] active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/30 cursor-pointer"
             >
               <span>চেকআউটে যান</span>
               <svg

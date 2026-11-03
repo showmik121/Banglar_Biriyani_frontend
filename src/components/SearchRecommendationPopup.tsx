@@ -101,10 +101,10 @@ export function SearchRecommendationPopup({
               onExecuteSearch(query)
               onClose()
             }}
-            className="flex w-full items-center justify-between rounded-xl bg-[#E4002B]/5 border border-[#E4002B]/30 p-2.5 text-left text-xs font-semibold text-[#E4002B] transition hover:bg-[#E4002B]/10 cursor-pointer"
+            className="flex w-full items-center justify-between rounded-xl bg-[#D7232B]/5 border border-[#D7232B]/30 p-2.5 text-left text-xs font-semibold text-[#D7232B] transition hover:bg-[#D7232B]/10 cursor-pointer"
           >
             <div className="flex items-center gap-2">
-              <span className="grid size-6 place-items-center rounded-full bg-[#E4002B] text-white">
+              <span className="grid size-6 place-items-center rounded-full bg-[#D7232B] text-white">
                 <svg
                   className="size-3"
                   viewBox="0 0 24 24"
@@ -138,7 +138,7 @@ export function SearchRecommendationPopup({
                     onExecuteSearch(pill)
                     onClose()
                   }}
-                  className="rounded-full border border-line bg-alabaster px-2.5 py-1 text-xs text-charcoal transition hover:border-[#E4002B] hover:bg-[#E4002B]/10 hover:text-[#E4002B] cursor-pointer"
+                  className="rounded-full border border-line bg-alabaster px-2.5 py-1 text-xs text-charcoal transition hover:border-[#D7232B] hover:bg-[#D7232B]/10 hover:text-[#D7232B] cursor-pointer"
                 >
                   {pill}
                 </button>
@@ -155,7 +155,7 @@ export function SearchRecommendationPopup({
                 ? `প্রস্তাবিত খাবার (${toBengaliNumber(filteredDishes.length)})`
                 : "জনপ্রিয় খাবার"}
             </span>
-            <span className="text-[10px] font-semibold text-[#E4002B]">বাংলার বিরিয়ানি</span>
+            <span className="text-[10px] font-semibold text-[#D7232B]">বাংলার বিরিয়ানি</span>
           </div>
 
           {filteredDishes.length > 0 ? (
@@ -179,7 +179,7 @@ export function SearchRecommendationPopup({
                         className="size-full object-cover transition group-hover:scale-105"
                       />
                     ) : (
-                      <div className="grid size-full place-items-center text-xs font-bold text-[#E4002B]">
+                      <div className="grid size-full place-items-center text-xs font-bold text-[#D7232B]">
                         BB
                       </div>
                     )}
@@ -188,7 +188,7 @@ export function SearchRecommendationPopup({
                   {/* Details */}
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-1.5">
-                      <span className="truncate text-xs font-bold text-charcoal group-hover:text-[#E4002B] transition-colors">
+                      <span className="truncate text-xs font-bold text-charcoal group-hover:text-[#D7232B] transition-colors">
                         {dish.name}
                       </span>
                       {dish.day && (
@@ -204,7 +204,7 @@ export function SearchRecommendationPopup({
 
                   {/* Price & Action */}
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-bold text-[#E4002B]">
+                    <span className="text-xs font-bold text-[#D7232B]">
                       {formatBdt(dish.price)}
                     </span>
                     <span className="block text-[10px] text-slate group-hover:text-charcoal transition-colors">

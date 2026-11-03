@@ -99,7 +99,7 @@ export function AdminOverview() {
   if (isLoading) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center space-y-3">
-        <div className="size-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#E4002B]" />
+        <div className="size-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#D7232B]" />
         <p className="text-xs font-semibold text-slate-500">ব্যবসার লাইভ তথ্য লোড হচ্ছে...</p>
       </div>
     )
@@ -112,7 +112,7 @@ export function AdminOverview() {
         <button
           type="button"
           onClick={fetchStats}
-          className="mt-4 rounded-xl bg-[#E4002B] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#B80022] cursor-pointer"
+          className="mt-4 rounded-xl bg-[#D7232B] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#B80022] cursor-pointer"
         >
           আবার চেষ্টা করুন
         </button>
@@ -142,7 +142,7 @@ export function AdminOverview() {
             <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">
               মোট আয়
             </span>
-            <span className="rounded-xl bg-[#FFF0F3] p-2 text-[#E4002B]">
+            <span className="rounded-xl bg-[#FFF0F3] p-2 text-[#D7232B]">
               <svg
                 className="size-5"
                 viewBox="0 0 24 24"
@@ -163,7 +163,7 @@ export function AdminOverview() {
               অর্ডার থেকে
             </p>
           </div>
-          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-[#E4002B] to-transparent" />
+          <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-[#D7232B] to-transparent" />
         </div>
 
         {/* Today's Revenue */}
@@ -271,7 +271,7 @@ export function AdminOverview() {
           </div>
 
           {topDay && topDay.revenueBdt > 0 && (
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#E4002B]/20 bg-[#FFF0F3] px-3 py-1 text-xs font-semibold text-[#E4002B]">
+            <div className="inline-flex items-center gap-2 rounded-full border border-[#D7232B]/20 bg-[#FFF0F3] px-3 py-1 text-xs font-semibold text-[#D7232B]">
               <span>🔥 সর্বোচ্চ বিক্রির দিন:</span>
               <strong className="text-slate-900">{dayLabelBn(topDay.day)}</strong>
               <span>({formatBdt(topDay.revenueBdt)})</span>
@@ -306,7 +306,7 @@ export function AdminOverview() {
                     style={{ height: `${heightPercent}%` }}
                     className={`w-full rounded-lg transition-all duration-500 ${
                       isHighest
-                        ? "bg-[#E4002B] shadow-md shadow-[#E4002B]/30"
+                        ? "bg-[#D7232B] shadow-md shadow-[#D7232B]/30"
                         : "bg-slate-300 hover:bg-slate-400"
                     }`}
                   />
@@ -315,7 +315,7 @@ export function AdminOverview() {
                 {/* Day label */}
                 <span
                   className={`mt-3 text-xs font-bold ${
-                    isHighest ? "text-[#E4002B]" : "text-slate-600"
+                    isHighest ? "text-[#D7232B]" : "text-slate-600"
                   }`}
                 >
                   {dayShortBn(dayStat.day)}
@@ -336,7 +336,7 @@ export function AdminOverview() {
           <button
             type="button"
             onClick={() => navigateTo("/admin/orders")}
-            className="text-xs font-semibold text-[#E4002B] hover:underline cursor-pointer"
+            className="text-xs font-semibold text-[#D7232B] hover:underline cursor-pointer"
           >
             সব লাইভ অর্ডার দেখুন →
           </button>
@@ -390,7 +390,7 @@ export function AdminOverview() {
                           {dayLabelBn(ord.scheduledDay)}
                         </span>
                       </td>
-                      <td className="px-5 py-3.5 font-mono font-bold text-[#E4002B]">
+                      <td className="px-5 py-3.5 font-mono font-bold text-[#D7232B]">
                         {formatBdt(ord.totalBdt)}
                       </td>
                       <td className="px-5 py-3.5">

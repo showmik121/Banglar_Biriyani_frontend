@@ -164,7 +164,7 @@ export function MyOrdersDrawer() {
           {/* Header */}
           <div className="flex items-center justify-between border-b border-line px-6 py-4.5 bg-gradient-to-r from-white via-[#FFF0F3]/40 to-white">
             <div className="flex items-center gap-3">
-              <span className="flex size-9 items-center justify-center rounded-xl bg-[#E4002B]/10 text-[#E4002B]">
+              <span className="flex size-9 items-center justify-center rounded-xl bg-[#D7232B]/10 text-[#D7232B]">
                 <svg
                   className="size-5"
                   viewBox="0 0 24 24"
@@ -195,11 +195,11 @@ export function MyOrdersDrawer() {
                 type="button"
                 onClick={fetchOrders}
                 disabled={isLoading}
-                className="grid size-9 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+                className="grid size-9 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]"
                 aria-label="অর্ডার রিফ্রেশ করুন"
               >
                 <svg
-                  className={`size-4 ${isLoading ? "animate-spin text-[#E4002B]" : ""}`}
+                  className={`size-4 ${isLoading ? "animate-spin text-[#D7232B]" : ""}`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
@@ -215,7 +215,7 @@ export function MyOrdersDrawer() {
               <button
                 type="button"
                 onClick={closeMyOrders}
-                className="grid size-9 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+                className="grid size-9 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]"
                 aria-label="আমার অর্ডার বন্ধ করুন"
               >
                 <svg
@@ -262,7 +262,7 @@ export function MyOrdersDrawer() {
               </div>
             ) : orders.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-16 text-center">
-                <span className="flex size-16 items-center justify-center rounded-full bg-[#FFF0F3] text-[#E4002B]">
+                <span className="flex size-16 items-center justify-center rounded-full bg-[#FFF0F3] text-[#D7232B]">
                   <svg
                     className="size-8"
                     viewBox="0 0 24 24"
@@ -290,7 +290,7 @@ export function MyOrdersDrawer() {
                     const menuEl = document.getElementById("menu")
                     menuEl?.scrollIntoView({ behavior: "smooth" })
                   }}
-                  className="mt-5 rounded-full bg-[#E4002B] px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#B80022]"
+                  className="mt-5 rounded-full bg-[#D7232B] px-5 py-2.5 text-xs font-bold text-white shadow-xs transition hover:bg-[#B80022]"
                 >
                   মেনু দেখে অর্ডার করুন
                 </button>
@@ -303,7 +303,7 @@ export function MyOrdersDrawer() {
                 return (
                   <div
                     key={order.id}
-                    className="rounded-2xl border border-line bg-white shadow-xs transition hover:border-[#E4002B]/40 hover:shadow-md"
+                    className="rounded-2xl border border-line bg-white shadow-xs transition hover:border-[#D7232B]/40 hover:shadow-md"
                   >
                     {/* Order Top Summary */}
                     <div className="border-b border-line bg-alabaster/40 p-4">
@@ -313,7 +313,7 @@ export function MyOrdersDrawer() {
                             <span className="font-mono text-sm font-bold text-charcoal">
                               #{order.orderNumber}
                             </span>
-                            <span className="rounded-full bg-[#E4002B]/10 px-2.5 py-0.5 text-[11px] font-bold text-[#E4002B]">
+                            <span className="rounded-full bg-[#D7232B]/10 px-2.5 py-0.5 text-[11px] font-bold text-[#D7232B]">
                               {dayLabelBn(order.scheduledDay)}
                             </span>
                           </div>
@@ -344,7 +344,7 @@ export function MyOrdersDrawer() {
                       {/* Delivery Slot info */}
                       <div className="mt-2.5 flex items-center gap-1.5 text-xs text-charcoal/80">
                         <svg
-                          className="size-3.5 text-[#E4002B]"
+                          className="size-3.5 text-[#D7232B]"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -378,9 +378,9 @@ export function MyOrdersDrawer() {
                                 <div
                                   className={`size-6 rounded-full flex items-center justify-center text-[10px] font-bold transition ${
                                     isPassed
-                                      ? "bg-[#E4002B] text-white shadow-xs"
+                                      ? "bg-[#D7232B] text-white shadow-xs"
                                       : "bg-alabaster text-slate border border-line"
-                                  } ${isCurrent ? "ring-4 ring-[#E4002B]/20 animate-pulse" : ""}`}
+                                  } ${isCurrent ? "ring-4 ring-[#D7232B]/20 animate-pulse" : ""}`}
                                 >
                                   {isPassed ? "✓" : idx + 1}
                                 </div>
@@ -447,7 +447,7 @@ export function MyOrdersDrawer() {
                         </div>
                         <div className="flex justify-between items-baseline pt-1 text-sm font-bold text-charcoal">
                           <span>সর্বমোট</span>
-                          <span className="text-[#E4002B] text-base">
+                          <span className="text-[#D7232B] text-base">
                             {formatBdt(order.totalBdt)}
                           </span>
                         </div>
@@ -458,7 +458,7 @@ export function MyOrdersDrawer() {
                               পেমেন্ট: <strong>{paymentMethodLabelBn(order.paymentMethod)}</strong>
                             </span>
                             {order.paymentTrxId && (
-                              <span className="font-mono text-[10px] font-bold text-[#E4002B] bg-[#FFF0F3] px-1.5 py-0.5 rounded border border-[#E4002B]/20">
+                              <span className="font-mono text-[10px] font-bold text-[#D7232B] bg-[#FFF0F3] px-1.5 py-0.5 rounded border border-[#D7232B]/20">
                                 TrxID: {order.paymentTrxId}
                               </span>
                             )}

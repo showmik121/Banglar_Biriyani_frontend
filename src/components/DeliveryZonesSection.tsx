@@ -87,7 +87,7 @@ export function DeliveryZonesSection({ onOrderNow }: Props) {
   return (
     <section id="delivery-zones" className="relative w-full overflow-hidden">
       {/* Top Main Section with Rich Red Textured Background */}
-      <div className="relative bg-[#E4002B] px-4 pt-12 pb-16 text-white sm:px-6 lg:px-8 lg:pt-16 lg:pb-20">
+      <div className="relative bg-[#D7232B] px-4 pt-12 pb-16 text-white sm:px-6 lg:px-8 lg:pt-16 lg:pb-20">
         {/* Subtle dot matrix pattern overlay */}
         <div
           className="pointer-events-none absolute inset-0 opacity-15"
@@ -151,7 +151,7 @@ export function DeliveryZonesSection({ onOrderNow }: Props) {
               <button
                 type="button"
                 onClick={handleOrderClick}
-                className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full border-2 border-white/80 px-7 text-sm font-semibold text-white transition hover:bg-white hover:text-[#E4002B] active:scale-95"
+                className="inline-flex h-12 cursor-pointer items-center justify-center rounded-full border-2 border-white/80 px-7 text-sm font-semibold text-white transition hover:bg-white hover:text-[#D7232B] active:scale-95"
               >
                 অর্ডার করুন
               </button>
@@ -166,7 +166,7 @@ export function DeliveryZonesSection({ onOrderNow }: Props) {
                 <h3 className="text-xl font-bold tracking-tight text-gray-900 sm:text-2xl">
                   ডেলিভারি এলাকা
                 </h3>
-                <span className="font-bengali rounded-full border border-rose-100 bg-rose-50 px-3 py-0.5 text-xs font-semibold text-[#E4002B]">
+                <span className="font-bengali rounded-full border border-rose-100 bg-rose-50 px-3 py-0.5 text-xs font-semibold text-[#D7232B]">
                   সাভার
                 </span>
               </div>
@@ -191,8 +191,8 @@ export function DeliveryZonesSection({ onOrderNow }: Props) {
                         <div
                           className={`flex size-7 shrink-0 items-center justify-center rounded-full text-xs font-bold transition sm:size-8 sm:text-sm ${
                             zone.id === 1
-                              ? "bg-[#E4002B] text-white shadow-sm"
-                              : "border border-rose-100 bg-rose-50/70 text-[#E4002B] group-hover:bg-rose-100/70"
+                              ? "bg-[#D7232B] text-white shadow-sm"
+                              : "border border-rose-100 bg-rose-50/70 text-[#D7232B] group-hover:bg-rose-100/70"
                           }`}
                         >
                           {toBengaliNumber(zone.id)}
@@ -230,7 +230,7 @@ export function DeliveryZonesSection({ onOrderNow }: Props) {
       </div>
 
       {/* Torn Paper / Ripped Edge Ribbon Divider */}
-      <div className="relative w-full overflow-hidden bg-[#E4002B] leading-none select-none">
+      <div className="relative w-full overflow-hidden bg-[#D7232B] leading-none select-none">
         {/* Layer 1: Top torn jagged edge with white paper */}
         <svg
           className="relative block h-7 w-full sm:h-9 md:h-11 text-white"
@@ -289,7 +289,7 @@ export function DeliveryZonesSection({ onOrderNow }: Props) {
               <button
                 type="button"
                 onClick={handleOrderClick}
-                className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-[#E4002B] px-6 text-sm font-bold text-white shadow-lg transition hover:bg-[#b80c14] active:scale-95 sm:h-12 sm:px-8 sm:text-base"
+                className="inline-flex h-11 cursor-pointer items-center justify-center rounded-full bg-[#D7232B] px-6 text-sm font-bold text-white shadow-lg transition hover:bg-[#b80c14] active:scale-95 sm:h-12 sm:px-8 sm:text-base"
               >
                 অর্ডার করুন
               </button>

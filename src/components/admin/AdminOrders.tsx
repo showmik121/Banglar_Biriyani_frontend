@@ -293,7 +293,7 @@ export function AdminOrders() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <span className="rounded-full bg-[#FFF0F3] px-2.5 py-0.5 font-mono text-[10px] font-bold text-[#E4002B] border border-[#E4002B]/20">
+            <span className="rounded-full bg-[#FFF0F3] px-2.5 py-0.5 font-mono text-[10px] font-bold text-[#D7232B] border border-[#D7232B]/20">
               অপারেশন ও কিচেন
             </span>
             <span className="text-xs text-slate-500">
@@ -313,7 +313,7 @@ export function AdminOrders() {
               onClick={() => setViewMode("table")}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
                 viewMode === "table"
-                  ? "bg-[#E4002B] text-white shadow-xs"
+                  ? "bg-[#D7232B] text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -334,7 +334,7 @@ export function AdminOrders() {
               onClick={() => setViewMode("kanban")}
               className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition cursor-pointer ${
                 viewMode === "kanban"
-                  ? "bg-[#E4002B] text-white shadow-xs"
+                  ? "bg-[#D7232B] text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -360,7 +360,7 @@ export function AdminOrders() {
             className="rounded-xl border border-slate-200 bg-white p-2 text-slate-600 transition hover:border-slate-300 hover:text-slate-900 shadow-xs cursor-pointer"
           >
             <svg
-              className={`size-4 ${isLoading ? "animate-spin text-[#E4002B]" : ""}`}
+              className={`size-4 ${isLoading ? "animate-spin text-[#D7232B]" : ""}`}
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
@@ -395,7 +395,7 @@ export function AdminOrders() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="অর্ডার নম্বর (BB-...), ফোন (০১XXXXXXXXX) বা গ্রাহকের নাম দিয়ে খুঁজুন..."
-              className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 transition focus:border-[#E4002B] focus:outline-none focus:ring-1 focus:ring-[#E4002B]/20"
+              className="w-full rounded-xl border border-slate-300 bg-white pl-10 pr-4 py-2 text-xs text-slate-900 placeholder-slate-400 transition focus:border-[#D7232B] focus:outline-none focus:ring-1 focus:ring-[#D7232B]/20"
             />
           </div>
 
@@ -405,7 +405,7 @@ export function AdminOrders() {
             <select
               value={paymentFilter}
               onChange={(e) => setPaymentFilter(e.target.value)}
-              className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#E4002B] focus:outline-none"
+              className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-800 focus:border-[#D7232B] focus:outline-none"
             >
               {PAYMENT_LIST.map((p) => (
                 <option key={p} value={p}>
@@ -428,7 +428,7 @@ export function AdminOrders() {
                 onClick={() => setDayFilter(day)}
                 className={`rounded-lg px-2.5 py-1 text-[11px] font-bold transition cursor-pointer ${
                   dayFilter === day
-                    ? "bg-[#E4002B] text-white shadow-xs"
+                    ? "bg-[#D7232B] text-white shadow-xs"
                     : "border border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100"
                 }`}
               >
@@ -447,7 +447,7 @@ export function AdminOrders() {
                 onClick={() => setStatusFilter(st)}
                 className={`rounded-lg px-2 py-1 text-[10px] font-bold transition cursor-pointer ${
                   statusFilter === st
-                    ? "bg-[#E4002B] text-white shadow-xs"
+                    ? "bg-[#D7232B] text-white shadow-xs"
                     : "border border-slate-200 bg-slate-50 text-slate-700 hover:border-slate-300 hover:bg-slate-100"
                 }`}
               >
@@ -461,7 +461,7 @@ export function AdminOrders() {
       {/* Main View: Table or Kanban */}
       {isLoading ? (
         <div className="flex min-h-[350px] flex-col items-center justify-center space-y-3 rounded-2xl border border-slate-200 bg-white shadow-sm">
-          <div className="size-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#E4002B]" />
+          <div className="size-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#D7232B]" />
           <p className="text-xs text-slate-500">অর্ডার লোড হচ্ছে...</p>
         </div>
       ) : orders.length === 0 ? (
@@ -515,7 +515,7 @@ export function AdminOrders() {
                         <button
                           type="button"
                           onClick={() => setSelectedOrder(ord)}
-                          className="font-bold text-slate-900 hover:text-[#E4002B] transition text-left cursor-pointer"
+                          className="font-bold text-slate-900 hover:text-[#D7232B] transition text-left cursor-pointer"
                         >
                           {ord.orderNumber}
                         </button>
@@ -524,7 +524,7 @@ export function AdminOrders() {
                             {paymentMethodLabelBn(ord.paymentMethod)}
                           </span>
                           {ord.paymentTrxId && (
-                            <span className="rounded bg-[#FFF0F3] border border-[#E4002B]/30 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#E4002B]">
+                            <span className="rounded bg-[#FFF0F3] border border-[#D7232B]/30 px-1.5 py-0.5 font-mono text-[10px] font-bold text-[#D7232B]">
                               TrxID: {ord.paymentTrxId}
                             </span>
                           )}
@@ -586,7 +586,7 @@ export function AdminOrders() {
                       </td>
 
                       {/* Total */}
-                      <td className="px-5 py-4 font-mono font-bold text-[#E4002B] text-sm">
+                      <td className="px-5 py-4 font-mono font-bold text-[#D7232B] text-sm">
                         {formatBdt(ord.totalBdt)}
                       </td>
 
@@ -640,7 +640,7 @@ export function AdminOrders() {
                               type="button"
                               disabled={updatingId === ord.id}
                               onClick={() => handleUpdateStatus(ord.id, "PREPARING")}
-                              className="rounded-lg bg-[#E4002B] px-2.5 py-1 text-[11px] font-bold text-white transition hover:bg-[#B80022] cursor-pointer shadow-xs"
+                              className="rounded-lg bg-[#D7232B] px-2.5 py-1 text-[11px] font-bold text-white transition hover:bg-[#B80022] cursor-pointer shadow-xs"
                             >
                               দম রান্না শুরু করুন
                             </button>
@@ -685,7 +685,7 @@ export function AdminOrders() {
                         <button
                           type="button"
                           onClick={() => setSelectedOrder(ord)}
-                          className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:border-[#E4002B] hover:text-[#E4002B] transition cursor-pointer"
+                          className="rounded-lg border border-slate-300 bg-white px-2.5 py-1 text-[11px] font-semibold text-slate-700 hover:border-[#D7232B] hover:text-[#D7232B] transition cursor-pointer"
                         >
                           কিচেন স্লিপ
                         </button>
@@ -736,11 +736,11 @@ export function AdminOrders() {
                           <button
                             type="button"
                             onClick={() => setSelectedOrder(ord)}
-                            className="font-mono text-xs font-bold text-slate-900 hover:text-[#E4002B] transition cursor-pointer"
+                            className="font-mono text-xs font-bold text-slate-900 hover:text-[#D7232B] transition cursor-pointer"
                           >
                             {ord.orderNumber}
                           </button>
-                          <span className="font-mono text-xs font-bold text-[#E4002B]">
+                          <span className="font-mono text-xs font-bold text-[#D7232B]">
                             {formatBdt(ord.totalBdt)}
                           </span>
                         </div>
@@ -763,7 +763,7 @@ export function AdminOrders() {
                             {paymentMethodLabelBn(ord.paymentMethod)}
                           </span>
                           {ord.paymentTrxId && (
-                            <span className="rounded border border-[#E4002B]/30 bg-[#FFF0F3] px-1 py-0.5 font-mono font-bold text-[#E4002B]">
+                            <span className="rounded border border-[#D7232B]/30 bg-[#FFF0F3] px-1 py-0.5 font-mono font-bold text-[#D7232B]">
                               {ord.paymentTrxId}
                             </span>
                           )}
@@ -818,7 +818,7 @@ export function AdminOrders() {
                             <button
                               type="button"
                               onClick={() => handleUpdateStatus(ord.id, "PREPARING")}
-                              className="w-full rounded-lg bg-[#E4002B] py-1 text-[10px] font-bold text-white hover:bg-[#B80022] cursor-pointer shadow-xs"
+                              className="w-full rounded-lg bg-[#D7232B] py-1 text-[10px] font-bold text-white hover:bg-[#B80022] cursor-pointer shadow-xs"
                             >
                               দম শুরু করুন
                             </button>
@@ -844,7 +844,7 @@ export function AdminOrders() {
                           <button
                             type="button"
                             onClick={() => setSelectedOrder(ord)}
-                            className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-700 hover:border-[#E4002B] hover:text-[#E4002B] cursor-pointer"
+                            className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[10px] text-slate-700 hover:border-[#D7232B] hover:text-[#D7232B] cursor-pointer"
                             title="কিচেন টিকেট দেখুন"
                           >
                             স্লিপ
@@ -877,7 +877,7 @@ export function AdminOrders() {
             {/* Modal Header */}
             <div className="flex items-center justify-between border-b border-slate-200 bg-white p-5 print:hidden">
               <div className="flex items-center gap-2">
-                <span className="rounded-lg bg-[#E4002B] px-2 py-0.5 text-xs font-bold text-white">
+                <span className="rounded-lg bg-[#D7232B] px-2 py-0.5 text-xs font-bold text-white">
                   কিচেন টিকেট
                 </span>
                 <span className="font-mono text-sm font-bold text-slate-900">
@@ -891,7 +891,7 @@ export function AdminOrders() {
                   className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-semibold text-slate-700 transition hover:bg-slate-100 cursor-pointer"
                 >
                   <svg
-                    className="size-3.5 text-[#E4002B]"
+                    className="size-3.5 text-[#D7232B]"
                     viewBox="0 0 24 24"
                     fill="none"
                     stroke="currentColor"
@@ -920,7 +920,7 @@ export function AdminOrders() {
                 <h1 className="font-display text-xl font-bold text-slate-900 print:text-black">
                   বাংলার বিরিয়ানি
                 </h1>
-                <p className="text-xs text-[#E4002B] font-semibold print:text-black">
+                <p className="text-xs text-[#D7232B] font-semibold print:text-black">
                   কিচেন দম ও ডিসপ্যাচ অর্ডার স্লিপ
                 </p>
                 <div className="mt-2 inline-block rounded-md border border-slate-200 bg-slate-50 px-3 py-1 font-mono text-sm font-bold text-slate-900 print:border-black print:text-black">
@@ -946,7 +946,7 @@ export function AdminOrders() {
                     পেমেন্ট মাধ্যম
                   </span>
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="font-bold text-[#E4002B] print:text-black">
+                    <p className="font-bold text-[#D7232B] print:text-black">
                       {paymentMethodLabelBn(selectedOrder.paymentMethod)}
                     </p>
                     {selectedOrder.paymentTrxId && (
@@ -1016,7 +1016,7 @@ export function AdminOrders() {
                   <tbody className="divide-y divide-slate-100 text-slate-800 print:divide-black print:text-black font-medium">
                     {selectedOrder.items?.map((item) => (
                       <tr key={item.id}>
-                        <td className="py-2 font-mono font-bold text-[#E4002B] print:text-black">
+                        <td className="py-2 font-mono font-bold text-[#D7232B] print:text-black">
                           {item.quantity}x
                         </td>
                         <td className="py-2">
@@ -1050,7 +1050,7 @@ export function AdminOrders() {
                 </div>
                 <div className="flex justify-between border-t border-slate-200 pt-2 font-bold text-sm text-slate-900 print:border-black print:text-black">
                   <span>সর্বমোট</span>
-                  <span className="font-mono text-[#E4002B] text-base print:text-black">
+                  <span className="font-mono text-[#D7232B] text-base print:text-black">
                     {formatBdt(selectedOrder.totalBdt)}
                   </span>
                 </div>
@@ -1078,8 +1078,8 @@ export function AdminOrders() {
                     onClick={() => handleUpdateStatus(selectedOrder.id, st)}
                     className={`rounded-lg px-2 py-1 text-[10px] font-bold transition cursor-pointer ${
                       selectedOrder.status === st
-                        ? "bg-[#E4002B] text-white opacity-90 cursor-default shadow-xs"
-                        : "border border-slate-200 bg-white text-slate-700 hover:border-[#E4002B] hover:text-[#E4002B]"
+                        ? "bg-[#D7232B] text-white opacity-90 cursor-default shadow-xs"
+                        : "border border-slate-200 bg-white text-slate-700 hover:border-[#D7232B] hover:text-[#D7232B]"
                     }`}
                   >
                     {orderStatusLabelBn(st)}

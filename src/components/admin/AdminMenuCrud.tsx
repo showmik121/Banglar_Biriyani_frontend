@@ -340,7 +340,7 @@ export function AdminMenuCrud() {
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <span className="rounded-full bg-[#E4002B]/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-[#E4002B] ring-1 ring-[#E4002B]/20">
+            <span className="rounded-full bg-[#D7232B]/10 px-2.5 py-0.5 font-mono text-[10px] font-bold text-[#D7232B] ring-1 ring-[#D7232B]/20">
               মেনু ক্যাটালগ ও রেসিপি
             </span>
             <span className="text-xs text-slate-500">
@@ -360,7 +360,7 @@ export function AdminMenuCrud() {
               onClick={() => setViewMode("grid")}
               className={`p-1.5 rounded-lg transition ${
                 viewMode === "grid"
-                  ? "bg-[#E4002B] text-white shadow-xs"
+                  ? "bg-[#D7232B] text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
               title="গ্রিড ভিউ"
@@ -383,7 +383,7 @@ export function AdminMenuCrud() {
               onClick={() => setViewMode("table")}
               className={`p-1.5 rounded-lg transition ${
                 viewMode === "table"
-                  ? "bg-[#E4002B] text-white shadow-xs"
+                  ? "bg-[#D7232B] text-white shadow-xs"
                   : "text-slate-600 hover:text-slate-900"
               }`}
               title="টেবিল ভিউ"
@@ -406,7 +406,7 @@ export function AdminMenuCrud() {
             <button
               type="button"
               onClick={openCreateModal}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#E4002B] px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#E4002B]/25 transition hover:bg-[#B80022] active:scale-[0.98] cursor-pointer"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#D7232B] px-4 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#D7232B]/25 transition hover:bg-[#B80022] active:scale-[0.98] cursor-pointer"
             >
               <svg
                 className="size-4"
@@ -432,7 +432,7 @@ export function AdminMenuCrud() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="নাম, বিবরণ বা উপকরণ দিয়ে খাবার খুঁজুন..."
-            className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+            className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
           />
         </div>
 
@@ -443,7 +443,7 @@ export function AdminMenuCrud() {
             onClick={() => setSelectedCategory("ALL")}
             className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
               selectedCategory === "ALL"
-                ? "bg-[#E4002B] text-white shadow-xs"
+                ? "bg-[#D7232B] text-white shadow-xs"
                 : "border border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:text-slate-900"
             }`}
           >
@@ -458,7 +458,7 @@ export function AdminMenuCrud() {
                 onClick={() => setSelectedCategory(cat.name)}
                 className={`rounded-lg px-3 py-1.5 text-xs font-bold transition ${
                   selectedCategory === cat.name
-                    ? "bg-[#E4002B] text-white shadow-xs"
+                    ? "bg-[#D7232B] text-white shadow-xs"
                     : "border border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:text-slate-900"
                 }`}
               >
@@ -472,7 +472,7 @@ export function AdminMenuCrud() {
       {/* Content: Grid or Table */}
       {isLoading ? (
         <div className="flex min-h-[350px] flex-col items-center justify-center space-y-3 rounded-2xl border border-slate-200 bg-white">
-          <div className="size-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#E4002B]" />
+          <div className="size-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#D7232B]" />
           <p className="text-xs text-slate-500">ক্যাটালগ লোড হচ্ছে...</p>
         </div>
       ) : filteredItems.length === 0 ? (
@@ -508,7 +508,7 @@ export function AdminMenuCrud() {
               <div className="flex flex-1 flex-col p-4">
                 <div className="flex items-start justify-between gap-2">
                   <h3 className="font-semibold text-slate-900 text-sm">{dish.name}</h3>
-                  <span className="font-mono font-bold text-[#E4002B] text-sm shrink-0">
+                  <span className="font-mono font-bold text-[#D7232B] text-sm shrink-0">
                     {formatBdt(dish.basePriceBdt)}
                   </span>
                 </div>
@@ -558,7 +558,7 @@ export function AdminMenuCrud() {
                     <button
                       type="button"
                       onClick={() => openEditModal(dish)}
-                      className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 hover:border-[#E4002B] hover:text-[#E4002B] shadow-2xs transition cursor-pointer"
+                      className="rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 hover:border-[#D7232B] hover:text-[#D7232B] shadow-2xs transition cursor-pointer"
                       title="খাবারের রেসিপি ও তথ্য সম্পাদনা করুন"
                     >
                       <svg
@@ -651,7 +651,7 @@ export function AdminMenuCrud() {
                       </span>
                     </td>
 
-                    <td className="px-5 py-3.5 font-mono font-bold text-[#E4002B]">
+                    <td className="px-5 py-3.5 font-mono font-bold text-[#D7232B]">
                       {formatBdt(dish.basePriceBdt)}
                     </td>
 
@@ -678,7 +678,7 @@ export function AdminMenuCrud() {
                         <button
                           type="button"
                           onClick={() => openEditModal(dish)}
-                          className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700 hover:border-[#E4002B] hover:text-[#E4002B] shadow-2xs"
+                          className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-[11px] font-semibold text-slate-700 hover:border-[#D7232B] hover:text-[#D7232B] shadow-2xs"
                         >
                           সম্পাদনা
                         </button>
@@ -752,7 +752,7 @@ export function AdminMenuCrud() {
                     required
                     value={formData.imageUrl}
                     onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                     placeholder="https://..."
                   />
                 </div>
@@ -768,7 +768,7 @@ export function AdminMenuCrud() {
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                     placeholder="যেমন: শাহী মাটন কাচ্চি"
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                   />
                 </div>
 
@@ -780,7 +780,7 @@ export function AdminMenuCrud() {
                     value={formData.categoryName}
                     onChange={(e) => setFormData({ ...formData, categoryName: e.target.value })}
                     placeholder="সিগনেচার বিরিয়ানি"
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                   />
                 </div>
               </div>
@@ -793,7 +793,7 @@ export function AdminMenuCrud() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   placeholder="বাসমতি চাল, জাফরান ও বেরেস্তার সাথে দমে রান্না করা মাংস..."
-                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                  className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                 />
               </div>
 
@@ -812,7 +812,7 @@ export function AdminMenuCrud() {
                         basePriceBdt: Number(e.target.value),
                       })
                     }
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                   />
                 </div>
 
@@ -823,7 +823,7 @@ export function AdminMenuCrud() {
                     value={formData.portionSize}
                     onChange={(e) => setFormData({ ...formData, portionSize: e.target.value })}
                     placeholder="১:১ রেগুলার"
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                   />
                 </div>
 
@@ -832,7 +832,7 @@ export function AdminMenuCrud() {
                   <select
                     value={formData.spiceLevel}
                     onChange={(e) => setFormData({ ...formData, spiceLevel: e.target.value })}
-                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                    className="mt-1 w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                   >
                     {SPICE_LEVELS.map((lvl) => (
                       <option key={lvl} value={lvl}>
@@ -850,7 +850,7 @@ export function AdminMenuCrud() {
                     type="checkbox"
                     checked={formData.isEveryday}
                     onChange={(e) => setFormData({ ...formData, isEveryday: e.target.checked })}
-                    className="size-4 rounded border-slate-300 text-[#E4002B] focus:ring-[#E4002B]"
+                    className="size-4 rounded border-slate-300 text-[#D7232B] focus:ring-[#D7232B]"
                   />
                   <div>
                     <span className="text-xs font-semibold text-slate-800">প্রতিদিনের খাবার</span>
@@ -868,7 +868,7 @@ export function AdminMenuCrud() {
                         isAvailable: e.target.checked,
                       })
                     }
-                    className="size-4 rounded border-slate-300 text-[#E4002B] focus:ring-[#E4002B]"
+                    className="size-4 rounded border-slate-300 text-[#D7232B] focus:ring-[#D7232B]"
                   />
                   <div>
                     <span className="text-xs font-semibold text-slate-800">স্টকে ও প্রাপ্য</span>
@@ -892,7 +892,7 @@ export function AdminMenuCrud() {
                         onClick={() => toggleDayAssignment(day)}
                         className={`rounded-lg px-2.5 py-1 text-xs font-bold transition cursor-pointer ${
                           isAssigned
-                            ? "bg-[#E4002B] text-white shadow-xs"
+                            ? "bg-[#D7232B] text-white shadow-xs"
                             : "border border-slate-200 bg-slate-50 text-slate-600 hover:border-slate-300 hover:text-slate-900"
                         }`}
                       >
@@ -915,7 +915,7 @@ export function AdminMenuCrud() {
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="rounded-xl bg-[#E4002B] px-5 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-[#B80022] disabled:opacity-50 cursor-pointer"
+                  className="rounded-xl bg-[#D7232B] px-5 py-2 text-xs font-semibold text-white shadow-md transition hover:bg-[#B80022] disabled:opacity-50 cursor-pointer"
                 >
                   {isSubmitting
                     ? "সংরক্ষণ হচ্ছে..."

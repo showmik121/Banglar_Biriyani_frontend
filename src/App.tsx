@@ -402,13 +402,13 @@ export default function App() {
       {/* Our Menu: biryani & regular items */}
       <section id="menu" className="scroll-mt-[calc(var(--header-h,120px)+16px)]">
         <div className="bg-[#FFF5F3] px-4 pb-8 pt-8 text-center sm:px-6 sm:pb-10 sm:pt-10">
-          <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#E4002B]">
+          <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-[#D7232B]">
             Our Menu
           </p>
           <h2 className="text-display mt-2 text-4xl sm:text-5xl">আমাদের শাহি মেনু</h2>
           <p className="mt-2 text-sm text-slate sm:text-base">Straight from the nawab's handi</p>
           <svg
-            className="mx-auto mt-3 h-3 w-28 text-[#E4002B]"
+            className="mx-auto mt-3 h-3 w-28 text-[#D7232B]"
             viewBox="0 0 112 12"
             fill="none"
             stroke="currentColor"

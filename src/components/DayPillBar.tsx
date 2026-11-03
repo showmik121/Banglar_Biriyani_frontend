@@ -66,16 +66,16 @@ export function DayPillBar({ active: propActive, onChange: propOnChange }: Props
               aria-selected={isActive}
               aria-pressed={isActive}
               onClick={() => onChange(d)}
-              className={`text-display h-11 shrink-0 snap-start rounded-full border px-5 text-sm transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#E4002B]/25 cursor-pointer ${
+              className={`text-display h-11 shrink-0 snap-start rounded-full border px-5 text-sm transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/25 cursor-pointer ${
                 isActive
-                  ? "border-[#E4002B] bg-[#E4002B] text-white shadow-[0_6px_16px_-6px_rgba(228,0,43,0.6)]"
-                  : "border-line bg-white text-charcoal hover:border-[#E4002B] hover:text-[#E4002B]"
+                  ? "border-[#D7232B] bg-[#D7232B] text-white shadow-[0_6px_16px_-6px_rgba(215,35,43,0.6)]"
+                  : "border-line bg-white text-charcoal hover:border-[#D7232B] hover:text-[#D7232B]"
               }`}
             >
               {dayLabelBn(d)}
               {isToday && (
                 <span
-                  className={`ml-1.5 text-[10px] ${isActive ? "text-saffron" : "text-[#E4002B]"}`}
+                  className={`ml-1.5 text-[10px] ${isActive ? "text-saffron" : "text-[#D7232B]"}`}
                 >
                   আজ
                 </span>

@@ -160,7 +160,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
         {/* Brand Header */}
         <div className="flex h-16 shrink-0 items-center justify-between border-b border-slate-200 px-6">
           <div className="flex items-center gap-3">
-            <span className="flex size-9 items-center justify-center rounded-xl bg-[#E4002B] font-bold text-white shadow-md shadow-[#E4002B]/30">
+            <span className="flex size-9 items-center justify-center rounded-xl bg-[#D7232B] font-bold text-white shadow-md shadow-[#D7232B]/30">
               BB
             </span>
             <div>
@@ -203,7 +203,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <span
               className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
                 isAdmin
-                  ? "bg-[#FFF0F3] text-[#E4002B] border border-[#E4002B]/20"
+                  ? "bg-[#FFF0F3] text-[#D7232B] border border-[#D7232B]/20"
                   : "bg-amber-50 text-amber-700 border border-amber-200"
               }`}
             >
@@ -229,7 +229,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
                 }}
                 className={`group flex w-full items-center justify-between rounded-xl px-3.5 py-2.5 text-xs font-semibold transition-all cursor-pointer ${
                   isCurrent
-                    ? "bg-[#E4002B] text-white shadow-md shadow-[#E4002B]/20"
+                    ? "bg-[#D7232B] text-white shadow-md shadow-[#D7232B]/20"
                     : "text-slate-600 hover:bg-slate-100 hover:text-slate-900"
                 }`}
                 aria-current={isCurrent ? "page" : undefined}
@@ -260,7 +260,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
           <button
             type="button"
             onClick={() => navigateTo("/")}
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-700 transition hover:border-[#E4002B] hover:bg-[#FFF0F3] hover:text-[#E4002B] cursor-pointer"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3.5 py-2.5 text-xs font-semibold text-slate-700 transition hover:border-[#D7232B] hover:bg-[#FFF0F3] hover:text-[#D7232B] cursor-pointer"
           >
             <svg
               className="size-4"
@@ -331,7 +331,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
             <button
               type="button"
               onClick={() => navigateTo("/")}
-              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-[#E4002B] hover:bg-[#FFF0F3] hover:text-[#E4002B] cursor-pointer"
+              className="hidden sm:inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-3.5 py-1.5 text-xs font-semibold text-slate-700 transition hover:border-[#D7232B] hover:bg-[#FFF0F3] hover:text-[#D7232B] cursor-pointer"
             >
               <span className="size-2 rounded-full bg-emerald-500" />
               ওয়েবসাইট প্রিভিউ
@@ -340,7 +340,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
               <span className="text-xs font-semibold text-slate-700">
                 {user?.fullName.split(" ")[0]}
               </span>
-              <span className="rounded-full bg-[#E4002B] px-2 py-0.5 text-[10px] font-bold text-white">
+              <span className="rounded-full bg-[#D7232B] px-2 py-0.5 text-[10px] font-bold text-white">
                 {roleLabelBn(user?.role)}
               </span>
             </div>

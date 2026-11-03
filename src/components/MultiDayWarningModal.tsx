@@ -67,7 +67,7 @@ export function MultiDayWarningModal({
 
         <p className="text-sm text-slate leading-relaxed">
           আপনার কার্টে বর্তমানে <strong className="text-charcoal">{dayLabelBn(currentDay)}</strong> এর
-          খাবার রয়েছে। আপনি <strong className="text-[#E4002B]">"{newProduct?.name}"</strong> যোগ করতে
+          খাবার রয়েছে। আপনি <strong className="text-[#D7232B]">"{newProduct?.name}"</strong> যোগ করতে
           চাইছেন, যা <strong className="text-charcoal">{dayLabelBn(newDay)}</strong> এর জন্য নির্ধারিত।
         </p>
 
@@ -86,7 +86,7 @@ export function MultiDayWarningModal({
           <button
             type="button"
             onClick={onConfirmClearAndAdd}
-            className="flex-1 rounded-full bg-[#E4002B] py-2.5 text-xs font-semibold text-white hover:bg-[#B80022] transition shadow-sm cursor-pointer"
+            className="flex-1 rounded-full bg-[#D7232B] py-2.5 text-xs font-semibold text-white hover:bg-[#B80022] transition shadow-sm cursor-pointer"
           >
             {dayLabelBn(newDay)} এর নতুন কার্ট শুরু করুন
           </button>

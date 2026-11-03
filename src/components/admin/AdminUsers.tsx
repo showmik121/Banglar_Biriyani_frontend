@@ -201,7 +201,7 @@ export function AdminUsers() {
           className="inline-flex items-center gap-2 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 hover:bg-slate-50 shadow-2xs transition"
         >
           <svg
-            className={`size-3.5 ${isLoading ? "animate-spin text-[#E4002B]" : ""}`}
+            className={`size-3.5 ${isLoading ? "animate-spin text-[#D7232B]" : ""}`}
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
@@ -224,7 +224,7 @@ export function AdminUsers() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="নাম, ইমেইল বা মোবাইল (০১XXXXXXXXX) দিয়ে খুঁজুন..."
-            className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+            className="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
           />
 
           <div className="flex gap-1 rounded-xl bg-slate-100 p-1 border border-slate-200">
@@ -235,7 +235,7 @@ export function AdminUsers() {
                 onClick={() => setRoleFilter(r)}
                 className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                   roleFilter === r
-                    ? "bg-[#E4002B] text-white shadow-xs"
+                    ? "bg-[#D7232B] text-white shadow-xs"
                     : "text-slate-600 hover:text-slate-900"
                 }`}
               >
@@ -250,7 +250,7 @@ export function AdminUsers() {
       <div className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
         {isLoading ? (
           <div className="flex min-h-[350px] flex-col items-center justify-center space-y-3">
-            <div className="size-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#E4002B]" />
+            <div className="size-8 animate-spin rounded-full border-4 border-slate-200 border-t-[#D7232B]" />
             <p className="text-xs text-slate-500">ব্যবহারকারীর তথ্য লোড হচ্ছে...</p>
           </div>
         ) : filteredUsers.length === 0 ? (
@@ -330,7 +330,7 @@ export function AdminUsers() {
                         <span
                           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold ${
                             u.role === "ADMIN"
-                              ? "bg-[#E4002B]/10 text-[#E4002B] ring-1 ring-[#E4002B]/20"
+                              ? "bg-[#D7232B]/10 text-[#D7232B] ring-1 ring-[#D7232B]/20"
                               : u.role === "STAFF"
                                 ? "bg-amber-50 text-amber-700 ring-1 ring-amber-200"
                                 : "bg-slate-100 text-slate-600 border border-slate-200"
@@ -346,7 +346,7 @@ export function AdminUsers() {
                       </td>
 
                       {/* Total Spend */}
-                      <td className="px-5 py-4 font-mono font-bold text-[#E4002B] text-sm">
+                      <td className="px-5 py-4 font-mono font-bold text-[#D7232B] text-sm">
                         {formatBdt(u.totalSpendBdt)}
                       </td>
 
@@ -383,7 +383,7 @@ export function AdminUsers() {
                           onChange={(e) =>
                             handleRoleChange(u, e.target.value as "CUSTOMER" | "STAFF" | "ADMIN")
                           }
-                          className={`rounded-xl border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs transition focus:border-[#E4002B] focus:outline-none ${
+                          className={`rounded-xl border border-slate-300 bg-white px-2.5 py-1.5 text-xs font-semibold text-slate-800 shadow-2xs transition focus:border-[#D7232B] focus:outline-none ${
                             isSelf ? "opacity-50 cursor-not-allowed" : "cursor-pointer"
                           }`}
                         >

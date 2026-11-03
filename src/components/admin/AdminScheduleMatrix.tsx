@@ -222,7 +222,7 @@ export function AdminScheduleMatrix() {
   if (isLoading) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center space-y-3">
-        <div className="size-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#E4002B]" />
+        <div className="size-10 animate-spin rounded-full border-4 border-slate-200 border-t-[#D7232B]" />
         <p className="text-xs font-semibold text-slate-500">৭ দিনের মিল শিডিউল লোড হচ্ছে...</p>
       </div>
     )
@@ -281,7 +281,7 @@ export function AdminScheduleMatrix() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <span className="rounded-full bg-[#FFF0F3] px-2.5 py-0.5 font-mono text-[10px] font-bold text-[#E4002B] border border-[#E4002B]/20">
+              <span className="rounded-full bg-[#FFF0F3] px-2.5 py-0.5 font-mono text-[10px] font-bold text-[#D7232B] border border-[#D7232B]/20">
                 প্রধান নিয়ন্ত্রণ
               </span>
               <span className="text-xs text-slate-500">রিয়েল-টাইম কিচেন সিঙ্ক</span>
@@ -298,10 +298,10 @@ export function AdminScheduleMatrix() {
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-800 shadow-xs transition hover:border-[#E4002B] hover:bg-[#FFF0F3] hover:text-[#E4002B] cursor-pointer"
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-xs font-semibold text-slate-800 shadow-xs transition hover:border-[#D7232B] hover:bg-[#FFF0F3] hover:text-[#D7232B] cursor-pointer"
             >
               <svg
-                className="size-4 text-[#E4002B]"
+                className="size-4 text-[#D7232B]"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -317,7 +317,7 @@ export function AdminScheduleMatrix() {
               type="button"
               onClick={handleSaveSchedule}
               disabled={isSaving}
-              className="inline-flex items-center gap-2 rounded-xl bg-[#E4002B] px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#E4002B]/25 transition hover:bg-[#B80022] active:scale-[0.98] disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#E4002B]"
+              className="inline-flex items-center gap-2 rounded-xl bg-[#D7232B] px-5 py-2.5 text-xs font-semibold text-white shadow-lg shadow-[#D7232B]/25 transition hover:bg-[#B80022] active:scale-[0.98] disabled:opacity-50 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]"
             >
               {isSaving ? (
                 <>
@@ -357,7 +357,7 @@ export function AdminScheduleMatrix() {
                 onClick={() => handleSelectDay(day)}
                 className={`flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all cursor-pointer ${
                   isSelected
-                    ? "bg-[#E4002B] text-white shadow-md shadow-[#E4002B]/30"
+                    ? "bg-[#D7232B] text-white shadow-md shadow-[#D7232B]/30"
                     : "border border-slate-300 bg-white text-slate-700 hover:border-slate-400 hover:bg-slate-50"
                 }`}
               >
@@ -417,7 +417,7 @@ export function AdminScheduleMatrix() {
             <button
               type="button"
               onClick={() => setIsAddModalOpen(true)}
-              className="mt-4 rounded-xl bg-[#E4002B] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#B80022] cursor-pointer"
+              className="mt-4 rounded-xl bg-[#D7232B] px-4 py-2 text-xs font-semibold text-white transition hover:bg-[#B80022] cursor-pointer"
             >
               + ক্যাটালগ থেকে খাবার যুক্ত করুন
             </button>
@@ -509,7 +509,7 @@ export function AdminScheduleMatrix() {
                               updateItem(index, { specialPriceBdt: val })
                             }}
                             placeholder={String(entry.item.basePriceBdt)}
-                            className="w-full rounded-lg border border-slate-300 bg-white py-1.5 pl-6 pr-2 font-mono text-xs text-slate-900 placeholder-slate-400 transition focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                            className="w-full rounded-lg border border-slate-300 bg-white py-1.5 pl-6 pr-2 font-mono text-xs text-slate-900 placeholder-slate-400 transition focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                           />
                         </div>
                       </td>
@@ -525,7 +525,7 @@ export function AdminScheduleMatrix() {
                               dailyQuota: Number(e.target.value) || 1,
                             })
                           }
-                          className="w-20 rounded-lg border border-slate-300 bg-white py-1.5 px-2.5 font-mono text-xs text-slate-900 transition focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                          className="w-20 rounded-lg border border-slate-300 bg-white py-1.5 px-2.5 font-mono text-xs text-slate-900 transition focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
                         />
                       </td>
 
@@ -544,7 +544,7 @@ export function AdminScheduleMatrix() {
                                   ? "bg-rose-500"
                                   : percentSold >= 60
                                     ? "bg-amber-500"
-                                    : "bg-[#E4002B]"
+                                    : "bg-[#D7232B]"
                               }`}
                             />
                           </div>
@@ -641,13 +641,13 @@ export function AdminScheduleMatrix() {
                 value={catalogSearch}
                 onChange={(e) => setCatalogSearch(e.target.value)}
                 placeholder="খাবারের নাম বা বিবরণ খুঁজুন..."
-                className="flex-1 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#E4002B] focus:ring-1 focus:ring-[#E4002B]/20 focus:outline-none"
+                className="flex-1 rounded-xl border border-slate-300 bg-white px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:border-[#D7232B] focus:ring-1 focus:ring-[#D7232B]/20 focus:outline-none"
               />
 
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-[#E4002B] focus:outline-none"
+                className="rounded-xl border border-slate-300 bg-white px-3 py-2 text-xs text-slate-900 focus:border-[#D7232B] focus:outline-none"
               >
                 <option value="ALL">সব ক্যাটাগরি</option>
                 {categoriesList.map((cat) => (
@@ -682,7 +682,7 @@ export function AdminScheduleMatrix() {
                         <div>
                           <p className="text-xs font-bold text-slate-900">{item.name}</p>
                           <div className="mt-0.5 flex items-center gap-2 text-[11px] text-slate-500">
-                            <span className="font-mono font-semibold text-[#E4002B]">
+                            <span className="font-mono font-semibold text-[#D7232B]">
                               {formatBdt(item.basePriceBdt)}
                             </span>
                             <span>•</span>
@@ -698,7 +698,7 @@ export function AdminScheduleMatrix() {
                         className={`rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
                           isAlreadyAdded
                             ? "border border-slate-200 bg-slate-100 text-slate-400 cursor-not-allowed"
-                            : "bg-[#E4002B] text-white hover:bg-[#B80022] cursor-pointer"
+                            : "bg-[#D7232B] text-white hover:bg-[#B80022] cursor-pointer"
                         }`}
                       >
                         {isAlreadyAdded
