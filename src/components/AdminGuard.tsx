@@ -98,7 +98,7 @@ export function AdminGuard({ children }: { children: ReactNode }) {
         <div className="max-w-sm text-center">
           <h1 className="text-xl font-semibold text-slate-900">This account can't open the admin panel</h1>
           <p className="mt-2 text-sm text-slate-600">
-            <strong>{user.email}</strong> is a customer account. Sign out and sign in with an admin or staff account.
+            <strong>{user.email ?? user.phone}</strong> is a customer account. Sign out and sign in with an admin or staff account.
           </p>
           <div className="mt-6 flex justify-center gap-2">
             <button type="button" onClick={() => logout()} className={btnPrimary}>

@@ -10,7 +10,7 @@ import React, {
 export interface AuthUser {
   id: number
   fullName: string
-  email: string
+  email: string | null
   phone: string
   role: "CUSTOMER" | "STAFF" | "ADMIN"
   defaultAddress: string | null
@@ -19,7 +19,7 @@ export interface AuthUser {
 
 export interface SignupInput {
   fullName: string
-  email: string
+  email?: string | null
   phone: string
   password: string
   defaultAddress?: string | null
@@ -46,7 +46,9 @@ interface AuthContextType {
   openAdminModal: () => void
   closeAdminModal: () => void
   login: (identifier: string, password: string) => Promise<{ ok: boolean; error?: string }>
-  signup: (data: SignupInput) => Promise<{ ok: boolean; error?: string }>
+  signup: (
+    data: SignupInput,
+  ) => Promise<{ ok: boolean; error?: string; fieldErrors?: Record<string, string[] | undefined> }>
   logout: () => Promise<void>
   updateProfile: (data: UpdateProfileInput) => Promise<{ ok: boolean; error?: string }>
   refreshUser: () => Promise<void>
@@ -166,8 +168,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const body = await res.json().catch(() => null)
 
         if (!res.ok) {
-          const message = body?.error?.message || "Registration failed. Please check inputs."
-          return { ok: false, error: message }
+          const details = body?.error?.details
+          const fieldErrors =
+            details && typeof details === "object" ? (details as Record<string, string[] | undefined>) : undefined
+          const message = body?.error?.message || "Couldn't create your account. Please try again."
+          return { ok: false, error: message, fieldErrors }
         }
 
         if (body?.data?.user) {

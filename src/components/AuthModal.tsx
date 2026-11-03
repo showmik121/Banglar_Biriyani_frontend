@@ -1,460 +1,340 @@
-import { useState, useEffect, useRef, type FormEvent } from "react"
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react"
 import { useAuth } from "../context/AuthContext"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
 
+type Tab = "login" | "signup"
+type SignupField = "fullName" | "phone" | "password"
+
+/** "+880 1711-000001" -> "01711000001" */
+const normalizePhone = (v: string) => {
+  const digits = v.replace(/\D/g, "")
+  return digits.startsWith("880") ? digits.slice(2) : digits
+}
+
+function validateSignup(name: string, phone: string, password: string): Partial<Record<SignupField, string>> {
+  const errors: Partial<Record<SignupField, string>> = {}
+  if (name.trim().length < 2) errors.fullName = "Enter your name"
+  if (!/^01[3-9]\d{8}$/.test(normalizePhone(phone))) errors.phone = "Enter an 11-digit mobile number starting with 01"
+  if (password.length < 8) errors.password = "Use at least 8 characters"
+  return errors
+}
+
+const inputClass = (invalid?: boolean) =>
+  `mt-1.5 block h-12 w-full rounded-xl border bg-white px-3.5 text-base text-charcoal outline-none transition placeholder:text-slate/50 focus:ring-2 sm:text-sm ${
+    invalid ? "border-rose-400 focus:border-rose-500 focus:ring-rose-200" : "border-line focus:border-brand focus:ring-brand/15"
+  }`
+
 export function AuthModal() {
   const { isAuthModalOpen, authModalDefaultTab, closeAuthModal, login, signup } = useAuth()
   const modalRef = useRef<HTMLDivElement>(null)
-
+  const firstInputRef = useRef<HTMLInputElement>(null)
   useBodyScrollLock(isAuthModalOpen)
   useFocusTrap(modalRef, isAuthModalOpen)
 
-  const [activeTab, setActiveTab] = useState<"login" | "signup">("login")
+  const [tab, setTab] = useState<Tab>("login")
+  const [busy, setBusy] = useState(false)
+  const [formError, setFormError] = useState<string | null>(null)
+  const [showPassword, setShowPassword] = useState(false)
 
-  // Login form state
-  const [loginIdentifier, setLoginIdentifier] = useState("")
+  // Sign in
+  const [identifier, setIdentifier] = useState("")
   const [loginPassword, setLoginPassword] = useState("")
-  const [showLoginPassword, setShowLoginPassword] = useState(false)
 
-  // Signup form state
-  const [signupFullName, setSignupFullName] = useState("")
-  const [signupEmail, setSignupEmail] = useState("")
-  const [signupPhone, setSignupPhone] = useState("")
-  const [signupAddress, setSignupAddress] = useState("")
-  const [signupPassword, setSignupPassword] = useState("")
-  const [showSignupPassword, setShowSignupPassword] = useState(false)
+  // Sign up: name, mobile number, password
+  const [fullName, setFullName] = useState("")
+  const [phone, setPhone] = useState("")
+  const [password, setPassword] = useState("")
+  const [touched, setTouched] = useState<Partial<Record<SignupField, boolean>>>({})
+  const [serverErrors, setServerErrors] = useState<Partial<Record<SignupField, string>>>({})
 
-  // Status & error state
-  const [isLoading, setIsLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const switchTo = (next: Tab) => {
+    setTab(next)
+    setFormError(null)
+    setShowPassword(false)
+    setTimeout(() => firstInputRef.current?.focus(), 30)
+  }
 
-  const firstInputRef = useRef<HTMLInputElement>(null)
-
-  // Synchronize active tab with context default tab when opened
-  useEffect(() => {
-    if (isAuthModalOpen) {
-      setActiveTab(authModalDefaultTab)
-      setErrorMessage(null)
-      setTimeout(() => firstInputRef.current?.focus(), 50)
-    }
-  }, [isAuthModalOpen, authModalDefaultTab])
-
-  // Close on Escape key
   useEffect(() => {
     if (!isAuthModalOpen) return
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        closeAuthModal()
-      }
-    }
-    window.addEventListener("keydown", handleKeyDown)
-    return () => window.removeEventListener("keydown", handleKeyDown)
+    setTab(authModalDefaultTab)
+    setFormError(null)
+    setTouched({})
+    setServerErrors({})
+    setTimeout(() => firstInputRef.current?.focus(), 50)
+  }, [isAuthModalOpen, authModalDefaultTab])
+
+  useEffect(() => {
+    if (!isAuthModalOpen) return
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && closeAuthModal()
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
   }, [isAuthModalOpen, closeAuthModal])
 
   if (!isAuthModalOpen) return null
 
-  const handleLoginSubmit = async (e: FormEvent) => {
+  const clientErrors = validateSignup(fullName, phone, password)
+  // Show a field's problem after the customer leaves it (or presses the button)
+  const fieldError = (f: SignupField) => serverErrors[f] || (touched[f] ? clientErrors[f] : undefined)
+
+  const submitLogin = async (e: FormEvent) => {
     e.preventDefault()
-    if (isLoading) return
-    setErrorMessage(null)
+    if (busy) return
+    setFormError(null)
+    setBusy(true)
+    const result = await login(identifier.trim(), loginPassword)
+    setBusy(false)
+    if (!result.ok) setFormError(result.error || "Wrong mobile number, email or password.")
+  }
 
-    if (!loginIdentifier.trim()) {
-      setErrorMessage("Please enter your email or Bangladesh mobile number")
-      return
-    }
-    if (!loginPassword) {
-      setErrorMessage("Please enter your password")
-      return
-    }
+  const submitSignup = async (e: FormEvent) => {
+    e.preventDefault()
+    if (busy) return
+    setFormError(null)
+    setServerErrors({})
+    setTouched({ fullName: true, phone: true, password: true })
+    if (Object.keys(clientErrors).length > 0) return
 
-    setIsLoading(true)
-    const result = await login(loginIdentifier.trim(), loginPassword)
-    setIsLoading(false)
-
+    setBusy(true)
+    const result = await signup({ fullName: fullName.trim(), phone: normalizePhone(phone), password })
+    setBusy(false)
     if (!result.ok) {
-      setErrorMessage(result.error || "Sign in failed")
+      const fe = result.fieldErrors || {}
+      const mapped: Partial<Record<SignupField, string>> = {}
+      for (const f of ["fullName", "phone", "password"] as SignupField[]) if (fe[f]?.[0]) mapped[f] = fe[f]![0]
+      setServerErrors(mapped)
+      if (Object.keys(mapped).length === 0) setFormError(result.error || "Couldn't create your account. Please try again.")
     }
   }
 
-  const handleSignupSubmit = async (e: FormEvent) => {
-    e.preventDefault()
-    if (isLoading) return
-    setErrorMessage(null)
-
-    if (!signupFullName.trim()) {
-      setErrorMessage("Full name is required")
-      return
-    }
-    if (!signupEmail.trim() || !signupEmail.includes("@")) {
-      setErrorMessage("Valid email address is required")
-      return
-    }
-    if (!signupPhone.trim()) {
-      setErrorMessage("Bangladesh mobile number is required")
-      return
-    }
-    if (signupPassword.length < 8) {
-      setErrorMessage("Password must be at least 8 characters")
-      return
-    }
-
-    setIsLoading(true)
-    const result = await signup({
-      fullName: signupFullName.trim(),
-      email: signupEmail.trim(),
-      phone: signupPhone.trim(),
-      defaultAddress: signupAddress.trim() || null,
-      password: signupPassword,
-    })
-    setIsLoading(false)
-
-    if (!result.ok) {
-      setErrorMessage(result.error || "Registration failed")
-    }
-  }
+  const isSignup = tab === "signup"
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6"
       role="dialog"
       aria-modal="true"
       aria-labelledby="auth-modal-title"
     >
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 bg-charcoal/60 backdrop-blur-xs transition-opacity"
-        onClick={closeAuthModal}
-        aria-hidden="true"
-      />
+      <div className="fixed inset-0 bg-charcoal/60" onClick={closeAuthModal} aria-hidden="true" />
 
-      {/* Modal Dialog Card */}
       <div
         ref={modalRef}
-        className="relative max-h-[94dvh] w-full max-w-md overflow-y-auto overscroll-contain rounded-t-3xl bg-white pb-[env(safe-area-inset-bottom)] shadow-2xl transition-all sm:max-h-[92vh] sm:rounded-2xl"
+        className="relative max-h-[94dvh] w-full max-w-sm overflow-y-auto overscroll-contain rounded-t-3xl bg-white px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-6 shadow-2xl sm:rounded-2xl sm:pb-6"
       >
-        {/* Top Header with Brand Badge and Close Button */}
-        <div className="relative border-b border-line bg-gradient-to-r from-white via-brand-light/50 to-white px-6 pb-4 pt-6">
-          <button
-            type="button"
-            onClick={closeAuthModal}
-            className="absolute right-4 top-4 grid size-9 place-items-center rounded-full text-slate transition hover:bg-slate/10 hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-            aria-label="Close authentication modal"
-          >
-            <svg
-              className="size-5"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden="true"
-            >
-              <path d="M18 6 6 18M6 6l12 12" />
-            </svg>
-          </button>
+        <button
+          type="button"
+          onClick={closeAuthModal}
+          aria-label="Close"
+          className="absolute right-3 top-3 grid size-10 place-items-center rounded-full text-slate hover:bg-cream hover:text-charcoal"
+        >
+          <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path d="M18 6 6 18M6 6l12 12" strokeLinecap="round" />
+          </svg>
+        </button>
 
-          <div className="flex items-center gap-2">
-            <img
-              src="/logo-mark.png"
-              alt=""
-              className="size-9 rounded-full bg-white object-contain ring-2 ring-gold/40"
-            />
-            <span className="text-xs font-bold uppercase tracking-wider text-brand">
-              Banglar Biriyani
-            </span>
-          </div>
+        <img src="/logo-mark.png" alt="" className="size-11 rounded-full ring-2 ring-gold/40" />
+        <h2 id="auth-modal-title" className="mt-3 text-2xl font-bold text-charcoal">
+          {isSignup ? "Create your account" : "Sign in"}
+        </h2>
+        <p className="mt-1 text-sm text-slate">
+          {isSignup ? "Order faster and track every order." : "Welcome back to Banglar Biriyani."}
+        </p>
 
-          <h2
-            id="auth-modal-title"
-            className="text-display mt-3 text-3xl text-charcoal"
-          >
-            {activeTab === "login" ? "Welcome Back" : "Create Your Account"}
-          </h2>
-          <p className="mt-0.5 text-xs text-slate">
-            {activeTab === "login"
-              ? "Sign in to manage orders, schedule meals, and checkout faster."
-              : "Register to earn rewards and enjoy 1-click authentic biriyani orders."}
+        {formError && (
+          <p role="alert" className="mt-4 rounded-xl bg-rose-50 px-3.5 py-2.5 text-sm text-rose-700">
+            {formError}
           </p>
-
-          {/* Tab Selector */}
-          <div className="mt-4 flex rounded-xl bg-alabaster p-1 text-sm font-semibold">
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("login")
-                setErrorMessage(null)
-              }}
-              className={`flex-1 rounded-lg py-2.5 transition ${
-                activeTab === "login"
-                  ? "bg-white text-brand shadow-xs"
-                  : "text-slate hover:text-charcoal"
-              }`}
-            >
-              Sign In
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setActiveTab("signup")
-                setErrorMessage(null)
-              }}
-              className={`flex-1 rounded-lg py-2.5 transition ${
-                activeTab === "signup"
-                  ? "bg-white text-brand shadow-xs"
-                  : "text-slate hover:text-charcoal"
-              }`}
-            >
-              Sign Up
-            </button>
-          </div>
-        </div>
-
-        {/* Error Notification Banner */}
-        {errorMessage && (
-          <div
-            role="alert"
-            aria-live="polite"
-            className="flex items-start gap-2 border-b border-rose-200 bg-rose-50 px-6 py-2.5 text-xs font-medium text-rose-700"
-          >
-            <svg
-              className="mt-0.5 size-4 shrink-0 text-rose-600"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              aria-hidden="true"
-            >
-              <circle cx="12" cy="12" r="10" />
-              <line x1="12" y1="8" x2="12" y2="12" />
-              <line x1="12" y1="16" x2="12.01" y2="16" />
-            </svg>
-            <span>{errorMessage}</span>
-          </div>
         )}
 
-        {/* Form Body */}
-        <div className="p-6">
-          {activeTab === "login" ? (
-            <form onSubmit={handleLoginSubmit} className="space-y-4">
-              <div>
-                <label
-                  htmlFor="login-identifier"
-                  className="block text-xs font-semibold text-charcoal"
-                >
-                  Email or Mobile Number
-                </label>
-                <div className="relative mt-1">
-                  <input
-                    ref={firstInputRef}
-                    id="login-identifier"
-                    type="text"
-                    autoComplete="username"
-                    placeholder="e.g., 01711000003 or customer@banglarbiriyani.com"
-                    value={loginIdentifier}
-                    onChange={(e) => setLoginIdentifier(e.target.value)}
-                    required
-                    className="block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2.5 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20"
-                  />
-                </div>
-              </div>
+        {isSignup ? (
+          <form onSubmit={submitSignup} noValidate className="mt-5 space-y-4">
+            <Field id="signup-name" label="Your name" error={fieldError("fullName")}>
+              <input
+                ref={firstInputRef}
+                id="signup-name"
+                type="text"
+                autoComplete="name"
+                value={fullName}
+                onChange={(e) => {
+                  setFullName(e.target.value)
+                  setServerErrors((s) => ({ ...s, fullName: undefined }))
+                }}
+                onBlur={() => setTouched((t) => ({ ...t, fullName: true }))}
+                aria-invalid={!!fieldError("fullName")}
+                aria-describedby={fieldError("fullName") ? "signup-name-error" : undefined}
+                className={inputClass(!!fieldError("fullName"))}
+              />
+            </Field>
 
-              <div>
-                <label
-                  htmlFor="login-password"
-                  className="block text-xs font-semibold text-charcoal"
-                >
-                  Password
-                </label>
-                <div className="relative mt-1">
-                  <input
-                    id="login-password"
-                    type={showLoginPassword ? "text" : "password"}
-                    autoComplete="current-password"
-                    placeholder="••••••••"
-                    value={loginPassword}
-                    onChange={(e) => setLoginPassword(e.target.value)}
-                    required
-                    className="block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2.5 pr-10 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowLoginPassword((prev) => !prev)}
-                    className="absolute right-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-slate hover:text-charcoal"
-                    aria-label={showLoginPassword ? "Hide password" : "Show password"}
-                  >
-                    <svg
-                      className="size-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      aria-hidden="true"
-                    >
-                      {showLoginPassword ? (
-                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22" />
-                      ) : (
-                        <>
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </>
-                      )}
-                    </svg>
-                  </button>
-                </div>
-              </div>
+            <Field id="signup-phone" label="Mobile number" error={fieldError("phone")}>
+              <input
+                id="signup-phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel"
+                placeholder="01XXXXXXXXX"
+                value={phone}
+                onChange={(e) => {
+                  setPhone(e.target.value)
+                  setServerErrors((s) => ({ ...s, phone: undefined }))
+                }}
+                onBlur={() => setTouched((t) => ({ ...t, phone: true }))}
+                aria-invalid={!!fieldError("phone")}
+                aria-describedby={fieldError("phone") ? "signup-phone-error" : undefined}
+                className={inputClass(!!fieldError("phone"))}
+              />
+            </Field>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-white shadow-md transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 disabled:opacity-70"
-              >
-                {isLoading ? (
-                  <>
-                    <svg className="size-4 animate-spin text-white" fill="none" viewBox="0 0 24 24">
-                      <circle
-                        className="opacity-25"
-                        cx="12"
-                        cy="12"
-                        r="10"
-                        stroke="currentColor"
-                        strokeWidth="4"
-                      />
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                    </svg>
-                    Signing In...
-                  </>
-                ) : (
-                  "Sign In to Banglar Biriyani"
-                )}
-              </button>
+            <Field id="signup-password" label="Password" error={fieldError("password")} hint="At least 8 characters">
+              <PasswordInput
+                id="signup-password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(v) => {
+                  setPassword(v)
+                  setServerErrors((s) => ({ ...s, password: undefined }))
+                }}
+                onBlur={() => setTouched((t) => ({ ...t, password: true }))}
+                shown={showPassword}
+                onToggle={() => setShowPassword((v) => !v)}
+                invalid={!!fieldError("password")}
+              />
+            </Field>
 
-            </form>
-          ) : (
-            <form onSubmit={handleSignupSubmit} className="space-y-3.5">
-              <div>
-                <label
-                  htmlFor="signup-fullname"
-                  className="block text-xs font-semibold text-charcoal"
-                >
-                  Full Name
-                </label>
-                <input
-                  ref={firstInputRef}
-                  id="signup-fullname"
-                  type="text"
-                  placeholder="e.g., Tanvir Ahmed"
-                  value={signupFullName}
-                  onChange={(e) => setSignupFullName(e.target.value)}
-                  required
-                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
+            <SubmitButton busy={busy} label="Create account" busyLabel="Creating account…" />
+            <p className="text-center text-xs text-slate">We only use your number for order updates.</p>
+          </form>
+        ) : (
+          <form onSubmit={submitLogin} className="mt-5 space-y-4">
+            <Field id="login-identifier" label="Mobile number or email">
+              <input
+                ref={firstInputRef}
+                id="login-identifier"
+                type="text"
+                autoComplete="username"
+                placeholder="01XXXXXXXXX"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                required
+                className={inputClass()}
+              />
+            </Field>
+            <Field id="login-password" label="Password">
+              <PasswordInput
+                id="login-password"
+                autoComplete="current-password"
+                value={loginPassword}
+                onChange={setLoginPassword}
+                shown={showPassword}
+                onToggle={() => setShowPassword((v) => !v)}
+                required
+              />
+            </Field>
+            <SubmitButton busy={busy} label="Sign in" busyLabel="Signing in…" />
+          </form>
+        )}
 
-              <div>
-                <label htmlFor="signup-email" className="block text-xs font-semibold text-charcoal">
-                  Email Address
-                </label>
-                <input
-                  id="signup-email"
-                  type="email"
-                  placeholder="name@example.com"
-                  value={signupEmail}
-                  onChange={(e) => setSignupEmail(e.target.value)}
-                  required
-                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
-
-              <div>
-                <label htmlFor="signup-phone" className="block text-xs font-semibold text-charcoal">
-                  Bangladesh Mobile Number
-                </label>
-                <input
-                  id="signup-phone"
-                  type="tel"
-                  placeholder="017XXXXXXXX"
-                  value={signupPhone}
-                  onChange={(e) => setSignupPhone(e.target.value)}
-                  required
-                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="signup-address"
-                  className="block text-xs font-semibold text-charcoal"
-                >
-                  Default Delivery Address
-                </label>
-                <input
-                  id="signup-address"
-                  type="text"
-                  placeholder="House, Road, Area (e.g., DIU Hostel, Khagan, Savar)"
-                  value={signupAddress}
-                  onChange={(e) => setSignupAddress(e.target.value)}
-                  className="mt-1 block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20"
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="signup-password"
-                  className="block text-xs font-semibold text-charcoal"
-                >
-                  Password (min 8 chars)
-                </label>
-                <div className="relative mt-1">
-                  <input
-                    id="signup-password"
-                    type={showSignupPassword ? "text" : "password"}
-                    placeholder="••••••••"
-                    value={signupPassword}
-                    onChange={(e) => setSignupPassword(e.target.value)}
-                    required
-                    minLength={8}
-                    className="block w-full rounded-xl border border-line bg-alabaster/40 px-3.5 py-2 pr-10 text-sm text-charcoal transition placeholder:text-slate/60 focus:border-brand focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand/20"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowSignupPassword((prev) => !prev)}
-                    className="absolute right-1 top-1/2 grid size-10 -translate-y-1/2 place-items-center text-slate hover:text-charcoal"
-                    aria-label={showSignupPassword ? "Hide password" : "Show password"}
-                  >
-                    <svg
-                      className="size-4"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      aria-hidden="true"
-                    >
-                      {showSignupPassword ? (
-                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22" />
-                      ) : (
-                        <>
-                          <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                          <circle cx="12" cy="12" r="3" />
-                        </>
-                      )}
-                    </svg>
-                  </button>
-                </div>
-              </div>
-
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl bg-brand py-3 text-sm font-bold text-white shadow-md transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 disabled:opacity-70"
-              >
-                {isLoading ? "Creating Account..." : "Create Account"}
-              </button>
-            </form>
-          )}
-        </div>
+        <p className="mt-5 text-center text-sm text-slate">
+          {isSignup ? "Already have an account? " : "New here? "}
+          <button
+            type="button"
+            onClick={() => switchTo(isSignup ? "login" : "signup")}
+            className="font-semibold text-brand underline-offset-2 hover:underline"
+          >
+            {isSignup ? "Sign in" : "Create an account"}
+          </button>
+        </p>
       </div>
     </div>
+  )
+}
+
+function Field({
+  id,
+  label,
+  error,
+  hint,
+  children,
+}: {
+  id: string
+  label: string
+  error?: string
+  hint?: string
+  children: ReactNode
+}) {
+  return (
+    <div>
+      <label htmlFor={id} className="block text-sm font-medium text-charcoal">
+        {label}
+      </label>
+      {children}
+      {error ? (
+        <p id={`${id}-error`} className="mt-1.5 text-xs font-medium text-rose-600">
+          {error}
+        </p>
+      ) : (
+        hint && <p className="mt-1.5 text-xs text-slate">{hint}</p>
+      )}
+    </div>
+  )
+}
+
+function PasswordInput({
+  id,
+  value,
+  onChange,
+  onBlur,
+  shown,
+  onToggle,
+  autoComplete,
+  invalid,
+  required,
+}: {
+  id: string
+  value: string
+  onChange: (v: string) => void
+  onBlur?: () => void
+  shown: boolean
+  onToggle: () => void
+  autoComplete: string
+  invalid?: boolean
+  required?: boolean
+}) {
+  return (
+    <div className="relative">
+      <input
+        id={id}
+        type={shown ? "text" : "password"}
+        autoComplete={autoComplete}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onBlur={onBlur}
+        required={required}
+        aria-invalid={invalid || undefined}
+        aria-describedby={invalid ? `${id}-error` : undefined}
+        className={`${inputClass(invalid)} pr-16`}
+      />
+      <button
+        type="button"
+        onClick={onToggle}
+        aria-label={shown ? "Hide password" : "Show password"}
+        className="absolute right-1.5 top-[calc(50%+3px)] h-9 -translate-y-1/2 rounded-lg px-2.5 text-xs font-semibold text-slate hover:bg-cream hover:text-charcoal"
+      >
+        {shown ? "Hide" : "Show"}
+      </button>
+    </div>
+  )
+}
+
+function SubmitButton({ busy, label, busyLabel }: { busy: boolean; label: string; busyLabel: string }) {
+  return (
+    <button
+      type="submit"
+      disabled={busy}
+      className="flex h-12 w-full items-center justify-center rounded-xl bg-brand text-sm font-bold text-white transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 disabled:opacity-70"
+    >
+      {busy ? busyLabel : label}
+    </button>
   )
 }

@@ -42,8 +42,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             >
               View site
             </a>
-            <span className="hidden max-w-48 truncate px-2 text-sm text-slate-500 md:inline" title={user?.email}>
-              {user?.email}
+            <span className="hidden max-w-48 truncate px-2 text-sm text-slate-500 md:inline" title={user?.email ?? undefined}>
+              {user?.email ?? user?.phone}
             </span>
             <button
               type="button"
