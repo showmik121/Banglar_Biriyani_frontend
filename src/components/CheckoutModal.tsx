@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, type FormEvent } from "react"
+import { saveTrackedOrder } from "../lib/trackedOrders"
 import { useCart } from "../context/CartContext"
 import { useAddress } from "../context/AddressContext"
 import { useAuth } from "../context/AuthContext"
@@ -270,6 +271,8 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
         order: orderData,
         items: orderItemsList,
       })
+      // Remember it on this device so "My orders" can show it, even without an account
+      saveTrackedOrder({ orderNumber: orderData.orderNumber, phone: orderData.customerPhone || customerPhone })
       clearCart()
 
       // Notify order listeners (e.g. MyOrdersDrawer) immediately without page reload
@@ -346,6 +349,22 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
               </div>
             </div>
 
+            {/* What happens next */}
+            <div className="mt-5 rounded-card border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900" role="status">
+              <p className="font-bold">What happens next</p>
+              <ol className="mt-2 list-decimal space-y-1 pl-5">
+                <li>The restaurant confirms your order in a few minutes.</li>
+                <li>
+                  We cook it fresh and deliver it for free
+                  {selectedZone ? ` to ${selectedZone.name} in about ${selectedZone.etaMinutes} minutes` : ""}.
+                </li>
+                <li>
+                  Watch every step in <strong>My orders</strong>. We'll call {placedOrder.order.customerPhone} if we need
+                  anything.
+                </li>
+              </ol>
+            </div>
+
             {/* Receipt Summary Card */}
             <div className="mt-6 space-y-3 rounded-card border border-line bg-alabaster p-4 text-xs">
               <div className="flex items-center justify-between border-b border-line/60 pb-2">
@@ -353,7 +372,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                   Delivery
                 </span>
                 <span className="rounded-full bg-brand px-2.5 py-0.5 font-bold text-white">
-                  {placedOrder.order.deliverySlot}
+                  {selectedZone ? `${selectedZone.name} · ${selectedZone.etaMinutes} min` : "Free delivery"}
                 </span>
               </div>
 
@@ -438,25 +457,23 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
             </div>
 
             <div className="mt-6 flex flex-col sm:flex-row gap-2.5">
-              {user && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    handleResetAndClose()
-                    openMyOrders()
-                  }}
-                  className="flex-1 rounded-full border border-brand py-3 text-center text-sm font-semibold text-brand transition hover:bg-brand-light cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30"
-                >
-                  View in My Orders
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={() => {
+                  handleResetAndClose()
+                  openMyOrders()
+                }}
+                className="flex-1 rounded-full border border-brand py-3 text-center text-sm font-semibold text-brand transition hover:bg-brand-light cursor-pointer focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30"
+              >
+                Track my order
+              </button>
               <button
                 ref={closeBtnRef}
                 type="button"
                 onClick={handleResetAndClose}
-                className={`${user ? "flex-1" : "w-full"} rounded-full bg-brand py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-brand-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 cursor-pointer`}
+                className={`flex-1 rounded-full bg-brand py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-brand-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 cursor-pointer`}
               >
-                Done / Continue Browsing
+                Done
               </button>
             </div>
           </div>

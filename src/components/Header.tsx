@@ -6,6 +6,9 @@ import { navigateTo } from "../utils/navigation"
 import { AddressRecommendationPopup } from "./AddressRecommendationPopup"
 import { SearchRecommendationPopup, type SearchableDish } from "./SearchRecommendationPopup"
 
+// Receipt icon for "My orders"
+const RECEIPT_ICON = "M6 3h12v18l-3-2-3 2-3-2-3 2V3ZM9 8h6M9 12h6M9 16h3"
+
 type Props = {
   cartCount?: number
   query: string
@@ -295,6 +298,14 @@ export function Header({
             <>
               <button
                 type="button"
+                onClick={openMyOrders}
+                className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
+              >
+                <Icon d={RECEIPT_ICON} className="size-4" />
+                My orders
+              </button>
+              <button
+                type="button"
                 onClick={() => openAuthModal("login")}
                 className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
               >
@@ -371,6 +382,19 @@ export function Header({
                 </a>
               </li>
             ))}
+            <li className="col-span-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsNavOpen(false)
+                  openMyOrders()
+                }}
+                className="flex h-12 w-full items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-charcoal active:bg-cream"
+              >
+                <Icon d={RECEIPT_ICON} className="size-4 text-brand" />
+                My orders · track your order
+              </button>
+            </li>
           </ul>
         </nav>
       )}
