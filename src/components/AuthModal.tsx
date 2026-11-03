@@ -114,13 +114,6 @@ export function AuthModal() {
     }
   }
 
-  const fillDemoAccount = (identifier: string, password: string) => {
-    setActiveTab("login")
-    setLoginIdentifier(identifier)
-    setLoginPassword(password)
-    setErrorMessage(null)
-  }
-
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-6"
@@ -337,48 +330,6 @@ export function AuthModal() {
                 )}
               </button>
 
-              {/* Quick Fill Demo Section (local development only) */}
-              {import.meta.env.DEV && (
-              <div className="pt-2">
-                <div className="relative flex items-center justify-center">
-                  <div className="absolute inset-0 flex items-center">
-                    <div className="w-full border-t border-line" />
-                  </div>
-                  <span className="relative bg-white px-2 text-[11px] font-semibold uppercase tracking-wider text-slate">
-                    Quick-Fill Demo Accounts
-                  </span>
-                </div>
-
-                <div className="mt-3 grid grid-cols-3 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => fillDemoAccount("customer@banglarbiriyani.com", "Customer@1234")}
-                    className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-brand hover:bg-brand-light"
-                  >
-                    <span className="text-xs font-bold text-charcoal">Customer</span>
-                    <span className="text-[11px] text-slate">Tanvir Ahmed</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => fillDemoAccount("kitchen@banglarbiriyani.com", "Staff@1234")}
-                    className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-brand hover:bg-brand-light"
-                  >
-                    <span className="text-xs font-bold text-charcoal">Kitchen Staff</span>
-                    <span className="text-[11px] text-slate">Chef Rahim</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => fillDemoAccount("admin@banglarbiriyani.com", "Admin@1234")}
-                    className="flex flex-col items-center rounded-lg border border-line bg-alabaster/60 p-2 text-center transition hover:border-brand hover:bg-brand-light"
-                  >
-                    <span className="text-xs font-bold text-charcoal">Admin</span>
-                    <span className="text-[11px] text-slate">Owner</span>
-                  </button>
-                </div>
-              </div>
-              )}
             </form>
           ) : (
             <form onSubmit={handleSignupSubmit} className="space-y-3.5">
