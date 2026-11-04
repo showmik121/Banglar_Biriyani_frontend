@@ -8,11 +8,11 @@ const dish = (id: number, name: string) => ({
   basePriceBdt: 300,
   imageUrl: "",
   isAvailable: true,
-  categoryName: "Signature Biriyani",
+  categoryName: "Home-Style Meals",
 })
-const row = (menuItemId: number, dayOfWeek: string) => ({
+const row = (menuItemId: number, mealTime: string) => ({
   menuItemId,
-  dayOfWeek,
+  mealTime,
   specialPriceBdt: null,
   dailyQuota: 100,
   isFeatured: false,
@@ -23,7 +23,7 @@ afterEach(() => vi.unstubAllGlobals())
 
 function mockApi() {
   const calls: { url: string; init?: RequestInit }[] = []
-  const schedule = Object.fromEntries(days.map((d) => [d, [row(1, d), row(2, d)]]))
+  const schedule = Object.fromEntries(days.map((d) => [d, [row(1, "BREAKFAST"), row(2, "LUNCH")]]))
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string, init?: RequestInit) => {
@@ -31,7 +31,11 @@ function mockApi() {
       if (init?.method === "PUT") return new Response(JSON.stringify({ data: { assignments: [] } }), { status: 200 })
       return new Response(
         JSON.stringify({
-          data: { days: schedule, menuCatalog: [dish(1, "Kacchi"), dish(2, "Tehari"), dish(3, "Thali"), dish(4, "Borhani")], categories: [] },
+          data: {
+            days: schedule,
+            menuCatalog: [dish(1, "Khichuri"), dish(2, "Kacchi"), dish(3, "Rice & Fish Curry"), dish(4, "Borhani")],
+            categories: [],
+          },
         }),
         { status: 200 },
       )
@@ -41,28 +45,34 @@ function mockApi() {
 }
 
 describe("Admin daily meals", () => {
-  test("adds a third meal and saves the day with the first meal as the special", async () => {
+  test("shows breakfast, lunch and dinner and saves each dish with its meal", async () => {
     const calls = mockApi()
     render(<AdminMeals />)
-    const select = await screen.findByLabelText("Add meal 3 of 3")
-    fireEvent.change(select, { target: { value: "3" } })
+    const dinner = (await screen.findByRole("heading", { name: "Dinner" })).closest("section")!
+    expect(within(dinner).getByText("No dinner yet.")).toBeInTheDocument()
 
-    // A day holds 3 meals, so the picker goes away
-    expect(screen.queryByLabelText(/Add meal/)).not.toBeInTheDocument()
+    // The same dish can be at lunch and at dinner
+    fireEvent.change(screen.getByLabelText("Add a dish to dinner"), { target: { value: "3" } })
+    fireEvent.change(screen.getByLabelText("Add a dish to dinner"), { target: { value: "2" } })
     fireEvent.click(screen.getByRole("button", { name: /^Save / }))
 
     await waitFor(() => expect(calls.some((c) => c.init?.method === "PUT")).toBe(true))
-    const put = calls.find((c) => c.init?.method === "PUT")!
-    const body = JSON.parse(String(put.init!.body))
-    expect(body.assignments.map((a: { menuItemId: number }) => a.menuItemId)).toEqual([1, 2, 3])
-    expect(body.assignments.map((a: { isFeatured: boolean }) => a.isFeatured)).toEqual([true, false, false])
+    const body = JSON.parse(String(calls.find((c) => c.init?.method === "PUT")!.init!.body))
+    expect(body.assignments.map((a: { mealTime: string; menuItemId: number }) => `${a.mealTime}:${a.menuItemId}`)).toEqual([
+      "BREAKFAST:1",
+      "LUNCH:2",
+      "DINNER:3",
+      "DINNER:2",
+    ])
+    // The first dish of each meal is its special
+    expect(body.assignments.map((a: { isFeatured: boolean }) => a.isFeatured)).toEqual([true, true, true, false])
   })
 
-  test("removing a meal enables Undo", async () => {
+  test("removing a dish enables Undo", async () => {
     mockApi()
     render(<AdminMeals />)
-    const list = (await screen.findByRole("heading", { level: 2 })).closest("section")!
-    fireEvent.click(within(list).getByRole("button", { name: /Remove Tehari/ }))
+    const lunch = (await screen.findByRole("heading", { name: "Lunch" })).closest("section")!
+    fireEvent.click(within(lunch).getByRole("button", { name: /Remove Kacchi/ }))
     expect(screen.getByRole("button", { name: "Undo changes" })).toBeEnabled()
   })
 })

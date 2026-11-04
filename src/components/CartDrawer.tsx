@@ -4,6 +4,7 @@ import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
 import { useLang } from "../context/LanguageContext"
 import { dishName } from "../i18n/dishes"
+import { mealTimeLabel } from "../i18n/mealTimes"
 
 interface UpsellItem {
   id: number
@@ -226,7 +227,7 @@ export function CartDrawer({
             <div className="space-y-3">
               {items.map((item: CartItem) => (
                 <div
-                  key={`${item.menuItemId}-${item.scheduledDay}`}
+                  key={`${item.menuItemId}-${item.scheduledDay}-${item.mealTime || ""}`}
                   className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-card border border-line bg-white p-3 shadow-xs transition hover:border-slate/30"
                 >
                   {item.imageUrl ? (
@@ -248,6 +249,11 @@ export function CartDrawer({
                     <h4 className="line-clamp-2 text-sm font-semibold leading-snug text-charcoal">{dishName(item.name, lang)}</h4>
                     <div className="mt-0.5 flex items-center gap-2">
                       <span className="text-sm font-bold text-brand">{taka(item.priceBdt)}</span>
+                      {item.mealTime && (
+                        <span className="rounded-full bg-cream px-2 py-0.5 text-[11px] font-semibold text-charcoal">
+                          {mealTimeLabel(item.mealTime, lang)}
+                        </span>
+                      )}
                     </div>
                   </div>
 
@@ -255,7 +261,7 @@ export function CartDrawer({
                     <button
                       type="button"
                       onClick={() =>
-                        updateQuantity(item.menuItemId, item.scheduledDay, item.quantity - 1)
+                        updateQuantity(item.menuItemId, item.scheduledDay, item.quantity - 1, item.mealTime || "")
                       }
                       className="grid size-9 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-brand hover:bg-brand hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                       aria-label={tr(`Decrease quantity of ${item.name}`, `${dishName(item.name, lang)} একটি কমান`)}
@@ -271,7 +277,7 @@ export function CartDrawer({
                     <button
                       type="button"
                       onClick={() =>
-                        updateQuantity(item.menuItemId, item.scheduledDay, item.quantity + 1)
+                        updateQuantity(item.menuItemId, item.scheduledDay, item.quantity + 1, item.mealTime || "")
                       }
                       className="grid size-9 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-brand hover:bg-brand hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                       aria-label={tr(`Increase quantity of ${item.name}`, `${dishName(item.name, lang)} একটি বাড়ান`)}
@@ -280,7 +286,7 @@ export function CartDrawer({
                     </button>
                     <button
                       type="button"
-                      onClick={() => removeItem(item.menuItemId, item.scheduledDay)}
+                      onClick={() => removeItem(item.menuItemId, item.scheduledDay, item.mealTime || "")}
                       className="ml-auto grid size-9 place-items-center rounded-full text-slate transition hover:text-brand cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                       title={tr("Remove item", "সরিয়ে দিন")}
                       aria-label={tr(`Remove ${item.name} from cart`, `${dishName(item.name, lang)} কার্ট থেকে সরান`)}

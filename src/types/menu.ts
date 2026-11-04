@@ -56,6 +56,8 @@ export interface CartItem {
   quantity: number
   portionSize?: string
   isEveryday?: boolean
+  /** BREAKFAST, LUNCH or DINNER for daily meals; empty for the regular menu */
+  mealTime?: string
 }
 
 export interface CreateOrderItemPayload {

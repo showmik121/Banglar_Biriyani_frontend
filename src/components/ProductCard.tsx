@@ -16,6 +16,7 @@ export type Product = {
   remainingPortions?: number
   dailyQuota?: number
   day?: string
+  mealTime?: string
 }
 
 export function ProductCard({

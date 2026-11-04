@@ -23,6 +23,7 @@ export type AddItemInput = {
   image?: string
   portionSize?: string
   isEveryday?: boolean
+  mealTime?: string
 }
 
 export type CartContextType = {
@@ -35,8 +36,8 @@ export type CartContextType = {
   setIsCheckoutOpen: (open: boolean) => void
   addItem: (item: AddItemInput, day?: Day | DayOfWeek | string) => void
   decrementItem: (menuItemId: number, scheduledDay?: string) => void
-  updateQuantity: (menuItemId: number, scheduledDay: string, quantity: number) => void
-  removeItem: (menuItemId: number, scheduledDay?: string) => void
+  updateQuantity: (menuItemId: number, scheduledDay: string, quantity: number, mealTime?: string) => void
+  removeItem: (menuItemId: number, scheduledDay?: string, mealTime?: string) => void
   clearCart: () => void
   totalItems: number
   subtotalBdt: number
@@ -129,7 +130,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
     const image = item.imageUrl ?? item.image
 
     setItems((prev) => {
-      const existingIndex = prev.findIndex((i) => i.menuItemId === numId)
+      const existingIndex = prev.findIndex((i) => i.menuItemId === numId && (i.mealTime || "") === (item.mealTime || ""))
 
       if (existingIndex > -1) {
         const next = [...prev]
@@ -151,6 +152,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
           quantity: 1,
           portionSize: item.portionSize,
           isEveryday: item.isEveryday,
+          ...(item.mealTime ? { mealTime: item.mealTime } : {}),
         },
       ]
     })
@@ -175,27 +177,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
   }, [pendingDaySwitch, doAddItem])
 
   const updateQuantity = useCallback(
-    (menuItemId: number, scheduledDay: string, quantity: number) => {
-      setItems((prev) => {
-        if (quantity <= 0) {
-          return prev.filter(
-            (i) =>
-              !(
-                i.menuItemId === menuItemId &&
-                i.scheduledDay.toUpperCase() === scheduledDay.toUpperCase()
-              ),
-          )
-        }
-        return prev.map((i) => {
-          if (
-            i.menuItemId === menuItemId &&
-            i.scheduledDay.toUpperCase() === scheduledDay.toUpperCase()
-          ) {
-            return { ...i, quantity }
-          }
-          return i
-        })
-      })
+    (menuItemId: number, scheduledDay: string, quantity: number, mealTime?: string) => {
+      const same = (i: CartItem) =>
+        i.menuItemId === menuItemId &&
+        i.scheduledDay.toUpperCase() === scheduledDay.toUpperCase() &&
+        (mealTime === undefined || (i.mealTime || "") === mealTime)
+      setItems((prev) =>
+        quantity <= 0 ? prev.filter((i) => !same(i)) : prev.map((i) => (same(i) ? { ...i, quantity } : i)),
+      )
     },
     [],
   )
@@ -230,13 +219,14 @@ export function CartProvider({ children }: { children: ReactNode }) {
     })
   }, [])
 
-  const removeItem = useCallback((menuItemId: number, scheduledDay?: string) => {
+  const removeItem = useCallback((menuItemId: number, scheduledDay?: string, mealTime?: string) => {
     setItems((prev) =>
       prev.filter(
         (i) =>
           !(
             i.menuItemId === menuItemId &&
-            (!scheduledDay || i.scheduledDay.toUpperCase() === scheduledDay.toUpperCase())
+            (!scheduledDay || i.scheduledDay.toUpperCase() === scheduledDay.toUpperCase()) &&
+            (mealTime === undefined || (i.mealTime || "") === mealTime)
           ),
       ),
     )

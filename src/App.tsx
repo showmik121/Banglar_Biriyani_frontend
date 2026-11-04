@@ -17,7 +17,8 @@ import { type SearchableDish } from "./components/SearchRecommendationPopup"
 import { useCart } from "./context/CartContext"
 import { useAddress } from "./context/AddressContext"
 import { useLang } from "./context/LanguageContext"
-import { DayPillBar, dayLabel } from "./components/DayPillBar"
+import { DayPillBar, dayLabel, getTodayDay } from "./components/DayPillBar"
+import { MEAL_TIMES, mealTimeLabel, mealTimeNow, mealTimeShort, type MealTime } from "./i18n/mealTimes"
 import { categoryName, dishDescription, dishName } from "./i18n/dishes"
 
 const img = (id: string, w = 800, h = 600) =>
@@ -481,6 +482,7 @@ type ApiMenuItem = {
   remainingPortions?: number
   dailyQuota?: number
   soldCount?: number
+  mealTime?: string
 }
 
 type MenuByDay = Record<string, ApiMenuItem[]>
@@ -513,6 +515,9 @@ export default function App() {
   const [menuDays, setMenuDays] = useState<MenuByDay>({})
   const [catalog, setCatalog] = useState<ApiMenuItem[]>([])
   const [highlightedDishId, setHighlightedDishId] = useState<string | null>(null)
+  const [mealTime, setMealTime] = useState<MealTime>(() =>
+    String(activeDay).toLowerCase() === getTodayDay().toLowerCase() ? mealTimeNow() : "LUNCH",
+  )
 
   // Load the menu from the API (falls back to the sample menu when the API is offline)
   useEffect(() => {
@@ -555,6 +560,7 @@ export default function App() {
     category: i.categoryName,
     remainingPortions: i.remainingPortions,
     dailyQuota: i.dailyQuota,
+    mealTime: i.mealTime,
   })
 
   // "Our menu": biriyani, tehari, kebab, drinks (every unique dish, home-style meals left out)
@@ -592,6 +598,7 @@ export default function App() {
   const filteredMenu = useMemo(() => menu.filter(matches), [menu, q]) // eslint-disable-line react-hooks/exhaustive-deps
   const filteredMeals = useMemo(() => meals.filter(matches), [meals, q]) // eslint-disable-line react-hooks/exhaustive-deps
   const visibleMenu = showAll || q ? filteredMenu : filteredMenu.slice(0, 4)
+  const mealsNow = filteredMeals.filter((p) => (p.mealTime || "LUNCH") === mealTime)
 
   const allSearchableDishes: SearchableDish[] = useMemo(
     () =>
@@ -755,10 +762,10 @@ export default function App() {
         badge={tr("Daily meals", "দৈনিক খাবার")}
         title={tr("Home-style", "ঘরোয়া স্বাদের")}
         highlight={tr("meals", "খাবার")}
-        subtitle={tr("Rice, chicken, fish and more", "ভাত, মুরগি, মাছ ও আরও অনেক কিছু")}
+        subtitle={tr("Breakfast, lunch and dinner", "সকালের নাস্তা, দুপুর আর রাতের খাবার")}
         body={tr(
-          "Fresh rice and curry every day of the week. Pick your day and order ahead.",
-          "সপ্তাহের প্রতিদিন তাজা ভাত-তরকারির আয়োজন। আপনার দিন বেছে নিয়ে আগেই অর্ডার করুন।",
+          "A different menu for every meal, every day of the week, just like your favourite bhater hotel. Pick a day and a meal, then order ahead.",
+          "ভাতের হোটেলের মতো সপ্তাহের প্রতিদিন তিন বেলার আলাদা মেনু। দিন আর বেলা বেছে নিয়ে আগেই অর্ডার করুন।",
         )}
         primary={{ label: tr("See meals", "মিল দেখুন"), href: "#meal" }}
       />
@@ -771,34 +778,63 @@ export default function App() {
           </div>
         </div>
         <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-          <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+          <div className="mb-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
             <h2 className="text-display text-3xl sm:text-4xl">{tr("7-day special meals", "৭ দিনের স্পেশাল মিল")}</h2>
             <p className="text-sm text-slate">
               {loading
                 ? tr("Loading...", "লোড হচ্ছে...")
-                : `${dayLabel(String(activeDay), lang)} • ${tr(
-                    `${filteredMeals.length} meals`,
-                    `${num(filteredMeals.length)}টি মিল`,
+                : `${dayLabel(String(activeDay), lang)} • ${mealTimeLabel(mealTime, lang)} • ${tr(
+                    `${mealsNow.length} items`,
+                    `${num(mealsNow.length)}টি আইটেম`,
                   )}`}
             </p>
           </div>
+
+          {/* Breakfast / Lunch / Dinner */}
+          <div role="tablist" aria-label={tr("Meal time", "বেলা")} className="mb-6 grid grid-cols-3 gap-1 rounded-2xl bg-cream p-1 sm:inline-grid sm:min-w-[420px]">
+            {MEAL_TIMES.map((m) => {
+              const count = filteredMeals.filter((p) => (p.mealTime || "LUNCH") === m).length
+              const active = m === mealTime
+              return (
+                <button
+                  key={m}
+                  type="button"
+                  role="tab"
+                  aria-selected={active}
+                  onClick={() => setMealTime(m)}
+                  className={`flex h-12 flex-col items-center justify-center rounded-xl text-sm font-bold transition ${
+                    active ? "bg-white text-brand shadow-sm" : "text-charcoal/70 hover:text-charcoal"
+                  }`}
+                >
+                  {mealTimeShort(m, lang)}
+                  <span className={`text-[11px] font-semibold ${active ? "text-brand/80" : "text-slate"}`}>
+                    {tr(`${count} items`, `${num(count)}টি`)}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
+
           <div className={mealGrid}>
             {loading
-              ? [1, 2, 3, 4].map((n) => <ProductSkeleton key={n} />)
-              : filteredMeals.map((p) => (
+              ? [1, 2, 3].map((n) => <ProductSkeleton key={n} />)
+              : mealsNow.map((p) => (
                   <ProductCard
-                    key={`meal-${p.id}`}
+                    key={`meal-${mealTime}-${p.id}`}
                     product={p}
                     isHighlighted={highlightedDishId === String(p.id)}
-                    onAdd={(item) => addItem(item, activeDay)}
+                    onAdd={(item) => addItem({ ...item, mealTime }, activeDay)}
                   />
                 ))}
           </div>
-          {!loading && filteredMeals.length === 0 && (
+          {!loading && mealsNow.length === 0 && (
             <p className="py-12 text-center text-slate">
               {q
-                ? tr(`No meals match "${query}" on this day.`, `এই দিনে "${query}" এর সাথে কোনো মিল মেলেনি।`)
-                : tr("No meals on this day yet. Try another day.", "এই দিনে এখনো কোনো মিল নেই। অন্য দিন দেখুন।")}
+                ? tr(`Nothing matches "${query}" for this meal.`, `এই বেলায় "${query}" এর সাথে কিছু মেলেনি।`)
+                : tr(
+                    `No ${mealTimeLabel(mealTime, "en").toLowerCase()} on this day yet. Try another meal or day.`,
+                    `এই দিনে ${mealTimeLabel(mealTime, "bn")} এখনো নেই। অন্য বেলা বা দিন দেখুন।`,
+                  )}
             </p>
           )}
         </div>

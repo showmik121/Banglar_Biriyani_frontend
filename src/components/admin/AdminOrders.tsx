@@ -21,6 +21,8 @@ interface OrderRow {
     deliveryZoneId: number | null
     notes: string | null
     createdAt: string
+    scheduledDay?: string
+    deliverySlot?: string
   }
   items: { id: number; itemNameSnapshot: string; quantity: number }[]
 }
@@ -255,6 +257,12 @@ export function AdminOrders() {
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_STYLE[order.status]}`}>
                     {STATUS_LABEL[order.status]}
                   </span>
+                  {order.deliverySlot && ["Breakfast", "Lunch", "Dinner"].includes(order.deliverySlot) && (
+                    <span className="rounded-full bg-saffron/30 px-2 py-0.5 text-xs font-semibold text-charcoal">
+                      {order.deliverySlot}
+                      {order.scheduledDay ? ` · ${order.scheduledDay.charAt(0)}${order.scheduledDay.slice(1, 3).toLowerCase()}` : ""}
+                    </span>
+                  )}
                   <span className="w-full text-xs text-slate sm:ml-auto sm:w-auto sm:text-sm">
                     {order.orderNumber} · {timeAgo(order.createdAt)}
                   </span>

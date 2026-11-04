@@ -9,6 +9,7 @@ import { STORE } from "../config/store"
 import { useLang } from "../context/LanguageContext"
 import { dishName } from "../i18n/dishes"
 import { dayLabel, getTodayDay } from "./DayPillBar"
+import { mealTimeLabel, mealTimeSlot } from "../i18n/mealTimes"
 import type { DayOfWeek, OrderDTO, OrderItemDTO } from "../types/menu"
 
 type Props = {
@@ -136,6 +137,10 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
   // The day the cart's dishes are for (one order is always for one day)
   const orderDay = String(items[0]?.scheduledDay || activeDay)
   const isToday = orderDay.toLowerCase() === getTodayDay().toLowerCase()
+  // Breakfast, lunch and dinner go out at different times, so one order is for one meal
+  const mealTimes = [...new Set(items.map((i) => i.mealTime).filter((m): m is string => !!m))]
+  const orderMeal = mealTimes.length === 1 ? mealTimes[0] : null
+  const mixedMeals = mealTimes.length > 1
   const discountBdt = appliedOffer?.discountBdt ?? 0
   const checkoutTotalBdt = Math.max(0, subtotalBdt - discountBdt) // delivery is free
   const payment = PAYMENT_OPTIONS.find((p) => p.id === paymentMethod) || PAYMENT_OPTIONS[0]
@@ -220,6 +225,15 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
       setGeneralError(tr("Your cart is empty. Add something tasty first.", "আপনার কার্ট খালি। আগে মজার কিছু যোগ করুন।"))
       return
     }
+    if (mixedMeals) {
+      setGeneralError(
+        tr(
+          "Breakfast, lunch and dinner are delivered at different times. Please order one meal at a time.",
+          "সকাল, দুপুর আর রাতের খাবার আলাদা সময়ে যায়। একবারে এক বেলার খাবার অর্ডার করুন।",
+        ),
+      )
+      return
+    }
     const errors = validate()
     setFieldErrors(errors)
     if (Object.keys(errors).length > 0) {
@@ -238,6 +252,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
         customerPhone: cleanPhone,
         customerAddress: customerAddress.trim(),
         scheduledDay: orderDay.toUpperCase() as DayOfWeek,
+        ...(orderMeal ? { deliverySlot: mealTimeSlot(orderMeal) } : {}),
         paymentMethod,
         paymentTrxId: online ? paymentTrxId.trim().toUpperCase() : undefined,
         notes: notes.trim() || undefined,
@@ -369,11 +384,22 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     </li>
                   ))}
                 </ul>
-                {!isToday && (
+                {(!isToday || orderMeal) && !mixedMeals && (
                   <p className="rounded-xl bg-saffron/25 px-3.5 py-2.5 text-sm text-charcoal">
-                    {tr("Delivery day: ", "ডেলিভারির দিন: ")}
-                    <strong>{dayLabel(orderDay, lang)}</strong>
-                    {tr(" (pre-order)", " (আগাম অর্ডার)")}
+                    {tr("Delivery: ", "ডেলিভারি: ")}
+                    <strong>
+                      {orderMeal ? `${mealTimeLabel(orderMeal, lang)} · ` : ""}
+                      {isToday ? tr("today", "আজ") : dayLabel(orderDay, lang)}
+                    </strong>
+                    {!isToday && tr(" (pre-order)", " (আগাম অর্ডার)")}
+                  </p>
+                )}
+                {mixedMeals && (
+                  <p role="alert" className="rounded-xl bg-rose-50 px-3.5 py-2.5 text-sm text-rose-700">
+                    {tr(
+                      "Your cart has dishes for more than one meal. Breakfast, lunch and dinner go out at different times, so please keep one meal in this order.",
+                      "আপনার কার্টে একাধিক বেলার খাবার আছে। সকাল, দুপুর আর রাতের খাবার আলাদা সময়ে যায়, তাই এই অর্ডারে এক বেলার খাবার রাখুন।",
+                    )}
                   </p>
                 )}
                 <button type="button" onClick={handleClose} className="text-sm font-semibold text-brand hover:underline">
