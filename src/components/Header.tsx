@@ -1,4 +1,3 @@
-import { addressLabelBn, roleLabelBn, toBengaliNumber } from "../utils/bengali"
 import { useState, useEffect, useRef } from "react"
 import { useCart } from "../context/CartContext"
 import { useAddress } from "../context/AddressContext"
@@ -6,6 +5,9 @@ import { useAuth } from "../context/AuthContext"
 import { navigateTo } from "../utils/navigation"
 import { AddressRecommendationPopup } from "./AddressRecommendationPopup"
 import { SearchRecommendationPopup, type SearchableDish } from "./SearchRecommendationPopup"
+
+// Receipt icon for "My orders"
+const RECEIPT_ICON = "M6 3h12v18l-3-2-3 2-3-2-3 2V3ZM9 8h6M9 12h6M9 16h3"
 
 type Props = {
   cartCount?: number
@@ -44,13 +46,15 @@ const ICONS = {
 }
 
 const NAV = [
-  { label: "আমাদের মেনু", href: "#menu" },
-  { label: "দৈনিক মিল", href: "#meal" },
-  { label: "ডেলিভারি এলাকা", href: "#delivery-zones" },
+  { label: "Menu", href: "#menu" },
+  { label: "Our Story", href: "#about" },
+  { label: "How to Order", href: "#how" },
+  { label: "Location", href: "#location" },
+  { label: "Contact", href: "#contact" },
 ]
 
 const iconBtn =
-  "grid size-10 shrink-0 place-items-center rounded-full text-charcoal transition hover:bg-alabaster hover:text-[#D7232B] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/25"
+  "grid size-10 shrink-0 place-items-center rounded-full text-charcoal transition hover:bg-cream hover:text-brand focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/25"
 
 export function Header({
   cartCount: propCartCount,
@@ -70,6 +74,7 @@ export function Header({
   const [isRecommendationOpen, setIsRecommendationOpen] = useState(false)
   const [isSearchRecOpen, setIsSearchRecOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const [isNavOpen, setIsNavOpen] = useState(false)
   const cartCount = propCartCount ?? totalItems
 
   // Close user dropdown when clicking outside
@@ -101,35 +106,35 @@ export function Header({
   }, [])
 
   return (
-    <header ref={ref} className="sticky top-0 z-40 border-b border-line bg-white">
+    <header
+      ref={ref}
+      className="sticky top-0 z-40 border-b border-line/80 bg-alabaster/90 backdrop-blur-xl supports-[backdrop-filter]:bg-alabaster/80"
+    >
       {/* Row 1: logo, address, account */}
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 pb-1 pt-2 sm:px-6 lg:px-8">
-        <a
-          href="#"
-          className="text-display flex shrink-0 items-center gap-2.5 text-xl leading-none text-[#D7232B] sm:text-2xl"
-        >
-          <img
-            src="/logo.png"
-            alt="বাংলার বিরিয়ানি লোগো"
-            className="h-12 w-auto shrink-0 object-contain sm:h-14"
-            width={778}
-            height={728}
-          />
-          বাংলার বিরিয়ানি
+      <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3 lg:px-8">
+        <a href="#" className="group flex shrink-0 items-center gap-2.5" aria-label="Banglar Biriyani home">
+          <span className="grid size-10 place-items-center rounded-full bg-white p-0.5 shadow-card ring-2 ring-gold/40 transition group-hover:ring-gold sm:size-12">
+            <img src="/logo-mark.png" alt="" className="size-full rounded-full object-contain" />
+          </span>
+          <span className="hidden flex-col leading-none sm:flex">
+            <span className="text-display text-lg text-maroon sm:text-xl">Banglar Biriyani</span>
+            <span className="font-bn mt-1 text-[11px] text-gold sm:text-xs">বাংলার বিরিয়ানি</span>
+          </span>
         </a>
 
         {/* Mobile Address Button */}
         <button
           type="button"
-          onClick={() => setIsRecommendationOpen(true)}
-          className="flex min-w-0 items-center gap-1.5 overflow-hidden rounded-full bg-alabaster/80 px-2.5 py-1 text-xs text-charcoal transition hover:bg-alabaster md:hidden"
-          title="ডেলিভারি ঠিকানা পরিবর্তন করুন"
+          onClick={() => setIsAddressModalOpen(true)}
+          aria-label="Change delivery address"
+          className="flex h-10 min-w-0 items-center gap-1.5 rounded-full bg-cream px-3 text-xs text-charcoal transition hover:bg-gold-light md:hidden"
+          title="Change delivery address"
         >
-          <Icon d={ICONS.pin} className="size-3.5 shrink-0 text-[#D7232B]" />
-          <span className="min-w-0 max-w-[100px] truncate font-medium">
-            {selectedAddress ? selectedAddress.area : "ঠিকানা"}
+          <Icon d={ICONS.pin} className="size-3.5 text-brand" />
+          <span className="hidden max-w-[88px] truncate font-medium min-[360px]:inline min-[380px]:max-w-[120px]">
+            {selectedAddress ? selectedAddress.area : "Address"}
           </span>
-          <Icon d={ICONS.chevron} className="size-3 shrink-0 text-slate" />
+          <Icon d={ICONS.chevron} className="size-3 text-slate" />
         </button>
 
         {/* Desktop Address Button Container with Floating Recommendation Popup */}
@@ -138,22 +143,20 @@ export function Header({
             type="button"
             onClick={() => setIsRecommendationOpen((prev) => !prev)}
             aria-expanded={isRecommendationOpen}
-            className="flex items-center gap-2 rounded-full px-3 py-2 text-sm transition hover:bg-alabaster focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]/30 cursor-pointer"
-            title="ডেলিভারি ঠিকানা পরিবর্তন করুন"
+            className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm transition hover:border-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 cursor-pointer"
+            title="Change delivery address"
           >
-            <Icon d={ICONS.pin} className="size-4 text-[#D7232B]" />
+            <Icon d={ICONS.pin} className="size-4 text-brand" />
             <span className="font-semibold text-charcoal">
-              {selectedAddress?.label
-                ? `${addressLabelBn(selectedAddress.label)} ঠিকানা`
-                : "নতুন ঠিকানা"}
+              {selectedAddress?.label ? `${selectedAddress.label} address` : "New address"}
             </span>
-            <span className="text-slate max-w-[200px] truncate">
-              {selectedAddress ? selectedAddress.details : "আপনার ঠিকানা নির্বাচন করুন"}
+            <span className="max-w-[110px] truncate text-slate lg:max-w-[200px]">
+              {selectedAddress ? selectedAddress.details : "Select your address"}
             </span>
             <Icon
               d={ICONS.chevron}
               className={`size-3.5 text-slate/70 transition-transform duration-200 ${
-                isRecommendationOpen ? "rotate-180 text-[#D7232B]" : ""
+                isRecommendationOpen ? "rotate-180 text-brand" : ""
               }`}
             />
           </button>
@@ -169,21 +172,21 @@ export function Header({
           />
         </div>
 
-        <div ref={userMenuRef} className="relative ml-auto flex items-center gap-1 md:ml-0">
+        <div ref={userMenuRef} className="relative ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1 md:ml-0">
           {user ? (
             <>
               <button
                 type="button"
                 onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-alabaster lg:flex"
+                className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
                 aria-expanded={isUserMenuOpen}
                 aria-haspopup="true"
               >
-                <Icon d={ICONS.user} className="size-4 text-[#D7232B]" />
+                <Icon d={ICONS.user} className="size-4 text-brand" />
                 {user.fullName.split(" ")[0]}
                 <Icon
                   d={ICONS.chevron}
-                  className={`size-4 text-[#D7232B] transition-transform ${
+                  className={`size-4 text-brand transition-transform ${
                     isUserMenuOpen ? "rotate-180" : ""
                   }`}
                 />
@@ -191,8 +194,8 @@ export function Header({
               <button
                 type="button"
                 onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                aria-label={`${user.fullName} এর অ্যাকাউন্ট মেনু`}
-                className={`${iconBtn} text-[#D7232B] lg:hidden`}
+                aria-label={`Account menu for ${user.fullName}`}
+                className={`${iconBtn} text-brand lg:hidden`}
               >
                 <Icon d={ICONS.user} />
               </button>
@@ -208,8 +211,8 @@ export function Header({
                     <p className="text-xs font-bold text-charcoal truncate">{user.fullName}</p>
                     <div className="mt-0.5 flex items-center justify-between text-[11px] text-slate">
                       <span className="truncate">{user.phone}</span>
-                      <span className="rounded-full bg-[#D7232B]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#D7232B]">
-                        {roleLabelBn(user.role)}
+                      <span className="rounded-full bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand">
+                        {user.role}
                       </span>
                     </div>
                   </div>
@@ -221,7 +224,7 @@ export function Header({
                         setIsUserMenuOpen(false)
                         openMyOrders()
                       }}
-                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-charcoal transition hover:bg-alabaster hover:text-[#D7232B]"
+                      className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-charcoal transition hover:bg-cream hover:text-brand"
                       role="menuitem"
                     >
                       <svg
@@ -235,7 +238,7 @@ export function Header({
                         <path d="M3 6h18" />
                         <path d="M16 10a4 4 0 0 1-8 0" />
                       </svg>
-                      আমার অর্ডার
+                      My Orders
                     </button>
 
                     {(user.role === "ADMIN" || user.role === "STAFF") && (
@@ -245,11 +248,11 @@ export function Header({
                           setIsUserMenuOpen(false)
                           navigateTo("/admin")
                         }}
-                        className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-[#D7232B] transition hover:bg-[#FFF0F3]"
+                        className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2 text-xs font-semibold text-brand transition hover:bg-brand-light"
                         role="menuitem"
                       >
                         <svg
-                          className="size-4 text-[#D7232B]"
+                          className="size-4 text-brand"
                           viewBox="0 0 24 24"
                           fill="none"
                           stroke="currentColor"
@@ -259,7 +262,7 @@ export function Header({
                           <path d="M9 3v18" />
                           <path d="m14 9 3 3-3 3" />
                         </svg>
-                        অ্যাডমিন প্যানেল
+                        Admin Panel
                       </button>
                     )}
                   </div>
@@ -285,7 +288,7 @@ export function Header({
                         <polyline points="16 17 21 12 16 7" />
                         <line x1="21" y1="12" x2="9" y2="12" />
                       </svg>
-                      লগআউট
+                      Sign Out
                     </button>
                   </div>
                 </div>
@@ -295,17 +298,25 @@ export function Header({
             <>
               <button
                 type="button"
-                onClick={() => openAuthModal("login")}
-                className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-alabaster lg:flex"
+                onClick={openMyOrders}
+                className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
               >
-                <Icon d={ICONS.user} className="size-4" />
-                লগইন / রেজিস্ট্রেশন
-                <Icon d={ICONS.chevron} className="size-4 text-[#D7232B]" />
+                <Icon d={RECEIPT_ICON} className="size-4" />
+                My orders
               </button>
               <button
                 type="button"
                 onClick={() => openAuthModal("login")}
-                aria-label="লগইন / রেজিস্ট্রেশন"
+                className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
+              >
+                <Icon d={ICONS.user} className="size-4" />
+                Sign In
+                <Icon d={ICONS.chevron} className="size-4 text-brand" />
+              </button>
+              <button
+                type="button"
+                onClick={() => openAuthModal("login")}
+                aria-label="Sign In"
                 className={`${iconBtn} lg:hidden`}
               >
                 <Icon d={ICONS.user} />
@@ -314,42 +325,91 @@ export function Header({
           )}
           <button
             type="button"
-            className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-alabaster sm:flex"
+            className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
           >
             <Icon d={ICONS.globe} className="size-4" />
-            বাং
-            <Icon d={ICONS.chevron} className="size-4 text-[#D7232B]" />
+            EN
+            <Icon d={ICONS.chevron} className="size-4 text-brand" />
           </button>
-          <button type="button" aria-label="পছন্দের তালিকা" className={iconBtn}>
+          <button type="button" aria-label="Favourites" className={`${iconBtn} hidden lg:grid`}>
             <Icon d={ICONS.heart} />
           </button>
           <button
             type="button"
             onClick={handleOpenCart}
-            aria-label={`কার্ট, ${toBengaliNumber(cartCount)}টি আইটেম`}
-            className={`relative ${iconBtn}`}
+            aria-label={`Cart, ${cartCount} items`}
+            className="relative ml-1 inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-brand px-3 text-sm font-bold text-white shadow-[0_8px_20px_-10px_rgba(168,20,31,0.9)] transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/25 sm:px-4"
           >
-            <Icon d={ICONS.bag} />
-            {cartCount > 0 && (
-              <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-[#D7232B] px-1 text-[11px] font-bold text-white shadow-xs ring-2 ring-white">
-                {toBengaliNumber(cartCount)}
-              </span>
-            )}
+            <Icon d={ICONS.bag} className="size-[18px]" />
+            <span className="hidden sm:inline">Cart</span>
+            <span
+              className={`grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] font-extrabold ${
+                cartCount > 0 ? "bg-saffron text-maroon" : "bg-white/15 text-white/80"
+              }`}
+            >
+              {cartCount}
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setIsNavOpen((o) => !o)}
+            aria-expanded={isNavOpen}
+            aria-controls="mobile-nav"
+            aria-label={isNavOpen ? "Close menu" : "Open menu"}
+            className={`${iconBtn} md:hidden`}
+          >
+            <Icon d={isNavOpen ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"} />
           </button>
         </div>
       </div>
 
+      {/* Mobile menu panel */}
+      {isNavOpen && (
+        <nav
+          id="mobile-nav"
+          aria-label="Sections"
+          className="border-t border-line/70 bg-alabaster px-4 pb-3 pt-2 md:hidden"
+        >
+          <ul className="grid grid-cols-2 gap-2">
+            {NAV.map((n) => (
+              <li key={n.label}>
+                <a
+                  href={n.href}
+                  onClick={() => setIsNavOpen(false)}
+                  className="flex h-12 items-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-charcoal active:bg-cream"
+                >
+                  {n.label}
+                </a>
+              </li>
+            ))}
+            <li className="col-span-2">
+              <button
+                type="button"
+                onClick={() => {
+                  setIsNavOpen(false)
+                  openMyOrders()
+                }}
+                className="flex h-12 w-full items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-charcoal active:bg-cream"
+              >
+                <Icon d={RECEIPT_ICON} className="size-4 text-brand" />
+                My orders · track your order
+              </button>
+            </li>
+          </ul>
+        </nav>
+      )}
+
       {/* Row 2: section nav + search */}
-      <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 pb-2.5 pt-1 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-        <nav aria-label="বিভাগসমূহ" className="no-scrollbar flex gap-1 overflow-x-auto">
+      <div className="mx-auto flex max-w-7xl flex-col gap-2 px-3 pb-3 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+        <nav aria-label="Sections" className="no-scrollbar -mx-1 hidden gap-1 overflow-x-auto md:flex">
           {NAV.map((n, i) => (
             <a
               key={n.label}
               href={n.href}
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${
                 i === 0
-                  ? "bg-charcoal text-white"
-                  : "text-charcoal hover:bg-alabaster hover:text-[#D7232B]"
+                  ? "bg-maroon text-white"
+                  : "text-charcoal hover:bg-cream hover:text-brand"
               }`}
             >
               {n.label}
@@ -367,7 +427,7 @@ export function Header({
             }}
             className="relative block w-full"
           >
-            <span className="sr-only">খুঁজুন</span>
+            <span className="sr-only">Search</span>
             {/* Left decorative search icon */}
             <Icon
               d={ICONS.search}
@@ -383,15 +443,15 @@ export function Header({
               }}
               onFocus={() => setIsSearchRecOpen(true)}
               onClick={() => setIsSearchRecOpen(true)}
-              placeholder="বিরিয়ানি, তেহারি বা পছন্দের খাবার খুঁজুন"
-              className="h-10 w-full rounded-full border border-line bg-alabaster pl-10 pr-10 text-sm outline-none transition placeholder:text-slate focus:border-[#D7232B] focus:bg-white focus:ring-4 focus:ring-[#D7232B]/10"
+              placeholder="Search biriyani, tehari, borhani…"
+              className="h-11 w-full rounded-full border border-line bg-white pl-10 pr-11 text-sm outline-none transition placeholder:text-slate/80 focus:border-brand focus:ring-4 focus:ring-brand/10"
             />
             {/* Small Search Icon Button on the right */}
             <button
               type="submit"
-              aria-label="খুঁজুন"
-              title="খুঁজুন"
-              className="absolute right-1.5 top-1/2 -translate-y-1/2 grid size-7 place-items-center rounded-full bg-[#D7232B] text-white transition hover:bg-[#B80022] active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D7232B]/40"
+              aria-label="Search"
+              title="Search"
+              className="absolute right-1 top-1/2 -translate-y-1/2 grid size-9 place-items-center rounded-full bg-brand text-white transition hover:bg-brand-hover active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
             >
               <Icon d={ICONS.search} className="size-3.5" />
             </button>

@@ -1,4 +1,3 @@
-import { dayLabelBn } from "../utils/bengali"
 import { useEffect } from "react"
 import { type Day } from "./DayPillBar"
 import { type Product } from "./ProductCard"
@@ -37,12 +36,12 @@ export function MultiDayWarningModal({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4 animate-in fade-in duration-200"
       role="dialog"
       aria-modal="true"
       aria-labelledby="multiday-modal-title"
     >
-      <div className="w-full max-w-md rounded-card bg-white p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+      <div className="w-full max-w-md rounded-t-3xl bg-white p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl animate-in zoom-in-95 duration-200 sm:rounded-card">
         <div className="flex items-center gap-3 mb-4">
           <div className="grid size-10 place-items-center rounded-full bg-amber-100 text-amber-700">
             <svg
@@ -59,20 +58,22 @@ export function MultiDayWarningModal({
           </div>
           <div>
             <h3 id="multiday-modal-title" className="text-display text-lg text-charcoal">
-              ভিন্ন ডেলিভারি দিন
+              Different Delivery Day
             </h3>
-            <p className="text-xs text-slate">নির্ধারিত দিন অনুযায়ী অর্ডার ডেলিভারি হয়</p>
+            <p className="text-xs text-slate">Orders are fulfilled per scheduled day</p>
           </div>
         </div>
 
         <p className="text-sm text-slate leading-relaxed">
-          আপনার কার্টে বর্তমানে <strong className="text-charcoal">{dayLabelBn(currentDay)}</strong> এর
-          খাবার রয়েছে। আপনি <strong className="text-[#D7232B]">"{newProduct?.name}"</strong> যোগ করতে
-          চাইছেন, যা <strong className="text-charcoal">{dayLabelBn(newDay)}</strong> এর জন্য নির্ধারিত।
+          Your cart currently contains delicious items scheduled for{" "}
+          <strong className="text-charcoal">{currentDay}</strong>. You are attempting to add{" "}
+          <strong className="text-brand">"{newProduct?.name}"</strong> which is scheduled for{" "}
+          <strong className="text-charcoal">{newDay}</strong>.
         </p>
 
         <p className="text-xs text-slate/80 mt-2 bg-alabaster p-2.5 rounded-lg border border-line">
-          তাজা দম রান্না ও সময়মতো গরম ডেলিভারি নিশ্চিত করতে একই অর্ডারে ভিন্ন ভিন্ন দিনের খাবার রাখা যায় না।
+          To ensure fresh dum preparation and on-time hot delivery, orders cannot mix dishes
+          scheduled across different days.
         </p>
 
         <div className="mt-6 flex flex-col sm:flex-row gap-2">
@@ -81,14 +82,14 @@ export function MultiDayWarningModal({
             onClick={onCancel}
             className="flex-1 rounded-full border border-line py-2.5 text-xs font-semibold text-charcoal hover:bg-alabaster transition cursor-pointer"
           >
-            {dayLabelBn(currentDay)} এর কার্ট রাখুন
+            Keep {currentDay} Cart
           </button>
           <button
             type="button"
             onClick={onConfirmClearAndAdd}
-            className="flex-1 rounded-full bg-[#D7232B] py-2.5 text-xs font-semibold text-white hover:bg-[#B80022] transition shadow-sm cursor-pointer"
+            className="flex-1 rounded-full bg-brand py-2.5 text-xs font-semibold text-white hover:bg-brand-hover transition shadow-sm cursor-pointer"
           >
-            {dayLabelBn(newDay)} এর নতুন কার্ট শুরু করুন
+            Start New {newDay} Cart
           </button>
         </div>
       </div>

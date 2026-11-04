@@ -8,8 +8,8 @@ export function OrderConfirmationModal({ order, onClose, onViewOrders }: Props) 
   if (!order) return null
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs animate-in fade-in duration-200">
-      <div className="flex max-h-[92vh] w-full max-w-lg flex-col rounded-card bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4 animate-in fade-in duration-200">
+      <div className="flex max-h-[94dvh] w-full max-w-lg flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl animate-in zoom-in-95 duration-200 sm:max-h-[92vh] sm:rounded-card">
         {/* Banner */}
         <div className="bg-brand p-6 text-center text-white relative">
           <div className="mx-auto mb-3 grid size-14 place-items-center rounded-full bg-white/20 text-white border border-white/30">
@@ -37,9 +37,9 @@ export function OrderConfirmationModal({ order, onClose, onViewOrders }: Props) 
           {/* Order Details */}
           <div className="rounded-lg border border-line bg-alabaster p-3.5 space-y-2">
             <div className="flex justify-between border-b border-line/60 pb-2">
-              <span className="text-slate">Scheduled Delivery:</span>
+              <span className="text-slate">Delivery:</span>
               <span className="font-bold text-charcoal">
-                {order.scheduledDay} ({order.deliverySlot})
+                {order.deliverySlot}
               </span>
             </div>
             <div className="flex justify-between border-b border-line/60 pb-2">

@@ -81,6 +81,10 @@ describe("checkout", () => {
       items: [{ menuItemId: 1, quantity: 2 }],
     })
     expect(await screen.findByText("What happens next")).toBeInTheDocument()
+    expect(screen.getByRole("heading", { name: "Order placed!" })).toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Track my order" })).toBeInTheDocument()
+    // Guests are invited to sign up for email updates
+    expect(screen.getByRole("button", { name: "Create an account" })).toBeInTheDocument()
     expect(clearCart).toHaveBeenCalled()
   })
 })

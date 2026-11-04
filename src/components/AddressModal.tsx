@@ -1,4 +1,3 @@
-import { addressLabelBn } from "../utils/bengali"
 import React, { useState, useEffect, useMemo, type FormEvent } from "react"
 import { useAddress, POPULAR_DHAKA_AREAS } from "../context/AddressContext"
 import { searchRecommendations } from "../data/dhakaRecommendations"
@@ -98,7 +97,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
   const handleAppendArea = (area: string) => {
     setError(null)
     if (!addressInput.trim()) {
-      setAddressInput(`${area}, ঢাকা`)
+      setAddressInput(`${area}, Savar`)
     } else if (!addressInput.toLowerCase().includes(area.toLowerCase())) {
       setAddressInput(`${addressInput.trim()}, ${area}`)
     }
@@ -110,12 +109,12 @@ export function AddressModal({ isOpen, onClose }: Props) {
 
     const trimmed = addressInput.trim()
     if (!trimmed) {
-      setError("আপনার ডেলিভারি ঠিকানা লিখুন।")
+      setError("Please write or enter your delivery address.")
       return
     }
 
     if (trimmed.length < 5) {
-      setError("আরও বিস্তারিত ঠিকানা দিন (কমপক্ষে ৫ অক্ষর)।")
+      setError("Please enter a more detailed address (at least 5 characters).")
       return
     }
 
@@ -124,7 +123,8 @@ export function AddressModal({ isOpen, onClose }: Props) {
       addAddress({
         label: tag,
         area:
-          POPULAR_DHAKA_AREAS.find((a) => trimmed.toLowerCase().includes(a.toLowerCase())) || "ঢাকা",
+          POPULAR_DHAKA_AREAS.find((a) => trimmed.toLowerCase().includes(a.toLowerCase())) ||
+          "Savar",
         details: trimmed,
         contactPhone: phone.trim() || undefined,
         instructions: instructions.trim() || undefined,
@@ -156,32 +156,32 @@ export function AddressModal({ isOpen, onClose }: Props) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-xs transition-opacity duration-200"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-black/60 p-0 backdrop-blur-xs sm:items-center sm:p-4 transition-opacity duration-200"
       aria-modal="true"
       role="dialog"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose()
       }}
     >
-      <div className="relative flex max-h-[92dvh] w-full max-w-xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl">
+      <div className="relative flex max-h-[94dvh] w-full max-w-xl flex-col overflow-hidden rounded-t-3xl bg-white shadow-2xl sm:max-h-[92vh] sm:rounded-2xl">
         {/* Modal Header */}
         <div className="flex items-center justify-between border-b border-line px-6 py-4">
           <div className="flex items-center gap-2.5">
-            <div className="grid size-9 place-items-center rounded-full bg-[#D7232B]/10 text-[#D7232B]">
+            <div className="grid size-9 place-items-center rounded-full bg-brand/10 text-brand">
               <Icon d={ICONS.pin} className="size-5" />
             </div>
             <div>
-              <h2 className="text-base font-bold text-charcoal sm:text-lg">ডেলিভারি ঠিকানা</h2>
+              <h2 className="text-base font-bold text-charcoal sm:text-lg">Delivery Address</h2>
               <p className="text-xs text-slate">
-                নিজের মতো ঠিকানা লিখুন অথবা সংরক্ষিত ঠিকানা থেকে বেছে নিন
+                Write your address freely or pick from saved locations
               </p>
             </div>
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="grid size-8 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal cursor-pointer"
-            aria-label="বন্ধ করুন"
+            className="grid size-10 shrink-0 place-items-center rounded-full text-slate transition hover:bg-alabaster hover:text-charcoal cursor-pointer"
+            aria-label="Close"
           >
             <Icon d={ICONS.close} className="size-4" />
           </button>
@@ -194,9 +194,9 @@ export function AddressModal({ isOpen, onClose }: Props) {
             <div>
               <div className="flex items-center justify-between mb-1.5">
                 <label className="text-xs font-bold uppercase tracking-wider text-charcoal">
-                  আপনার ঠিকানা লিখুন *
+                  Write Your Address (Of Your Choice) *
                 </label>
-                <span className="text-[11px] text-slate">যেকোনো ঠিকানা লিখতে পারেন</span>
+                <span className="text-[11px] text-slate">Free text input</span>
               </div>
 
               <div className="relative">
@@ -207,8 +207,8 @@ export function AddressModal({ isOpen, onClose }: Props) {
                     setAddressInput(e.target.value)
                     if (error) setError(null)
                   }}
-                  placeholder="যেমন: রোড ২৭, বাসা ৪৫, ফ্ল্যাট ৪বি, ধানমন্ডি, ঢাকা (বা অন্য যেকোনো ঠিকানা)..."
-                  className="w-full rounded-xl border border-line bg-white p-3.5 text-sm text-charcoal placeholder:text-slate/60 shadow-xs transition focus:border-[#D7232B] focus:outline-none focus:ring-2 focus:ring-[#D7232B]/20"
+                  placeholder="e.g., Room 302, DIU Hostel, Daffodil Smart City, Savar (or any custom location)..."
+                  className="w-full rounded-xl border border-line bg-white p-3.5 text-sm text-charcoal placeholder:text-slate/60 shadow-xs transition focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
                   autoFocus
                 />
                 {addressInput && (
@@ -216,7 +216,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                     type="button"
                     onClick={() => setAddressInput("")}
                     className="absolute right-3 top-3 text-slate/50 hover:text-charcoal p-1"
-                    title="ঠিকানা মুছে ফেলুন"
+                    title="Clear address input"
                   >
                     <Icon d={ICONS.close} className="size-3.5" />
                   </button>
@@ -225,12 +225,12 @@ export function AddressModal({ isOpen, onClose }: Props) {
 
               {/* Live matching recommendations popup */}
               {liveRecommendations.length > 0 && (
-                <div className="mt-2 rounded-xl border border-[#D7232B]/30 bg-[#FFF0F3] p-2.5 space-y-1.5 shadow-xs">
+                <div className="mt-2 rounded-xl border border-brand/30 bg-brand-light p-2.5 space-y-1.5 shadow-xs">
                   <div className="flex items-center justify-between px-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#D7232B]">
-                      ✨ "{addressInput}" এর জন্য প্রস্তাবিত ঠিকানা:
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand">
+                      ✨ Recommended Locations for "{addressInput}":
                     </span>
-                    <span className="text-[10px] text-slate">বেছে নিতে ক্লিক করুন</span>
+                    <span className="text-[10px] text-slate">Click to autocomplete</span>
                   </div>
                   <div className="space-y-1">
                     {liveRecommendations.map((rec) => (
@@ -238,7 +238,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                         key={rec.id}
                         type="button"
                         onClick={() => setAddressInput(rec.details)}
-                        className="flex w-full items-center justify-between rounded-lg bg-white p-2 text-left text-xs transition hover:border-[#D7232B] hover:shadow-xs border border-transparent cursor-pointer"
+                        className="flex w-full items-center justify-between rounded-lg bg-white p-2 text-left text-xs transition hover:border-brand hover:shadow-xs border border-transparent cursor-pointer"
                       >
                         <div className="min-w-0 flex-1">
                           <span className="font-bold text-charcoal">{rec.name}</span>
@@ -246,8 +246,8 @@ export function AddressModal({ isOpen, onClose }: Props) {
                             {rec.details}
                           </span>
                         </div>
-                        <span className="ml-2 rounded-full bg-[#D7232B]/10 px-2 py-0.5 text-[10px] font-bold text-[#D7232B] shrink-0">
-                          এটি ব্যবহার করুন
+                        <span className="ml-2 rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand shrink-0">
+                          Use This
                         </span>
                       </button>
                     ))}
@@ -261,7 +261,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
             {/* Quick-Click Area Chips to append with 1 tap */}
             <div>
               <span className="block text-[11px] font-semibold text-slate mb-1.5">
-                দ্রুত এলাকা যোগ করুন (ক্লিক করুন):
+                Quick-add delivery areas near DIU (click to add):
               </span>
               <div className="flex flex-wrap gap-1.5">
                 {POPULAR_DHAKA_AREAS.slice(0, 10).map((areaName) => (
@@ -269,7 +269,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                     key={areaName}
                     type="button"
                     onClick={() => handleAppendArea(areaName)}
-                    className="rounded-full border border-line/80 bg-alabaster px-2.5 py-1 text-xs text-charcoal transition hover:border-[#D7232B] hover:bg-[#D7232B]/10 hover:text-[#D7232B] cursor-pointer"
+                    className="rounded-full border border-line/80 bg-alabaster px-3 py-2 text-xs text-charcoal transition hover:border-brand hover:bg-brand/10 hover:text-brand cursor-pointer"
                   >
                     + {areaName}
                   </button>
@@ -279,20 +279,20 @@ export function AddressModal({ isOpen, onClose }: Props) {
 
             {/* Address Tag Selector */}
             <div className="flex items-center gap-2 pt-1">
-              <span className="text-xs font-semibold text-slate">ট্যাগ:</span>
+              <span className="text-xs font-semibold text-slate">Tag as:</span>
               {(["Home", "Work", "Other"] as const).map((t) => (
                 <button
                   key={t}
                   type="button"
                   onClick={() => setTag(t)}
-                  className={`flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold transition cursor-pointer ${
+                  className={`flex items-center gap-1.5 rounded-full px-3.5 py-2 text-xs font-semibold transition cursor-pointer ${
                     tag === t
-                      ? "bg-[#D7232B] text-white"
+                      ? "bg-brand text-white"
                       : "bg-alabaster text-charcoal hover:bg-slate/15"
                   }`}
                 >
                   {getTagIcon(t)}
-                  {addressLabelBn(t)}
+                  {t}
                 </button>
               ))}
             </div>
@@ -302,36 +302,38 @@ export function AddressModal({ isOpen, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => setShowDetailedFields((prev) => !prev)}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#D7232B] hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1.5 py-2 text-xs font-semibold text-brand hover:underline cursor-pointer"
               >
                 <Icon d={showDetailedFields ? ICONS.close : ICONS.plus} className="size-3.5" />
-                {showDetailedFields ? "অতিরিক্ত তথ্য লুকান" : "ফোন ও ডেলিভারি নির্দেশনা যোগ করুন (ঐচ্ছিক)"}
+                {showDetailedFields
+                  ? "Hide extra details"
+                  : "Add phone & delivery instructions (optional)"}
               </button>
 
               {showDetailedFields && (
                 <div className="mt-3 space-y-3 rounded-xl border border-line/70 bg-alabaster/50 p-3.5">
                   <div>
                     <label className="block text-[11px] font-semibold text-charcoal mb-1">
-                      যোগাযোগের ফোন
+                      Contact Phone
                     </label>
                     <input
                       type="tel"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       placeholder="017XXXXXXXX"
-                      className="w-full rounded-lg border border-line bg-white px-3 py-2 text-xs text-charcoal outline-none focus:border-[#D7232B]"
+                      className="w-full rounded-lg border border-line bg-white px-3 py-2 text-xs text-charcoal outline-none focus:border-brand"
                     />
                   </div>
                   <div>
                     <label className="block text-[11px] font-semibold text-charcoal mb-1">
-                      ডেলিভারি নির্দেশনা
+                      Delivery Note / Instructions
                     </label>
                     <input
                       type="text"
                       value={instructions}
                       onChange={(e) => setInstructions(e.target.value)}
-                      placeholder="যেমন: সিকিউরিটি গার্ডের কাছে রাখবেন, আসার আগে ফোন করবেন..."
-                      className="w-full rounded-lg border border-line bg-white px-3 py-2 text-xs text-charcoal outline-none focus:border-[#D7232B]"
+                      placeholder="e.g., Leave with security guard, call before arriving..."
+                      className="w-full rounded-lg border border-line bg-white px-3 py-2 text-xs text-charcoal outline-none focus:border-brand"
                     />
                   </div>
                 </div>
@@ -341,9 +343,9 @@ export function AddressModal({ isOpen, onClose }: Props) {
             {/* Primary Action Button */}
             <button
               type="submit"
-              className="w-full rounded-full bg-[#D7232B] py-3 text-sm font-bold text-white shadow-md transition hover:bg-[#B80022] active:scale-[0.99] cursor-pointer"
+              className="w-full rounded-full bg-brand py-3 text-sm font-bold text-white shadow-md transition hover:bg-brand-hover active:scale-[0.99] cursor-pointer"
             >
-              ✓ আমার ডেলিভারি ঠিকানা হিসেবে সেট করুন
+              ✓ Set as My Delivery Address
             </button>
           </form>
 
@@ -352,9 +354,9 @@ export function AddressModal({ isOpen, onClose }: Props) {
             <div className="border-t border-line pt-4 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate">
-                  সংরক্ষিত ঠিকানা ({addresses.length})
+                  Saved Locations ({addresses.length})
                 </span>
-                <span className="text-[11px] text-slate">বেছে নিতে ক্লিক করুন</span>
+                <span className="text-[11px] text-slate">Click to choose</span>
               </div>
 
               <div className="space-y-2.5">
@@ -366,14 +368,14 @@ export function AddressModal({ isOpen, onClose }: Props) {
                       onClick={() => selectAddress(addr.id)}
                       className={`group relative flex cursor-pointer items-start gap-3 rounded-xl border p-3.5 transition ${
                         isSelected
-                          ? "border-[#D7232B] bg-[#D7232B]/5 ring-2 ring-[#D7232B]/20"
+                          ? "border-brand bg-brand/5 ring-2 ring-brand/20"
                           : "border-line bg-white hover:border-slate/40 hover:bg-alabaster/40"
                       }`}
                     >
                       <div
                         className={`mt-0.5 grid size-8 shrink-0 place-items-center rounded-full ${
                           isSelected
-                            ? "bg-[#D7232B] text-white"
+                            ? "bg-brand text-white"
                             : "bg-alabaster text-slate group-hover:text-charcoal"
                         }`}
                       >
@@ -382,15 +384,13 @@ export function AddressModal({ isOpen, onClose }: Props) {
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-sm font-bold text-charcoal">
-                            {addressLabelBn(addr.label)}
-                          </span>
+                          <span className="text-sm font-bold text-charcoal">{addr.label}</span>
                           <span className="rounded-full bg-slate/10 px-2 py-0.5 text-[10px] font-medium text-slate">
                             {addr.area}
                           </span>
                           {isSelected && (
-                            <span className="rounded-full bg-[#D7232B] px-2 py-0.2 text-[10px] font-bold text-white">
-                              সক্রিয়
+                            <span className="rounded-full bg-brand px-2 py-0.2 text-[10px] font-bold text-white">
+                              Active
                             </span>
                           )}
                         </div>
@@ -401,7 +401,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
 
                         {addr.instructions && (
                           <p className="mt-0.5 text-[11px] text-slate italic">
-                            নোট: {addr.instructions}
+                            Note: {addr.instructions}
                           </p>
                         )}
                       </div>
@@ -415,7 +415,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                             handleEditAddress(addr)
                           }}
                           className="rounded-lg p-1.5 text-slate transition hover:bg-slate/10 hover:text-charcoal cursor-pointer"
-                          title="এই ঠিকানা সম্পাদনা করুন"
+                          title="Edit this address"
                         >
                           <Icon d={ICONS.edit} className="size-3.5" />
                         </button>
@@ -426,7 +426,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                             deleteAddress(addr.id)
                           }}
                           className="rounded-lg p-1.5 text-slate transition hover:bg-rose-50 hover:text-rose-600 cursor-pointer"
-                          title="এই ঠিকানা মুছে ফেলুন"
+                          title="Delete this address"
                         >
                           <Icon d={ICONS.trash} className="size-3.5" />
                         </button>

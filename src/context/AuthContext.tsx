@@ -10,7 +10,7 @@ import React, {
 export interface AuthUser {
   id: number
   fullName: string
-  email: string
+  email: string | null
   phone: string
   role: "CUSTOMER" | "STAFF" | "ADMIN"
   defaultAddress: string | null
@@ -46,7 +46,9 @@ interface AuthContextType {
   openAdminModal: () => void
   closeAdminModal: () => void
   login: (identifier: string, password: string) => Promise<{ ok: boolean; error?: string }>
-  signup: (data: SignupInput) => Promise<{ ok: boolean; error?: string }>
+  signup: (
+    data: SignupInput,
+  ) => Promise<{ ok: boolean; error?: string; fieldErrors?: Record<string, string[] | undefined> }>
   logout: () => Promise<void>
   updateProfile: (data: UpdateProfileInput) => Promise<{ ok: boolean; error?: string }>
   refreshUser: () => Promise<void>
@@ -129,7 +131,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const body = await res.json().catch(() => null)
 
         if (!res.ok) {
-          const message = body?.error?.message || "ভুল তথ্য অথবা লগইন ব্যর্থ হয়েছে"
+          const message = body?.error?.message || "Invalid credentials or login failed"
           return { ok: false, error: message }
         }
 
@@ -141,12 +143,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         return {
           ok: false,
-          error: "লগইন সেবা থেকে অপ্রত্যাশিত উত্তর এসেছে",
+          error: "Unexpected response from authentication service",
         }
       } catch (err) {
         return {
           ok: false,
-          error: err instanceof Error ? err.message : "লগইনের সময় নেটওয়ার্ক সমস্যা হয়েছে",
+          error: err instanceof Error ? err.message : "Network error during sign in",
         }
       }
     },
@@ -166,8 +168,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const body = await res.json().catch(() => null)
 
         if (!res.ok) {
-          const message = body?.error?.message || "রেজিস্ট্রেশন ব্যর্থ হয়েছে। তথ্যগুলো যাচাই করুন।"
-          return { ok: false, error: message }
+          const details = body?.error?.details
+          const fieldErrors =
+            details && typeof details === "object" ? (details as Record<string, string[] | undefined>) : undefined
+          const message = body?.error?.message || "Couldn't create your account. Please try again."
+          return { ok: false, error: message, fieldErrors }
         }
 
         if (body?.data?.user) {
@@ -178,12 +183,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
         return {
           ok: false,
-          error: "রেজিস্ট্রেশন সেবা থেকে অপ্রত্যাশিত উত্তর এসেছে",
+          error: "Unexpected response from registration service",
         }
       } catch (err) {
         return {
           ok: false,
-          error: err instanceof Error ? err.message : "রেজিস্ট্রেশনের সময় নেটওয়ার্ক সমস্যা হয়েছে",
+          error: err instanceof Error ? err.message : "Network error during registration",
         }
       }
     },
@@ -219,7 +224,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (!res.ok) {
         return {
           ok: false,
-          error: body?.error?.message || "প্রোফাইল আপডেট করা যায়নি",
+          error: body?.error?.message || "Failed to update profile",
         }
       }
 
@@ -232,7 +237,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (err) {
       return {
         ok: false,
-        error: err instanceof Error ? err.message : "প্রোফাইল আপডেট করা যায়নি",
+        error: err instanceof Error ? err.message : "Failed to update profile",
       }
     }
   }, [])

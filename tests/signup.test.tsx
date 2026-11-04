@@ -27,6 +27,16 @@ describe("sign up", () => {
     expect(screen.queryByLabelText(/address/i)).not.toBeInTheDocument()
   })
 
+  test("switches between sign in and create account with the tabs", () => {
+    render(<AuthModal />)
+    expect(screen.getByRole("tab", { name: "Create account" })).toHaveAttribute("aria-selected", "true")
+    fireEvent.click(screen.getByRole("tab", { name: "Sign in" }))
+    expect(screen.getByLabelText("Mobile number or email")).toBeInTheDocument()
+    expect(screen.queryByLabelText("Your name")).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole("button", { name: "Create an account" }))
+    expect(screen.getByLabelText("Your name")).toBeInTheDocument()
+  })
+
   test("shows what is wrong under each field and does not submit", () => {
     render(<AuthModal />)
     fill("Mobile number", "12345")

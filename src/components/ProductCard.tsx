@@ -1,4 +1,3 @@
-import { dayLabelBn, formatBdt, toBengaliNumber } from "../utils/bengali"
 import { useState } from "react"
 import { useCart } from "../context/CartContext"
 
@@ -6,6 +5,7 @@ export type Product = {
   id: string | number
   name: string
   banglaName?: string
+  category?: string
   description: string
   price: number
   basePriceBdt?: number
@@ -34,7 +34,6 @@ export function ProductCard({
     product.remainingPortions !== undefined &&
     product.remainingPortions > 0 &&
     product.remainingPortions <= 15
-  const currentDayLabel = product.day || activeDay
 
   const handleAdd = () => {
     if (isSoldOut) return
@@ -50,74 +49,102 @@ export function ProductCard({
   return (
     <article
       id={`dish-${product.id}`}
-      className={`group flex flex-col overflow-hidden rounded-card bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 scroll-mt-[calc(var(--header-h,120px)+32px)] ${
-        isHighlighted
-          ? "ring-4 ring-[#D7232B] shadow-[0_0_35px_rgba(215,35,43,0.4)] scale-[1.02]"
-          : ""
-      }`}
+      className={`group relative flex gap-3 rounded-card border border-line/70 bg-white p-2.5 shadow-card transition-all duration-300 min-[560px]:flex-col min-[560px]:gap-0 min-[560px]:hover:-translate-y-1 hover:border-gold/40 hover:shadow-lift scroll-mt-[calc(var(--header-h,120px)+32px)] ${
+        isHighlighted ? "scale-[1.02] ring-4 ring-gold shadow-gold" : ""
+      } ${isSoldOut ? "opacity-80" : ""}`}
     >
-      <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-saffron/40 via-alabaster to-[#D7232B]/15">
+      <div className="relative aspect-square w-28 shrink-0 self-start overflow-hidden rounded-[0.9rem] bg-gradient-to-br from-gold-light via-cream to-brand-light min-[380px]:w-32 min-[560px]:aspect-[4/3] min-[560px]:w-auto min-[560px]:self-auto">
         {product.image ? (
           <img
             src={product.image}
             alt={product.name}
             loading="lazy"
-            className="size-full object-cover transition duration-500 group-hover:scale-105"
+            className={`size-full object-cover transition duration-700 group-hover:scale-[1.06] ${
+              isSoldOut ? "grayscale" : ""
+            }`}
           />
         ) : (
-          <div className="grid size-full place-items-center text-display text-5xl text-[#D7232B]/20">
-            BB
+          <div className="grid size-full place-items-center">
+            <img src="/logo-mark.png" alt="" className="size-14 opacity-40 min-[560px]:size-20" />
           </div>
         )}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent" />
+
         {product.bestseller && (
-          <span className="text-display absolute left-3 top-3 rounded-full bg-saffron px-3 py-1.5 text-xs text-charcoal">
-            বেস্টসেলার
+          <span className="text-eyebrow absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-maroon/90 px-2 py-1 text-[11px] tracking-[0.12em] text-saffron backdrop-blur min-[560px]:left-2.5 min-[560px]:top-2.5 min-[560px]:px-2.5 min-[560px]:py-1.5 min-[560px]:text-[11px]">
+            ★ <span className="hidden min-[560px]:inline">Bestseller</span><span className="min-[560px]:hidden">Top</span>
           </span>
         )}
         {isSoldOut && (
-          <span className="absolute right-3 top-3 rounded-full bg-slate-900/85 px-3 py-1 font-mono text-xs font-bold text-white shadow-sm backdrop-blur-xs">
-            স্টক শেষ
+          <span className="text-eyebrow absolute inset-x-1.5 bottom-1.5 rounded-full bg-charcoal/85 px-2 py-1 text-center text-[10px] text-white backdrop-blur min-[560px]:inset-x-auto min-[560px]:bottom-auto min-[560px]:right-2.5 min-[560px]:top-2.5 min-[560px]:px-2.5 min-[560px]:py-1.5 min-[560px]:text-[11px]">
+            Sold Out
+          </span>
+        )}
+        {product.portionSize && !isSoldOut && (
+          <span className="absolute bottom-2.5 left-2.5 hidden rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-charcoal backdrop-blur min-[560px]:inline">
+            {product.portionSize}
           </span>
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-2 p-4">
-        <h3 className="text-display text-lg">{product.name}</h3>
-        <p className="line-clamp-2 text-sm text-slate">{product.description}</p>
+
+      <div className="flex min-w-0 flex-1 flex-col py-0.5 pr-0.5 min-[560px]:px-2 min-[560px]:pb-1.5 min-[560px]:pt-4">
+        <h3 className="text-display line-clamp-2 text-[1.05rem] leading-snug min-[560px]:text-[1.2rem]">{product.name}</h3>
+        {product.banglaName && (
+          <p className="font-bn mt-0.5 text-sm text-gold">{product.banglaName}</p>
+        )}
+        <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-slate min-[560px]:mt-1.5 min-[560px]:text-sm">
+          {product.description}
+        </p>
 
         {isLowStock && (
-          <div className="flex items-center gap-1.5 font-sans text-xs font-semibold text-[#D7232B]">
+          <p className="mt-2 flex items-center gap-2 rounded-lg bg-chili-light px-2.5 py-1.5 text-xs font-semibold text-chili min-[560px]:mt-3">
             <span className="relative flex size-2">
-              <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#D7232B] opacity-75"></span>
-              <span className="relative inline-flex size-2 rounded-full bg-[#D7232B]"></span>
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-chili opacity-75"></span>
+              <span className="relative inline-flex size-2 rounded-full bg-chili"></span>
             </span>
-            <span>
-              ⚡ {dayLabelBn(currentDayLabel)} এর জন্য মাত্র{" "}
-              {toBengaliNumber(product.remainingPortions ?? 0)} পোর্শন বাকি!
-            </span>
-          </div>
+            Only {product.remainingPortions} left today
+          </p>
         )}
 
-        <p className="text-display mt-auto pt-1 text-2xl text-[#D7232B]">
-          {formatBdt(product.price)}
-        </p>
-        <button
-          type="button"
-          disabled={isSoldOut}
-          onClick={handleAdd}
-          className={`mt-1 h-11 w-full rounded-full text-sm font-semibold transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-[#D7232B]/30 ${
-            isSoldOut
-              ? "cursor-not-allowed border border-stone-300 bg-stone-200 text-stone-500"
-              : justAdded
-                ? "border-2 border-[#D7232B] bg-[#FFF0F3] text-[#D7232B]"
-                : "bg-[#D7232B] text-white hover:bg-[#B80022]"
-          }`}
-        >
-          {isSoldOut
-            ? `${currentDayLabel ? dayLabelBn(currentDayLabel) : "আজ"} স্টক শেষ`
-            : justAdded
-              ? "যোগ হয়েছে ✓"
-              : "+ কার্টে যোগ করুন"}
-        </button>
+        <div className="mt-auto flex items-end justify-between gap-2 pt-2.5 min-[560px]:gap-3 min-[560px]:pt-4">
+          <div className="leading-none">
+            {product.basePriceBdt !== undefined && product.basePriceBdt > product.price && (
+              <span className="mb-1 block text-xs text-slate line-through">
+                ৳{product.basePriceBdt}
+              </span>
+            )}
+            <span className="text-display text-xl text-brand min-[560px]:text-2xl">
+              <span className="mr-0.5 text-lg">৳</span>
+              {product.price}
+            </span>
+          </div>
+          <button
+            type="button"
+            disabled={isSoldOut}
+            onClick={handleAdd}
+            aria-label={isSoldOut ? `${product.name} is sold out` : `Add ${product.name} to cart`}
+            className={`inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-bold min-[560px]:h-11 min-[560px]:px-4 transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 ${
+              isSoldOut
+                ? "cursor-not-allowed bg-cream text-slate"
+                : justAdded
+                  ? "bg-gold-light text-gold ring-1 ring-gold/50"
+                  : "bg-brand text-white hover:bg-brand-hover hover:shadow-[0_10px_22px_-10px_rgba(168,20,31,0.9)]"
+            }`}
+          >
+            {isSoldOut ? (
+              "Sold Out"
+            ) : justAdded ? (
+              "Added ✓"
+            ) : (
+              <>
+                <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" aria-hidden>
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                Add<span className="hidden min-[560px]:inline"> to Cart</span>
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </article>
   )

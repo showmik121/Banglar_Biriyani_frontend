@@ -1,4 +1,3 @@
-import { addressLabelBn, toBengaliNumber } from "../utils/bengali"
 import React, { useState, useEffect, useRef } from "react"
 import { useAddress } from "../context/AddressContext"
 import { searchRecommendations, type RecommendationItem } from "../data/dhakaRecommendations"
@@ -108,7 +107,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
         ref={popupRef}
         className="absolute left-1/2 top-full z-50 mt-2 w-[calc(100vw-32px)] max-w-md -translate-x-1/2 overflow-hidden rounded-2xl border border-line bg-white shadow-2xl transition-all animate-in fade-in duration-150 sm:w-[440px]"
         role="dialog"
-        aria-label="ঠিকানার পরামর্শ"
+        aria-label="Address Recommendations"
       >
         {/* Header / Search Input */}
         <div className="border-b border-line p-3.5 bg-alabaster/40">
@@ -132,15 +131,15 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                   }
                 }
               }}
-              placeholder="এলাকা, রোড খুঁজুন বা যেকোনো ঠিকানা লিখুন..."
-              className="w-full rounded-xl border border-line bg-white py-2.5 pl-9 pr-8 text-sm text-charcoal outline-none transition focus:border-[#D7232B] focus:ring-2 focus:ring-[#D7232B]/20"
+              placeholder="Search area, road or write any address..."
+              className="w-full rounded-xl border border-line bg-white py-2.5 pl-9 pr-8 text-sm text-charcoal outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => handleQueryChange("")}
                 className="absolute right-2.5 text-slate/60 hover:text-charcoal p-1"
-                aria-label="খোঁজা মুছে ফেলুন"
+                aria-label="Clear search"
               >
                 <Icon d={ICONS.close} className="size-3.5" />
               </button>
@@ -155,19 +154,19 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
             <button
               type="button"
               onClick={handleSelectCustomQuery}
-              className="flex w-full items-center gap-3 rounded-xl border border-[#D7232B]/30 bg-[#D7232B]/5 p-3 text-left transition hover:bg-[#D7232B]/10 cursor-pointer"
+              className="flex w-full items-center gap-3 rounded-xl border border-brand/30 bg-brand/5 p-3 text-left transition hover:bg-brand/10 cursor-pointer"
             >
-              <div className="grid size-8 shrink-0 place-items-center rounded-full bg-[#D7232B] text-white">
+              <div className="grid size-8 shrink-0 place-items-center rounded-full bg-brand text-white">
                 <Icon d={ICONS.pin} className="size-4" />
               </div>
               <div className="min-w-0 flex-1">
-                <span className="block text-xs font-bold text-[#D7232B]">
-                  হুবহু এই ঠিকানা ব্যবহার করুন
+                <span className="block text-xs font-bold text-brand">
+                  Use exact custom address
                 </span>
                 <p className="truncate text-sm font-medium text-charcoal">"{query}"</p>
               </div>
-              <span className="rounded-full bg-[#D7232B] px-2.5 py-1 text-[11px] font-bold text-white">
-                এখানে ডেলিভারি দিন
+              <span className="rounded-full bg-brand px-2.5 py-1 text-[11px] font-bold text-white">
+                Deliver Here
               </span>
             </button>
           )}
@@ -176,7 +175,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
           {!query && addresses.length > 0 && (
             <div>
               <div className="px-2 pb-1.5 pt-1 text-[11px] font-bold uppercase tracking-wider text-slate">
-                আপনার সংরক্ষিত ঠিকানা
+                Your Saved Locations
               </div>
               <div className="space-y-1">
                 {addresses.map((addr) => {
@@ -191,13 +190,13 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                       }}
                       className={`flex w-full items-center gap-3 rounded-xl p-2.5 text-left transition cursor-pointer ${
                         isSelected
-                          ? "bg-[#D7232B]/10 border border-[#D7232B]/30"
+                          ? "bg-brand/10 border border-brand/30"
                           : "hover:bg-alabaster"
                       }`}
                     >
                       <div
                         className={`grid size-7 shrink-0 place-items-center rounded-full text-xs ${
-                          isSelected ? "bg-[#D7232B] text-white" : "bg-slate/10 text-slate"
+                          isSelected ? "bg-brand text-white" : "bg-slate/10 text-slate"
                         }`}
                       >
                         {addr.label === "Work" ? (
@@ -208,12 +207,10 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-charcoal">
-                            {addressLabelBn(addr.label)}
-                          </span>
+                          <span className="text-xs font-bold text-charcoal">{addr.label}</span>
                           <span className="text-[10px] text-slate font-medium">{addr.area}</span>
                           {isSelected && (
-                            <span className="text-[10px] font-bold text-[#D7232B]">• সক্রিয়</span>
+                            <span className="text-[10px] font-bold text-brand">• Active</span>
                           )}
                         </div>
                         <p className="truncate text-xs text-slate">{addr.details}</p>
@@ -229,11 +226,11 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
           <div>
             <div className="flex items-center justify-between px-2 pb-1.5 pt-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate">
-                {query ? `প্রস্তাবিত ঠিকানা (${toBengaliNumber(results.length)})` : "জনপ্রিয় ডেলিভারি এলাকা"}
+                {query ? `Recommended Matches (${results.length})` : "Popular Delivery Hotspots"}
               </span>
-              <span className="flex items-center gap-1 text-[10px] font-semibold text-[#D7232B]">
+              <span className="flex items-center gap-1 text-[10px] font-semibold text-brand">
                 <Icon d={ICONS.sparkles} className="size-3" />
-                ঢাকা
+                Near DIU
               </span>
             </div>
 
@@ -246,12 +243,12 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                     onClick={() => handleSelectRecommendation(item)}
                     className="flex w-full items-start gap-3 rounded-xl p-2.5 text-left transition hover:bg-alabaster group cursor-pointer"
                   >
-                    <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-[#D7232B]/10 text-[#D7232B] group-hover:bg-[#D7232B] group-hover:text-white transition-colors">
+                    <div className="mt-0.5 grid size-7 shrink-0 place-items-center rounded-full bg-brand/10 text-brand group-hover:bg-brand group-hover:text-white transition-colors">
                       <Icon d={ICONS.pin} className="size-3.5" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-charcoal group-hover:text-[#D7232B] transition-colors">
+                        <span className="text-xs font-bold text-charcoal group-hover:text-brand transition-colors">
                           {item.name}
                         </span>
                         {item.tag && (
@@ -268,8 +265,8 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
             ) : (
               <div className="p-4 text-center">
                 <p className="text-xs text-slate">
-                  মিলে এমন কোনো ঠিকানা পাওয়া যায়নি। আপনার ঠিকানা সেট করতে উপরের "হুবহু এই ঠিকানা ব্যবহার করুন" এ
-                  ক্লিক করুন!
+                  No matching preset found. Click "Use exact custom address" above to set your
+                  location!
                 </p>
               </div>
             )}
@@ -284,9 +281,10 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
               onClose()
               onOpenDetailedModal()
             }}
-            className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-[#D7232B] hover:underline cursor-pointer"
+            className="inline-flex items-center justify-center gap-1.5 text-xs font-bold text-brand hover:underline cursor-pointer"
           >
-            <Icon d={ICONS.edit} className="size-3.5" />+ ফ্ল্যাট, তলা ও ডেলিভারি নির্দেশনাসহ পুরো ঠিকানা লিখুন
+            <Icon d={ICONS.edit} className="size-3.5" />+ Write full apartment, floor & delivery
+            instructions
           </button>
         </div>
       </div>
