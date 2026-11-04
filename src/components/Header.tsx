@@ -478,6 +478,7 @@ export function Header({
               }}
               onFocus={() => setIsSearchRecOpen(true)}
               onClick={() => setIsSearchRecOpen(true)}
+              aria-label={tr("Search dishes", "খাবার খুঁজুন")}
               placeholder={tr("Search biriyani, tehari, borhani…", "বিরিয়ানি, তেহারি, বোরহানি খুঁজুন…")}
               className="h-11 w-full rounded-full border border-line bg-white pl-10 pr-11 text-sm outline-none transition placeholder:text-slate/80 focus:border-brand focus:ring-4 focus:ring-brand/10"
             />

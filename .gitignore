@@ -25,3 +25,9 @@ npm-debug.log*
 Thumbs.db
 .vscode/
 .idea/
+
+# Claude Code project skills (local tooling, not part of the site)
+.claude/
+# Local Claude Code tooling, not part of the site
+ecc-skills/
+install-ecc-skills.bat

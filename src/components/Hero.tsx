@@ -173,7 +173,7 @@ export function Hero({
                   }}
                   aria-label={tr(`Photo ${i + 1}`, `ছবি ${num(i + 1)}`)}
                   aria-current={i === active}
-                  className="grid h-6 place-items-center px-0.5"
+                  className="grid h-6 min-w-6 place-items-center"
                 >
                   <span
                     className={`block h-2 rounded-full transition-all ${
