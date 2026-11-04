@@ -26,8 +26,7 @@ Thumbs.db
 .vscode/
 .idea/
 
-# Claude Code project skills (local tooling, not part of the site)
-.claude/
-# Local Claude Code tooling, not part of the site
-ecc-skills/
-install-ecc-skills.bat
+# Browser tests output
+e2e-log.txt
+test-results/
+playwright-report/

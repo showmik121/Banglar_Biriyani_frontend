@@ -69,3 +69,7 @@ Admin প্যানেল: সাইটের ঠিকানার শেষ�
 ## ৮. ফ্রি প্ল্যানের সীমা
 
 Netlify, Supabase আর Brevo-র ফ্রি প্ল্যানে ব্যবহারের সীমা আছে (যেমন Brevo-তে দিনে ৩০০ ইমেইল)। অর্ডার অনেক বাড়লে সংশ্লিষ্ট সার্ভিসের ড্যাশবোর্ডে ব্যবহার দেখুন এবং দরকারে প্ল্যান বদলান।
+
+## Browser tests (e2e)
+
+`e2e.bat` runs Playwright tests in a real browser: sign up -> menu -> add to cart -> checkout -> the admin sees and confirms the order. They use a fake API (`e2e/fakeApi.ts`), so the live site and database are never touched. The result is saved to `e2e-log.txt` (`E2E_EXIT=0` = passed). They are not part of GitHub Actions.
