@@ -692,16 +692,16 @@ export default function App() {
         secondary={{ label: tr("View menu", "মেনু দেখুন"), href: "#meal" }}
       />
 
-      <div className="max-md:order-2">
+      <div className="max-md:order-3">
         <PromiseStrip />
       </div>
 
-      <div className="max-md:order-2">
+      <div className="max-md:order-3">
         <OffersBand offers={storeOffers} />
       </div>
 
       {/* Our menu: biriyani and regular dishes */}
-      <section id="menu" className="scroll-mt-[calc(var(--header-h,120px)+16px)] max-md:order-2">
+      <section id="menu" className="scroll-mt-[calc(var(--header-h,120px)+16px)] max-md:order-1">
         <div className="px-5 pb-2 pt-8 sm:bg-brand-light/60 sm:px-6 sm:pb-8 sm:pt-12">
           <SectionTitle
             eyebrow={tr("Our Menu", "আমাদের মেনু")}
@@ -771,7 +771,7 @@ export default function App() {
       </section>
 
       {/* 7-day meals with a sticky day picker */}
-      <section id="meal" className="scroll-mt-[var(--header-h,120px)] max-md:order-1">
+      <section id="meal" className="scroll-mt-[var(--header-h,120px)] max-md:order-2">
         <div className="sticky top-[var(--header-h,120px)] z-30 border-b border-line bg-alabaster/95 py-3 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <DayPillBar />
@@ -863,15 +863,15 @@ export default function App() {
         </div>
       </section>
 
-      <div className="max-md:order-3">
+      <div className="max-md:order-4">
         <OrderProcess />
       </div>
 
-      <div className="max-md:order-3">
+      <div className="max-md:order-4">
         <LocationSection zones={storeZones} />
       </div>
 
-      <div className="max-md:order-3">
+      <div className="max-md:order-4">
         <Footer />
       </div>
 
@@ -898,7 +898,7 @@ export default function App() {
           </button>
         </div>
       )}
-      {totalItems > 0 && <div className="h-20 md:hidden max-md:order-4" aria-hidden />}
+      {totalItems > 0 && <div className="h-20 md:hidden max-md:order-5" aria-hidden />}
 
       <CartDrawer onProceedToCheckout={() => setIsCheckoutOpen(true)} />
       <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />

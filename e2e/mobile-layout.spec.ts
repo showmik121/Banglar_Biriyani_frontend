@@ -22,9 +22,13 @@ test("phone layout: no sideways scroll, order button and dish cards fit", async 
   const box = await page.getByRole("link", { name: "Order now" }).first().boundingBox()
   expect(box!.y + box!.height).toBeLessThan(page.viewportSize()!.height)
 
-  // The daily meals start within about one screen, not after several screens of scrolling
-  const mealTop = await page.locator("#meal").evaluate((el) => el.getBoundingClientRect().top + window.scrollY)
-  expect(mealTop).toBeLessThan(page.viewportSize()!.height * 1.15)
+  // On a phone the menu comes first, then the daily meals
+  const tops = await page.evaluate(() => ({
+    menu: document.querySelector("#menu")!.getBoundingClientRect().top + window.scrollY,
+    meal: document.querySelector("#meal")!.getBoundingClientRect().top + window.scrollY,
+  }))
+  expect(tops.menu).toBeLessThan(page.viewportSize()!.height * 1.15)
+  expect(tops.menu).toBeLessThan(tops.meal)
 
   await page.screenshot({ path: "test-results/mobile-1-top.png" })
   await page.locator("#meal").scrollIntoViewIfNeeded()
