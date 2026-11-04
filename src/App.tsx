@@ -17,6 +17,7 @@ import { type SearchableDish } from "./components/SearchRecommendationPopup"
 import { useCart } from "./context/CartContext"
 import { useAddress } from "./context/AddressContext"
 import { useLang } from "./context/LanguageContext"
+import { DayPillBar, dayLabel } from "./components/DayPillBar"
 import { categoryName, dishDescription, dishName } from "./i18n/dishes"
 
 const img = (id: string, w = 800, h = 600) =>
@@ -95,8 +96,21 @@ const INITIAL_MENU: Product[] = [
   },
 ]
 
-const grid =
-  "grid grid-cols-1 gap-3 min-[560px]:grid-cols-2 min-[560px]:gap-5 md:grid-cols-3 lg:grid-cols-4 lg:gap-6"
+const grid = "grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-6 lg:grid-cols-4"
+
+// Hero slider photos
+const HERO_IMAGES = [
+  img("photo-1631515243349-e0cb75fb8d3a", 2000, 1100),
+  img("photo-1633945274405-b6c8069047b0", 2000, 1100),
+  img("photo-1589302168068-964664d93dc0", 2000, 1100),
+  img("photo-1563379091339-03b21ab4a4f8", 2000, 1100),
+]
+const MEAL_IMAGES = [
+  img("photo-1589778655375-3e622a9fc91c", 2000, 1000),
+  img("photo-1585937421612-70a008356fbe", 2000, 1000),
+  img("photo-1546833999-b9f581a1996d", 2000, 1000),
+  img("photo-1626777552726-4a6b54c97e46", 2000, 1000),
+]
 
 function SectionTitle({
   title,
@@ -214,24 +228,6 @@ function PromiseStrip() {
       </ul>
       <TornEdge side="bottom" className="text-brand" />
     </section>
-  )
-}
-
-function AnnouncementBar() {
-  const { tr } = useLang()
-  return (
-    <div className="bg-charcoal text-white">
-      <p className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs sm:px-6 lg:px-8">
-        <span className="font-bn font-semibold text-saffron">গরম গরম বিরিয়ানি</span>
-        <span className="text-white/40">•</span>
-        <span>
-          <span className="hidden sm:inline">
-            {tr("Delivering hot around Daffodil Smart City, Savar. ", "ড্যাফোডিল স্মার্ট সিটি, সাভারের আশেপাশে গরম গরম ডেলিভারি। ")}
-          </span>
-          <span className="font-semibold text-saffron">{tr("Order online now", "এখনই অনলাইনে অর্ডার করুন")}</span>
-        </span>
-      </p>
-    </div>
   )
 }
 
@@ -489,79 +485,6 @@ type MenuByDay = Record<string, ApiMenuItem[]>
 
 const HIDDEN_CATEGORIES = new Set(["home-style-meals"])
 
-function AboutSection() {
-  const { tr } = useLang()
-  const points = [
-    {
-      title: tr("Shahi recipes", "শাহি রেসিপি"),
-      body: tr("Old Dhaka nawabi recipes, made the slow way.", "পুরান ঢাকার নবাবি রেসিপি, ধীরে ধীরে রান্না।"),
-    },
-    {
-      title: tr("Sealed dum handi", "মুখ বন্ধ দমের হাঁড়ি"),
-      body: tr("Meat and rice layered, sealed and slow-cooked.", "মাংস আর চালের স্তর, মুখ বন্ধ করে ধীরে রান্না।"),
-    },
-    {
-      title: tr("Fiery & fragrant", "ঝাল ও সুগন্ধি"),
-      body: tr("Whole spices, saffron, kewra and pure ghee.", "আস্ত মসলা, জাফরান, কেওড়া আর খাঁটি ঘি।"),
-    },
-  ]
-  return (
-    <section
-      id="about"
-      className="bg-halftone relative scroll-mt-[var(--header-h,120px)] overflow-hidden"
-    >
-      <div className="mx-auto grid max-w-7xl items-center gap-12 px-4 py-14 sm:gap-14 sm:px-6 sm:py-20 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-28">
-        <div className="relative mx-auto w-[85%] max-w-md sm:w-full">
-          <div className="bg-jali absolute -inset-3 rotate-[-3deg] rounded-[2rem]" />
-          <div className="relative overflow-hidden rounded-[1.75rem] ring-8 ring-white shadow-lift">
-            <img
-              src={PHOTOS.about}
-              alt={tr("A plate of biryani with tender meat", "নরম মাংসের এক প্লেট বিরিয়ানি")}
-              loading="lazy"
-              className="aspect-[6/7] w-full object-cover"
-            />
-          </div>
-          <img
-            src={PHOTOS.aboutInset}
-            alt={tr("Whole spices used in our biriyani", "আমাদের বিরিয়ানির আস্ত মসলা")}
-            loading="lazy"
-            className="absolute -left-4 -top-4 size-20 rounded-full object-cover shadow-lift ring-4 ring-white sm:-left-10 sm:-top-6 sm:size-36 sm:ring-[6px]"
-          />
-          <div className="absolute -bottom-6 -right-3 rotate-[4deg] rounded-2xl bg-saffron px-4 py-3 text-charcoal shadow-lift sm:-right-8 sm:px-6 sm:py-4">
-            <p className="font-calli text-2xl leading-none sm:text-3xl">ভালোবাসায় রান্না</p>
-            <p className="text-eyebrow mt-1.5 text-charcoal/70">{tr("Cooked with love", "যত্ন নিয়ে রান্না")}</p>
-          </div>
-        </div>
-
-        <div>
-          <p className="text-eyebrow text-brand">{tr("Our story", "আমাদের গল্প")}</p>
-          <h2 className="text-display mt-3 text-4xl text-charcoal sm:text-5xl">
-            ঐতিহ্যের স্বাদ, <span className="text-brand">প্রতিটি লোকমায়</span>
-          </h2>
-          <p className="mt-3 text-lg font-semibold text-slate">
-            {tr("A royal feast from the nawab's kitchen", "নবাবের রান্নাঘরের রাজকীয় ভোজ")}
-          </p>
-          <p className="mt-6 max-w-xl leading-relaxed text-slate">
-            {tr(
-              "Banglar Biriyani brings the rich, spicy biriyani of Puran Dhaka to Savar, right next to Daffodil Smart City. Our meat is marinated overnight, layered with fragrant rice and cooked slowly in a sealed handi, just the way it has always been made.",
-              "বাংলার বিরিয়ানি পুরান ঢাকার মসলাদার, জমকালো বিরিয়ানি নিয়ে এসেছে সাভারে, ড্যাফোডিল স্মার্ট সিটির ঠিক পাশে। সারা রাত মাংস মেরিনেট করে, সুগন্ধি চালের সাথে স্তরে সাজিয়ে মুখ বন্ধ হাঁড়িতে ধীরে রান্না করি, ঠিক যেভাবে সবসময় রান্না হয়ে এসেছে।",
-            )}
-          </p>
-          <ul className="mt-9 grid gap-4 sm:grid-cols-3">
-            {points.map((pt) => (
-              <li key={pt.title} className="rounded-2xl border border-line bg-white p-4 shadow-card">
-                <span className="mb-3 block h-1 w-8 rounded-full bg-brand" />
-                <p className="font-bold text-charcoal">{pt.title}</p>
-                <p className="mt-1 text-sm leading-relaxed text-slate">{pt.body}</p>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </section>
-  )
-}
-
 export default function App() {
   const currentPath = useCurrentPath()
   const { lang, tr, num, taka } = useLang()
@@ -584,7 +507,6 @@ export default function App() {
   const { isAddressModalOpen, setIsAddressModalOpen } = useAddress()
   const [query, setQuery] = useState("")
   const [showAll, setShowAll] = useState(false)
-  const [category, setCategory] = useState("All")
   const [loading, setLoading] = useState(true)
   const [menuDays, setMenuDays] = useState<MenuByDay>({})
   const [highlightedDishId, setHighlightedDishId] = useState<string | null>(null)
@@ -617,57 +539,57 @@ export default function App() {
     }
   }, [currentPath])
 
-  // One flat restaurant menu: every unique dish, no day schedule
+  const toProduct = (i: ApiMenuItem): Product => ({
+    id: String(i.id),
+    name: i.name,
+    description: i.description,
+    price: i.priceBdt ?? i.basePriceBdt,
+    basePriceBdt: i.basePriceBdt,
+    image: i.imageUrl,
+    bestseller: i.isFeatured,
+    portionSize: i.portionSize,
+    category: i.categoryName,
+    remainingPortions: i.remainingPortions,
+    dailyQuota: i.dailyQuota,
+  })
+
+  // "Our menu": biriyani, tehari, kebab, drinks (every unique dish, home-style meals left out)
   const menu: Product[] = useMemo(() => {
     const seen = new Set<number>()
     const items: ApiMenuItem[] = []
     Object.values(menuDays).forEach((dayList) =>
       dayList.forEach((item) => {
-        if (seen.has(item.id) || HIDDEN_CATEGORIES.has(item.categorySlug)) return
-        if (item.isAvailable === false) return
+        if (seen.has(item.id) || item.isAvailable === false) return
+        if (HIDDEN_CATEGORIES.has(item.categorySlug) && !item.isFeatured) return
         seen.add(item.id)
         items.push(item)
       }),
     )
-    if (items.length === 0) return INITIAL_MENU
-
-    return items.map((i) => ({
-      id: String(i.id),
-      name: i.name,
-      description: i.description,
-      price: i.priceBdt ?? i.basePriceBdt,
-      basePriceBdt: i.basePriceBdt,
-      image: i.imageUrl,
-      bestseller: i.isFeatured,
-      portionSize: i.portionSize,
-      category: i.categoryName,
-    }))
+    return items.length === 0 ? INITIAL_MENU : items.map(toProduct)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [menuDays])
 
-  const categories = useMemo(() => {
-    const list: string[] = []
-    menu.forEach((p) => p.category && !list.includes(p.category) && list.push(p.category))
-    return ["All", ...list]
-  }, [menu])
+  // "7-day special meals": everything on the menu for the chosen day
+  const dayKey = String(activeDay).toUpperCase()
+  const meals: Product[] = useMemo(
+    () => (menuDays[dayKey] || []).filter((i) => i.isAvailable !== false).map(toProduct),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [menuDays, dayKey],
+  )
 
   const q = query.toLowerCase()
-  const filteredMenu = useMemo(
-    () =>
-      menu.filter(
-        (p) =>
-          (category === "All" || p.category === category) &&
-          (p.name.toLowerCase().includes(q) ||
-            dishName(p.name, "bn").includes(q) ||
-            p.category?.toLowerCase().includes(q) ||
-            categoryName(p.category ?? "", "bn").includes(q)),
-      ),
-    [menu, q, category],
-  )
-  const visibleMenu = showAll || q || category !== "All" ? filteredMenu : filteredMenu.slice(0, 8)
+  const matches = (p: Product) =>
+    p.name.toLowerCase().includes(q) ||
+    dishName(p.name, "bn").includes(q) ||
+    p.category?.toLowerCase().includes(q) ||
+    categoryName(p.category ?? "", "bn").includes(q)
+  const filteredMenu = useMemo(() => menu.filter(matches), [menu, q]) // eslint-disable-line react-hooks/exhaustive-deps
+  const filteredMeals = useMemo(() => meals.filter(matches), [meals, q]) // eslint-disable-line react-hooks/exhaustive-deps
+  const visibleMenu = showAll || q ? filteredMenu : filteredMenu.slice(0, 4)
 
   const allSearchableDishes: SearchableDish[] = useMemo(
     () =>
-      menu.map((p) => ({
+      [...menu, ...meals.filter((m) => !menu.some((p) => p.id === m.id))].map((p) => ({
         id: p.id,
         name: dishName(p.name, lang),
         description: dishDescription(p.name, p.description, lang),
@@ -676,12 +598,11 @@ export default function App() {
         bestseller: p.bestseller,
         categoryName: p.category ? categoryName(p.category, lang) : p.category,
       })),
-    [menu, lang],
+    [menu, meals, lang],
   )
 
   const handleSelectDish = (dish: SearchableDish) => {
     setQuery(dish.name)
-    setCategory("All")
     setShowAll(true)
     setHighlightedDishId(String(dish.id))
     setTimeout(() => {
@@ -721,7 +642,6 @@ export default function App() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <AnnouncementBar />
       <Header
         cartCount={totalItems}
         query={query}
@@ -733,129 +653,150 @@ export default function App() {
       />
 
       <Hero
-        image={PHOTOS.hero}
-        alt={tr("A plate of fragrant biriyani with tender mutton", "নরম খাসির মাংসের সুগন্ধি বিরিয়ানি")}
-        kicker="ড্যাফোডিল স্মার্ট সিটির পাশেই, সাভার"
-        lineOne="দমে রান্না"
-        lineTwo="শাহি বিরিয়ানি"
-        english={tr("The royal taste of Bengal", "বাংলার রাজকীয় স্বাদ")}
+        images={HERO_IMAGES}
+        alt={tr("A plate of fragrant biriyani with tender meat", "নরম মাংসের সুগন্ধি বিরিয়ানি")}
+        badge={tr("This week only", "শুধু এই সপ্তাহে")}
+        title={tr("Authentic Dhakaiya", "খাঁটি ঢাকাইয়া")}
+        highlight={tr("biriyani taste", "বিরিয়ানির স্বাদ")}
+        subtitle={tr("7-day special menu", "৭ দিনের স্পেশাল মেনু")}
         body={tr(
-          "Old Dhaka style shahi biriyani, tehari, jali kabab and ice-cold borhani. Spicy, smoky and cooked the traditional way, delivered hot to DIU campus, hostels and all around Savar.",
-          "পুরান ঢাকার শাহি বিরিয়ানি, তেহারি, জালি কাবাব আর ঠান্ডা বোরহানি। ঝাল, ধোঁয়া ওঠা আর ঐতিহ্যবাহী রান্না, ডিআইইউ ক্যাম্পাস, হোস্টেল আর সাভারের সব জায়গায় গরম গরম পৌঁছে দিই।",
+          "Dum-cooked kacchi, smoky tehari and fresh borhani. A new feast every day, delivered hot to your door.",
+          "দমে রান্না করা কাচ্চি, ধোঁয়া ওঠা তেহারি আর তাজা বোরহানি। প্রতিদিন নতুন ভোজ, গরম গরম পৌঁছে যাবে আপনার কাছে।",
         )}
-        primary={{ label: tr("Order Now", "অর্ডার করুন"), href: "#menu" }}
-        secondary={{ label: tr("View Menu", "মেনু দেখুন"), href: "#menu" }}
-        special={{ name: tr("Shahi Mutton Kacchi", "শাহি মাটন কাচ্চি"), price: 450 }}
+        primary={{ label: tr("Order now", "অর্ডার করুন"), href: "#menu" }}
+        secondary={{ label: tr("View menu", "মেনু দেখুন"), href: "#meal" }}
       />
 
       <PromiseStrip />
 
       <OffersBand offers={storeOffers} />
 
-      <section
-        id="menu"
-        className="mx-auto w-full max-w-7xl scroll-mt-[calc(var(--header-h,120px)+16px)] px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-28"
-      >
-        <SectionTitle
-          eyebrow={tr("Our Menu", "আমাদের মেনু")}
-          bangla="আমাদের শাহি মেনু"
-          title={tr("Straight from the nawab's handi", "সরাসরি নবাবি হাঁড়ি থেকে")}
-          meta={
-            loading
-              ? tr("Loading...", "লোড হচ্ছে...")
-              : tr(`${filteredMenu.length} dishes`, `${num(filteredMenu.length)}টি খাবার`)
-          }
-        />
-
-        {categories.length > 1 && (
-          <div
-            role="tablist"
-            aria-label={tr("Menu categories", "মেনুর ক্যাটাগরি")}
-            className="no-scrollbar -mx-4 mb-10 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:justify-center sm:px-0"
-          >
-            {categories.map((c) => {
-              const active = c === category
-              return (
-                <button
-                  key={c}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => {
-                    setCategory(c)
-                    setShowAll(false)
-                  }}
-                  className={`h-10 shrink-0 rounded-full border px-5 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/25 ${
-                    active
-                      ? "border-brand bg-brand text-white shadow-[0_8px_18px_-8px_rgba(214,19,30,0.8)]"
-                      : "border-line bg-white text-charcoal hover:border-brand/40 hover:text-brand"
-                  }`}
-                >
-                  {categoryName(c, lang)}
-                </button>
-              )
-            })}
-          </div>
-        )}
-
-        <div className={grid}>
-          {loading
-            ? [1, 2, 3, 4].map((n) => <ProductSkeleton key={n} />)
-            : visibleMenu.map((p) => (
-                <ProductCard
-                  key={p.id}
-                  product={p}
-                  isHighlighted={highlightedDishId === String(p.id)}
-                  onAdd={(item) => addItem(item, activeDay)}
-                />
-              ))}
+      {/* Our menu: biriyani and regular dishes */}
+      <section id="menu" className="scroll-mt-[calc(var(--header-h,120px)+16px)]">
+        <div className="bg-brand-light/60 px-4 pb-8 pt-10 sm:px-6 sm:pt-12">
+          <SectionTitle
+            eyebrow={tr("Our Menu", "আমাদের মেনু")}
+            bangla="আমাদের শাহি মেনু"
+            title={tr("Straight from the nawab's handi", "সরাসরি নবাবি হাঁড়ি থেকে")}
+            meta={
+              loading
+                ? tr("Loading...", "লোড হচ্ছে...")
+                : tr(`${filteredMenu.length} dishes`, `${num(filteredMenu.length)}টি খাবার`)
+            }
+          />
         </div>
-        {!loading && filteredMenu.length === 0 && (
-          <div className="py-14 text-center">
-            <p className="text-display text-2xl">{tr("No dishes found", "কোনো খাবার পাওয়া যায়নি")}</p>
-            <p className="mt-2 text-slate">
-              {tr(
-                `Nothing matches "${query}". Try biriyani, tehari or kabab.`,
-                `"${query}" এর সাথে কিছু মেলেনি। বিরিয়ানি, তেহারি বা কাবাব লিখে দেখুন।`,
-              )}
-            </p>
-            <button
-              type="button"
-              onClick={() => {
-                setQuery("")
-                setCategory("All")
-              }}
-              className="mt-5 inline-flex h-11 items-center rounded-full bg-brand px-6 text-sm font-bold text-white transition hover:bg-brand-hover"
-            >
-              {tr("Show full menu", "পুরো মেনু দেখুন")}
-            </button>
+        <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+          <div className={grid}>
+            {loading
+              ? [1, 2, 3, 4].map((n) => <ProductSkeleton key={n} />)
+              : visibleMenu.map((p) => (
+                  <ProductCard
+                    key={p.id}
+                    product={p}
+                    isHighlighted={highlightedDishId === String(p.id)}
+                    onAdd={(item) => addItem(item, activeDay)}
+                  />
+                ))}
           </div>
-        )}
-        {!q && category === "All" && filteredMenu.length > 8 && (
-          <div className="mt-10 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setShowAll((s) => !s)}
-              aria-expanded={showAll}
-              className="inline-flex h-12 items-center gap-2 rounded-full border border-maroon/80 bg-white px-7 text-sm font-bold text-maroon transition hover:bg-maroon hover:text-white"
-            >
-              {showAll ? tr("Show fewer dishes", "কম খাবার দেখান") : tr("See full menu", "পুরো মেনু দেখুন")}
-              <svg
-                className={`size-4 transition ${showAll ? "rotate-180" : ""}`}
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.5"
-                aria-hidden
+          {!loading && filteredMenu.length === 0 && (
+            <div className="py-12 text-center">
+              <p className="text-display text-2xl">{tr("No dishes found", "কোনো খাবার পাওয়া যায়নি")}</p>
+              <p className="mt-2 text-slate">
+                {tr(
+                  `Nothing matches "${query}". Try biriyani, tehari or kabab.`,
+                  `"${query}" এর সাথে কিছু মেলেনি। বিরিয়ানি, তেহারি বা কাবাব লিখে দেখুন।`,
+                )}
+              </p>
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                className="mt-5 inline-flex h-11 items-center rounded-full bg-brand px-6 text-sm font-bold text-white transition hover:bg-brand-hover"
               >
-                <path d="m6 9 6 6 6-6" />
-              </svg>
-            </button>
-          </div>
-        )}
+                {tr("Show full menu", "পুরো মেনু দেখুন")}
+              </button>
+            </div>
+          )}
+          {!q && filteredMenu.length > 4 && (
+            <div className="mt-8 flex justify-center">
+              <button
+                type="button"
+                onClick={() => setShowAll((v) => !v)}
+                aria-expanded={showAll}
+                className="inline-flex h-12 items-center gap-2 rounded-full border-2 border-charcoal bg-white px-7 text-sm font-bold text-charcoal transition hover:bg-charcoal hover:text-white"
+              >
+                {showAll ? tr("Show less", "কম দেখুন") : tr("See more", "আরও দেখুন")}
+                <svg
+                  className={`size-4 transition ${showAll ? "rotate-180" : ""}`}
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                  aria-hidden
+                >
+                  <path d="m6 9 6 6 6-6" />
+                </svg>
+              </button>
+            </div>
+          )}
+        </div>
       </section>
 
-      <AboutSection />
+      <Hero
+        compact
+        as="h2"
+        images={MEAL_IMAGES}
+        alt={tr("A Bengali thali with rice, curries and sides", "ভাত, তরকারি ও সাইড ডিশসহ বাঙালি থালি")}
+        badge={tr("Daily meals", "দৈনিক খাবার")}
+        title={tr("Home-style", "ঘরোয়া স্বাদের")}
+        highlight={tr("meals", "খাবার")}
+        subtitle={tr("Rice, chicken, fish and more", "ভাত, মুরগি, মাছ ও আরও অনেক কিছু")}
+        body={tr(
+          "Fresh rice and curry every day of the week. Pick your day and order ahead.",
+          "সপ্তাহের প্রতিদিন তাজা ভাত-তরকারির আয়োজন। আপনার দিন বেছে নিয়ে আগেই অর্ডার করুন।",
+        )}
+        primary={{ label: tr("See meals", "মিল দেখুন"), href: "#meal" }}
+      />
+
+      {/* 7-day meals with a sticky day picker */}
+      <section id="meal" className="scroll-mt-[var(--header-h,120px)]">
+        <div className="sticky top-[var(--header-h,120px)] z-30 border-b border-line bg-alabaster/95 py-3 backdrop-blur">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <DayPillBar />
+          </div>
+        </div>
+        <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
+          <div className="mb-6 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
+            <h2 className="text-display text-3xl sm:text-4xl">{tr("7-day special meals", "৭ দিনের স্পেশাল মিল")}</h2>
+            <p className="text-sm text-slate">
+              {loading
+                ? tr("Loading...", "লোড হচ্ছে...")
+                : `${dayLabel(String(activeDay), lang)} • ${tr(
+                    `${filteredMeals.length} meals`,
+                    `${num(filteredMeals.length)}টি মিল`,
+                  )}`}
+            </p>
+          </div>
+          <div className={grid}>
+            {loading
+              ? [1, 2, 3, 4].map((n) => <ProductSkeleton key={n} />)
+              : filteredMeals.map((p) => (
+                  <ProductCard
+                    key={`meal-${p.id}`}
+                    product={p}
+                    isHighlighted={highlightedDishId === String(p.id)}
+                    onAdd={(item) => addItem(item, activeDay)}
+                  />
+                ))}
+          </div>
+          {!loading && filteredMeals.length === 0 && (
+            <p className="py-12 text-center text-slate">
+              {q
+                ? tr(`No meals match "${query}" on this day.`, `এই দিনে "${query}" এর সাথে কোনো মিল মেলেনি।`)
+                : tr("No meals on this day yet. Try another day.", "এই দিনে এখনো কোনো মিল নেই। অন্য দিন দেখুন।")}
+            </p>
+          )}
+        </div>
+      </section>
 
       <OrderProcess />
 

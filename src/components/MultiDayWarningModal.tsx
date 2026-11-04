@@ -1,5 +1,7 @@
 import { useEffect } from "react"
-import { type Day } from "./DayPillBar"
+import { type Day, dayLabel } from "./DayPillBar"
+import { useLang } from "../context/LanguageContext"
+import { dishName } from "../i18n/dishes"
 import { type Product } from "./ProductCard"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 
@@ -21,6 +23,9 @@ export function MultiDayWarningModal({
   onCancel,
 }: Props) {
   useBodyScrollLock(isOpen)
+  const { lang, tr } = useLang()
+  const cur = dayLabel(String(currentDay), lang)
+  const next = dayLabel(String(newDay), lang)
 
   // Close on Escape key
   useEffect(() => {
@@ -58,22 +63,33 @@ export function MultiDayWarningModal({
           </div>
           <div>
             <h3 id="multiday-modal-title" className="text-display text-lg text-charcoal">
-              Different Delivery Day
+              {tr("Different delivery day", "আলাদা ডেলিভারির দিন")}
             </h3>
-            <p className="text-xs text-slate">Orders are fulfilled per scheduled day</p>
+            <p className="text-xs text-slate">{tr("One order is delivered on one day", "একটি অর্ডার একদিনেই ডেলিভারি হয়")}</p>
           </div>
         </div>
 
         <p className="text-sm text-slate leading-relaxed">
-          Your cart currently contains delicious items scheduled for{" "}
-          <strong className="text-charcoal">{currentDay}</strong>. You are attempting to add{" "}
-          <strong className="text-brand">"{newProduct?.name}"</strong> which is scheduled for{" "}
-          <strong className="text-charcoal">{newDay}</strong>.
+          {lang === "bn" ? (
+            <>
+              আপনার কার্টে <strong className="text-charcoal">{cur}</strong>-এর খাবার আছে। আপনি{" "}
+              <strong className="text-brand">"{dishName(newProduct?.name ?? "", lang)}"</strong> যোগ করতে চাইছেন, যেটা{" "}
+              <strong className="text-charcoal">{next}</strong>-এর।
+            </>
+          ) : (
+            <>
+              Your cart has dishes for <strong className="text-charcoal">{cur}</strong>. You're adding{" "}
+              <strong className="text-brand">"{newProduct?.name}"</strong>, which is for{" "}
+              <strong className="text-charcoal">{next}</strong>.
+            </>
+          )}
         </p>
 
         <p className="text-xs text-slate/80 mt-2 bg-alabaster p-2.5 rounded-lg border border-line">
-          To ensure fresh dum preparation and on-time hot delivery, orders cannot mix dishes
-          scheduled across different days.
+          {tr(
+            "So every dish arrives fresh and hot, one order can't mix dishes from different days.",
+            "সব খাবার তাজা ও গরম পৌঁছাতে, একটি অর্ডারে আলাদা দিনের খাবার রাখা যায় না।",
+          )}
         </p>
 
         <div className="mt-6 flex flex-col sm:flex-row gap-2">
@@ -82,14 +98,14 @@ export function MultiDayWarningModal({
             onClick={onCancel}
             className="flex-1 rounded-full border border-line py-2.5 text-xs font-semibold text-charcoal hover:bg-alabaster transition cursor-pointer"
           >
-            Keep {currentDay} Cart
+            {tr(`Keep ${cur} cart`, `${cur}-এর কার্ট রাখুন`)}
           </button>
           <button
             type="button"
             onClick={onConfirmClearAndAdd}
             className="flex-1 rounded-full bg-brand py-2.5 text-xs font-semibold text-white hover:bg-brand-hover transition shadow-sm cursor-pointer"
           >
-            Start New {newDay} Cart
+            {tr(`Start a new ${next} cart`, `${next}-এর নতুন কার্ট শুরু করুন`)}
           </button>
         </div>
       </div>

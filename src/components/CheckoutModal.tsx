@@ -8,6 +8,7 @@ import { useFocusTrap } from "../hooks/useFocusTrap"
 import { STORE } from "../config/store"
 import { useLang } from "../context/LanguageContext"
 import { dishName } from "../i18n/dishes"
+import { dayLabel, getTodayDay } from "./DayPillBar"
 import type { DayOfWeek, OrderDTO, OrderItemDTO } from "../types/menu"
 
 type Props = {
@@ -132,6 +133,9 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
   const selectedZone = zones.find((z) => z.id === zoneId) || null
   const [placedZone, setPlacedZone] = useState<DeliveryZone | null>(null)
   const itemCount = items.reduce((n, i) => n + i.quantity, 0)
+  // The day the cart's dishes are for (one order is always for one day)
+  const orderDay = String(items[0]?.scheduledDay || activeDay)
+  const isToday = orderDay.toLowerCase() === getTodayDay().toLowerCase()
   const discountBdt = appliedOffer?.discountBdt ?? 0
   const checkoutTotalBdt = Math.max(0, subtotalBdt - discountBdt) // delivery is free
   const payment = PAYMENT_OPTIONS.find((p) => p.id === paymentMethod) || PAYMENT_OPTIONS[0]
@@ -233,7 +237,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
         customerName: customerName.trim(),
         customerPhone: cleanPhone,
         customerAddress: customerAddress.trim(),
-        scheduledDay: activeDay.toUpperCase() as DayOfWeek,
+        scheduledDay: orderDay.toUpperCase() as DayOfWeek,
         paymentMethod,
         paymentTrxId: online ? paymentTrxId.trim().toUpperCase() : undefined,
         notes: notes.trim() || undefined,
@@ -365,6 +369,13 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     </li>
                   ))}
                 </ul>
+                {!isToday && (
+                  <p className="rounded-xl bg-saffron/25 px-3.5 py-2.5 text-sm text-charcoal">
+                    {tr("Delivery day: ", "ডেলিভারির দিন: ")}
+                    <strong>{dayLabel(orderDay, lang)}</strong>
+                    {tr(" (pre-order)", " (আগাম অর্ডার)")}
+                  </p>
+                )}
                 <button type="button" onClick={handleClose} className="text-sm font-semibold text-brand hover:underline">
                   {tr("Edit cart", "কার্ট বদলান")}
                 </button>

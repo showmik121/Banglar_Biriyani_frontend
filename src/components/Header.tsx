@@ -48,11 +48,9 @@ const ICONS = {
 }
 
 const NAV = [
-  { en: "Menu", bn: "মেনু", href: "#menu" },
-  { en: "Our Story", bn: "আমাদের গল্প", href: "#about" },
-  { en: "How to Order", bn: "কীভাবে অর্ডার করবেন", href: "#how" },
-  { en: "Location", bn: "লোকেশন", href: "#location" },
-  { en: "Contact", bn: "যোগাযোগ", href: "#contact" },
+  { en: "Our menu", bn: "আমাদের মেনু", href: "#menu" },
+  { en: "Daily meals", bn: "দৈনিক মিল", href: "#meal" },
+  { en: "Delivery area", bn: "ডেলিভারি এলাকা", href: "#location" },
 ]
 
 /** EN | বাংলা switch */
@@ -374,17 +372,14 @@ export function Header({
             type="button"
             onClick={handleOpenCart}
             aria-label={tr(`Cart, ${cartCount} items`, `কার্ট, ${num(cartCount)}টি আইটেম`)}
-            className="relative ml-1 inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-brand px-3 text-sm font-bold text-white shadow-[0_8px_20px_-10px_rgba(168,20,31,0.9)] transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/25 sm:px-4"
+            className={`${iconBtn} relative`}
           >
-            <Icon d={ICONS.bag} className="size-[18px]" />
-            <span className="hidden sm:inline">{tr("Cart", "কার্ট")}</span>
-            <span
-              className={`grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] font-extrabold ${
-                cartCount > 0 ? "bg-saffron text-maroon" : "bg-white/15 text-white/80"
-              }`}
-            >
-              {num(cartCount)}
-            </span>
+            <Icon d={ICONS.bag} className="size-[22px]" />
+            {cartCount > 0 && (
+              <span className="absolute right-0.5 top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-brand px-1 text-[10px] font-extrabold text-white ring-2 ring-alabaster">
+                {num(cartCount)}
+              </span>
+            )}
           </button>
           <button
             type="button"
@@ -448,7 +443,7 @@ export function Header({
               href={n.href}
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${
                 i === 0
-                  ? "bg-maroon text-white"
+                  ? "bg-charcoal text-white"
                   : "text-charcoal hover:bg-cream hover:text-brand"
               }`}
             >

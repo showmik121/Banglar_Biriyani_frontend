@@ -9,10 +9,10 @@ const SOCIALS = [
 ] as const
 
 const LINKS = [
-  { en: "Menu", bn: "মেনু", href: "#menu" },
-  { en: "Our Story", bn: "আমাদের গল্প", href: "#about" },
-  { en: "How to Order", bn: "কীভাবে অর্ডার করবেন", href: "#how" },
-  { en: "Location", bn: "লোকেশন", href: "#location" },
+  { en: "Our menu", bn: "আমাদের মেনু", href: "#menu" },
+  { en: "Daily meals", bn: "দৈনিক মিল", href: "#meal" },
+  { en: "How to order", bn: "কীভাবে অর্ডার করবেন", href: "#how" },
+  { en: "Delivery area", bn: "ডেলিভারি এলাকা", href: "#location" },
   { en: "Contact", bn: "যোগাযোগ", href: "#contact" },
 ]
 

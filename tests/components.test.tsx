@@ -53,17 +53,20 @@ describe("Hero", () => {
   test("shows the headline and links the order button to the menu", () => {
     render(
       <Hero
-        image="/x.jpg"
+        images={["/a.jpg", "/b.jpg"]}
         alt="Biriyani"
-        kicker="ড্যাফোডিল স্মার্ট সিটির পাশেই, সাভার"
-        lineOne="দমে রান্না"
-        lineTwo="শাহি বিরিয়ানি"
-        english="The royal taste of Bengal"
+        badge="This week only"
+        title="Authentic Dhakaiya"
+        highlight="biriyani taste"
+        subtitle="7-day special menu"
         body="Hot biriyani near DIU"
-        primary={{ label: "Order Now", href: "#menu" }}
+        primary={{ label: "Order now", href: "#menu" }}
+        secondary={{ label: "View menu", href: "#meal" }}
       />,
     )
-    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("শাহি বিরিয়ানি")
+    expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent("Authentic Dhakaiya biriyani taste")
     expect(screen.getByRole("link", { name: /order now/i })).toHaveAttribute("href", "#menu")
+    // one dot per photo
+    expect(screen.getAllByRole("button", { name: /photo/i })).toHaveLength(2)
   })
 })
