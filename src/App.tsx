@@ -97,6 +97,9 @@ const INITIAL_MENU: Product[] = [
   },
 ]
 
+// On phones the daily list shows this many dishes first, the rest open with one tap
+const PHONE_MEAL_LIMIT = 5
+
 const grid = "grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
 // The 3 meals of a day fill one row on wide screens
 const mealGrid = "grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
@@ -189,19 +192,19 @@ const PROMISES = [
 function PromiseStrip() {
   const { tr } = useLang()
   return (
-    <section aria-label={tr("Our promise", "আমাদের প্রতিশ্রুতি")} className="relative mt-2 bg-white text-charcoal sm:bg-jali sm:mt-6 sm:text-white">
-      <div className="hidden sm:block"><TornEdge side="top" className="text-brand" /></div>
-      <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-6 px-5 py-6 sm:gap-y-8 sm:px-6 sm:py-10 lg:grid-cols-4 lg:px-8 lg:py-12">
+    <section aria-label={tr("Our promise", "আমাদের প্রতিশ্রুতি")} className="bg-jali relative mt-6 text-white">
+      <TornEdge side="top" className="text-brand" />
+      <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-8 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:px-8 lg:py-12">
         {PROMISES.map((p) => (
-          <li key={p.title} className="flex flex-col items-start gap-3 text-left sm:flex-row sm:items-center sm:gap-4">
+          <li key={p.title} className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
             <span className="relative shrink-0">
               <img
                 src={p.photo}
                 alt=""
                 loading="lazy"
-                className="size-12 rounded-full object-cover sm:size-20 sm:ring-4 sm:ring-white/90 sm:shadow-[0_12px_24px_-10px_rgba(60,0,4,0.8)]"
+                className="size-20 rounded-full object-cover ring-4 ring-white/90 shadow-[0_12px_24px_-10px_rgba(60,0,4,0.8)]"
               />
-              <span className="absolute -bottom-1 -right-1 hidden size-8 place-items-center rounded-full bg-saffron text-charcoal ring-2 ring-brand sm:grid">
+              <span className="absolute -bottom-1 -right-1 grid size-8 place-items-center rounded-full bg-saffron text-charcoal ring-2 ring-brand">
                 <svg
                   className="size-4"
                   viewBox="0 0 24 24"
@@ -217,13 +220,13 @@ function PromiseStrip() {
               </span>
             </span>
             <div>
-              <p className="text-display text-base sm:text-xl">{p.title}</p>
-              <p className="mt-0.5 text-xs leading-relaxed text-slate sm:mt-1 sm:text-white/75 sm:text-sm">{tr(p.body, p.bodyBn)}</p>
+              <p className="text-display text-xl">{p.title}</p>
+              <p className="mt-1 text-xs leading-relaxed text-white/75 sm:text-sm">{tr(p.body, p.bodyBn)}</p>
             </div>
           </li>
         ))}
       </ul>
-      <div className="hidden sm:block"><TornEdge side="bottom" className="text-brand" /></div>
+      <TornEdge side="bottom" className="text-brand" />
     </section>
   )
 }
@@ -505,6 +508,7 @@ export default function App() {
   const { isAddressModalOpen, setIsAddressModalOpen } = useAddress()
   const [query, setQuery] = useState("")
   const [showAll, setShowAll] = useState(false)
+  const [mealsExpanded, setMealsExpanded] = useState(false)
   const [loading, setLoading] = useState(true)
   const [menuDays, setMenuDays] = useState<MenuByDay>({})
   const [catalog, setCatalog] = useState<ApiMenuItem[]>([])
@@ -601,6 +605,8 @@ export default function App() {
   void clockTick
   const dhaka = dhakaClock()
   const orderClosed = String(activeDay).toUpperCase() === dhaka.day && !mealIsOpen(mealTime, dhaka.hour)
+  // a new day or meal starts collapsed again
+  useEffect(() => setMealsExpanded(false), [activeDay, mealTime])
   const mealsNow = filteredMeals.filter((p) => (p.mealTime || "LUNCH") === mealTime)
 
   const allSearchableDishes: SearchableDish[] = useMemo(
@@ -683,12 +689,16 @@ export default function App() {
         secondary={{ label: tr("View menu", "মেনু দেখুন"), href: "#meal" }}
       />
 
-      <PromiseStrip />
+      <div className="max-md:order-2">
+        <PromiseStrip />
+      </div>
 
-      <OffersBand offers={storeOffers} />
+      <div className="max-md:order-2">
+        <OffersBand offers={storeOffers} />
+      </div>
 
       {/* Our menu: biriyani and regular dishes */}
-      <section id="menu" className="scroll-mt-[calc(var(--header-h,120px)+16px)]">
+      <section id="menu" className="scroll-mt-[calc(var(--header-h,120px)+16px)] max-md:order-2">
         <div className="px-5 pb-2 pt-8 sm:bg-brand-light/60 sm:px-6 sm:pb-8 sm:pt-12">
           <SectionTitle
             eyebrow={tr("Our Menu", "আমাদের মেনু")}
@@ -758,15 +768,15 @@ export default function App() {
       </section>
 
       {/* 7-day meals with a sticky day picker */}
-      <section id="meal" className="scroll-mt-[var(--header-h,120px)]">
+      <section id="meal" className="scroll-mt-[var(--header-h,120px)] max-md:order-1">
         <div className="sticky top-[var(--header-h,120px)] z-30 border-b border-line bg-alabaster/95 py-3 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <DayPillBar />
           </div>
         </div>
-        <div className="mx-auto w-full max-w-7xl px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
-          <div className="mb-5 flex flex-wrap items-end justify-between gap-x-4 gap-y-1">
-            <h2 className="text-display text-3xl sm:text-4xl">{tr("7-day special meals", "৭ দিনের স্পেশাল মিল")}</h2>
+        <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-10 lg:px-8 lg:py-14">
+          <div className="mb-3 flex flex-wrap items-end justify-between gap-x-4 gap-y-0.5 sm:mb-5">
+            <h2 className="text-display text-2xl sm:text-4xl">{tr("7-day special meals", "৭ দিনের স্পেশাল মিল")}</h2>
             <p className="text-sm text-slate">
               {loading
                 ? tr("Loading...", "লোড হচ্ছে...")
@@ -778,7 +788,7 @@ export default function App() {
           </div>
 
           {/* Lunch / Dinner */}
-          <div role="tablist" aria-label={tr("Meal time", "বেলা")} className="mb-6 grid grid-cols-2 gap-1 rounded-2xl bg-cream p-1 sm:inline-grid sm:min-w-[320px]">
+          <div role="tablist" aria-label={tr("Meal time", "বেলা")} className="mb-4 grid grid-cols-2 gap-1 rounded-2xl bg-cream p-1 sm:mb-6 sm:inline-grid sm:min-w-[320px]">
             {MEAL_TIMES.map((m) => {
               const count = filteredMeals.filter((p) => (p.mealTime || "LUNCH") === m).length
               const active = m === mealTime
@@ -789,7 +799,7 @@ export default function App() {
                   role="tab"
                   aria-selected={active}
                   onClick={() => setMealTime(m)}
-                  className={`flex h-12 flex-col items-center justify-center rounded-xl text-sm font-bold transition ${
+                  className={`flex h-11 flex-col items-center justify-center rounded-xl text-sm font-bold leading-tight transition sm:h-12 ${
                     active ? "bg-white text-brand shadow-sm" : "text-charcoal/70 hover:text-charcoal"
                   }`}
                 >
@@ -814,16 +824,29 @@ export default function App() {
           <div className={mealGrid}>
             {loading
               ? [1, 2, 3].map((n) => <ProductSkeleton key={n} />)
-              : mealsNow.map((p) => (
-                  <ProductCard
-                    key={`meal-${mealTime}-${p.id}`}
-                    product={p}
-                    isHighlighted={highlightedDishId === String(p.id)}
-                    orderClosed={orderClosed}
-                    onAdd={(item) => addItem({ ...item, mealTime }, activeDay)}
-                  />
+              : mealsNow.map((p, i) => (
+                  <div key={`meal-${mealTime}-${p.id}`} className={i >= PHONE_MEAL_LIMIT && !mealsExpanded ? "max-sm:hidden" : "contents"}>
+                    <ProductCard
+                      product={p}
+                      isHighlighted={highlightedDishId === String(p.id)}
+                      orderClosed={orderClosed}
+                      onAdd={(item) => addItem({ ...item, mealTime }, activeDay)}
+                    />
+                  </div>
                 ))}
           </div>
+          {!loading && mealsNow.length > PHONE_MEAL_LIMIT && (
+            <button
+              type="button"
+              onClick={() => setMealsExpanded((v) => !v)}
+              aria-expanded={mealsExpanded}
+              className="mt-4 flex h-12 w-full items-center justify-center rounded-full border border-line bg-white text-sm font-bold text-charcoal active:scale-[0.99] sm:hidden"
+            >
+              {mealsExpanded
+                ? tr("Show fewer", "কম দেখুন")
+                : tr(`See all ${mealsNow.length} dishes`, `${num(mealsNow.length)}টি খাবারই দেখুন`)}
+            </button>
+          )}
           {!loading && mealsNow.length === 0 && (
             <p className="py-12 text-center text-slate">
               {q
@@ -837,11 +860,17 @@ export default function App() {
         </div>
       </section>
 
-      <OrderProcess />
+      <div className="max-md:order-3">
+        <OrderProcess />
+      </div>
 
-      <LocationSection zones={storeZones} />
+      <div className="max-md:order-3">
+        <LocationSection zones={storeZones} />
+      </div>
 
-      <Footer />
+      <div className="max-md:order-3">
+        <Footer />
+      </div>
 
       {/* Phone-only cart bar, shown once something is in the cart */}
       {totalItems > 0 && !isCartOpen && !isCheckoutOpen && (
@@ -866,7 +895,7 @@ export default function App() {
           </button>
         </div>
       )}
-      {totalItems > 0 && <div className="h-20 md:hidden" aria-hidden />}
+      {totalItems > 0 && <div className="h-20 md:hidden max-md:order-4" aria-hidden />}
 
       <CartDrawer onProceedToCheckout={() => setIsCheckoutOpen(true)} />
       <CheckoutModal isOpen={isCheckoutOpen} onClose={() => setIsCheckoutOpen(false)} />

@@ -60,15 +60,15 @@ export function Hero({
 
   return (
     <section
-      className="relative isolate overflow-hidden bg-alabaster sm:bg-gradient-to-b sm:from-cream sm:via-alabaster sm:to-white"
+      className="relative isolate overflow-hidden bg-gradient-to-b from-cream via-alabaster to-white"
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
       {/* soft background shapes */}
-      <div className="pointer-events-none absolute -right-32 -top-32 -z-10 hidden size-[28rem] sm:block rounded-full bg-saffron/20 blur-3xl" aria-hidden />
-      <div className="pointer-events-none absolute -left-32 bottom-0 -z-10 hidden size-96 sm:block rounded-full bg-brand/10 blur-3xl" aria-hidden />
+      <div className="pointer-events-none absolute -right-32 -top-32 -z-10 size-[28rem] rounded-full bg-saffron/20 blur-3xl" aria-hidden />
+      <div className="pointer-events-none absolute -left-32 bottom-0 -z-10 size-96 rounded-full bg-brand/10 blur-3xl" aria-hidden />
 
       <div className="mx-auto grid max-w-7xl items-center gap-5 px-5 pb-8 pt-3 sm:px-6 sm:py-10 lg:grid-cols-[1.1fr_1fr] lg:gap-10 lg:px-8 lg:py-14">
         <div className="order-2 flex flex-col items-start text-left sm:items-center sm:text-center lg:order-1 lg:items-start lg:text-left">
@@ -79,8 +79,8 @@ export function Hero({
           <Heading className="text-display mt-2 text-[1.75rem] leading-[1.15] tracking-tight sm:mt-4 text-charcoal sm:text-5xl lg:text-[3.5rem]">
             {title} <span className="text-brand">{highlight}</span>
           </Heading>
-          <p className="text-display mt-1.5 text-sm font-semibold text-slate sm:mt-3 sm:text-xl sm:text-maroon">{subtitle}</p>
-          <p className="mt-1.5 max-w-md text-[13px] leading-relaxed text-slate/90 sm:mt-3 sm:text-base">{body}</p>
+          <p className="text-display mt-1 text-sm font-semibold text-slate sm:mt-3 sm:text-xl sm:text-maroon">{subtitle}</p>
+          <p className="mt-1.5 hidden max-w-md text-[13px] leading-relaxed text-slate/90 sm:mt-3 sm:block sm:text-base">{body}</p>
 
           <div className="mt-4 grid w-full grid-cols-2 gap-3 sm:mt-6 sm:flex sm:w-auto sm:flex-wrap sm:justify-center lg:justify-start">
             <a
@@ -99,7 +99,7 @@ export function Hero({
             )}
           </div>
 
-          <ul className="mt-5 grid w-full max-w-md sm:mt-7 grid-cols-3 divide-x divide-line py-1 text-center max-sm:border-t max-sm:border-line max-sm:pt-4 sm:rounded-2xl sm:border sm:border-line sm:bg-white/80 sm:py-3 sm:shadow-sm lg:max-w-lg">
+          <ul className="mt-5 hidden w-full max-w-md sm:mt-7 sm:grid grid-cols-3 divide-x divide-line py-1 text-center max-sm:border-t max-sm:border-line max-sm:pt-4 sm:rounded-2xl sm:border sm:border-line sm:bg-white/80 sm:py-3 sm:shadow-sm lg:max-w-lg">
             {[
               [tr("7 days", "৭ দিন"), tr("7 menus", "৭ রকম মেনু")],
               [tr("Free", "ফ্রি"), tr("delivery", "ডেলিভারি")],
@@ -118,7 +118,7 @@ export function Hero({
           <div className="relative w-full sm:mx-3 sm:my-3 sm:w-[380px] lg:w-[430px]">
             <div className="absolute -inset-3 hidden rounded-full border-2 border-dashed border-saffron/70 sm:block" aria-hidden />
             <div className="absolute -inset-6 -z-10 hidden rounded-full bg-brand/10 sm:block" aria-hidden />
-            <div className="relative aspect-[16/11] overflow-hidden rounded-[28px] bg-charcoal sm:aspect-square sm:rounded-full sm:shadow-2xl sm:ring-8 sm:ring-white">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-[28px] bg-charcoal sm:aspect-square sm:rounded-full sm:shadow-2xl sm:ring-8 sm:ring-white">
               <div
                 className="absolute inset-0 flex will-change-transform"
                 style={{
