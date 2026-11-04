@@ -5,6 +5,7 @@ import { navigateTo, useCurrentPath } from "../../utils/navigation"
 const TABS = [
   { label: "Orders", short: "Orders", path: "/admin/orders" },
   { label: "Menu", short: "Menu", path: "/admin/menu" },
+  { label: "Daily meals", short: "Meals", path: "/admin/meals" },
   { label: "Offers", short: "Offers", path: "/admin/offers" },
   { label: "Delivery points", short: "Delivery", path: "/admin/delivery" },
 ]
@@ -57,7 +58,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
         <nav aria-label="Admin sections" className="mx-auto max-w-5xl px-1 sm:px-2">
-          <ul className="grid grid-cols-4 sm:flex">
+          <ul className="grid grid-cols-5 sm:flex">
             {TABS.map((t) => {
               const isActive = t.path === active
               return (
@@ -69,7 +70,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                       navigateTo(t.path)
                     }}
                     aria-current={isActive ? "page" : undefined}
-                    className={`flex h-11 items-center justify-center border-b-[3px] px-2 text-sm font-semibold transition sm:px-3 ${
+                    className={`flex h-11 items-center justify-center border-b-[3px] px-1 text-[13px] font-semibold transition sm:px-3 sm:text-sm ${
                       isActive
                         ? "border-saffron text-white"
                         : "border-transparent text-white/65 hover:text-white"

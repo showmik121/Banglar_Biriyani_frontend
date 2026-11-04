@@ -97,6 +97,8 @@ const INITIAL_MENU: Product[] = [
 ]
 
 const grid = "grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-6 lg:grid-cols-4"
+// The 3 meals of a day fill one row on wide screens
+const mealGrid = "grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-6 lg:grid-cols-3"
 
 // Hero slider photos
 const HERO_IMAGES = [
@@ -509,6 +511,7 @@ export default function App() {
   const [showAll, setShowAll] = useState(false)
   const [loading, setLoading] = useState(true)
   const [menuDays, setMenuDays] = useState<MenuByDay>({})
+  const [catalog, setCatalog] = useState<ApiMenuItem[]>([])
   const [highlightedDishId, setHighlightedDishId] = useState<string | null>(null)
 
   // Load the menu from the API (falls back to the sample menu when the API is offline)
@@ -522,6 +525,7 @@ export default function App() {
         const json = await res.json()
         const days = json.data?.days || json.days
         if (isMounted && days) setMenuDays(days)
+        if (isMounted && Array.isArray(json.data?.items)) setCatalog(json.data.items)
       } catch (err) {
         console.warn("Could not load menu from API, using fallback data:", err)
       } finally {
@@ -557,7 +561,9 @@ export default function App() {
   const menu: Product[] = useMemo(() => {
     const seen = new Set<number>()
     const items: ApiMenuItem[] = []
-    Object.values(menuDays).forEach((dayList) =>
+    // The full menu comes in `items`; older servers only sent the days
+    const source = catalog.length > 0 ? [catalog] : Object.values(menuDays)
+    source.forEach((dayList) =>
       dayList.forEach((item) => {
         if (seen.has(item.id) || item.isAvailable === false) return
         if (HIDDEN_CATEGORIES.has(item.categorySlug) && !item.isFeatured) return
@@ -567,7 +573,7 @@ export default function App() {
     )
     return items.length === 0 ? INITIAL_MENU : items.map(toProduct)
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [menuDays])
+  }, [menuDays, catalog])
 
   // "7-day special meals": everything on the menu for the chosen day
   const dayKey = String(activeDay).toUpperCase()
@@ -776,7 +782,7 @@ export default function App() {
                   )}`}
             </p>
           </div>
-          <div className={grid}>
+          <div className={mealGrid}>
             {loading
               ? [1, 2, 3, 4].map((n) => <ProductSkeleton key={n} />)
               : filteredMeals.map((p) => (
