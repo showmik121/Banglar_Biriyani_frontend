@@ -27,7 +27,7 @@ test("phone layout: no sideways scroll, order button and dish cards fit", async 
     menu: document.querySelector("#menu")!.getBoundingClientRect().top + window.scrollY,
     meal: document.querySelector("#meal")!.getBoundingClientRect().top + window.scrollY,
   }))
-  expect(tops.menu).toBeLessThan(page.viewportSize()!.height * 1.15)
+  expect(tops.menu).toBeLessThan(page.viewportSize()!.height * 0.7)
   expect(tops.menu).toBeLessThan(tops.meal)
 
   await page.screenshot({ path: "test-results/mobile-1-top.png" })

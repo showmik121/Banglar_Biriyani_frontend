@@ -126,18 +126,18 @@ function SectionTitle({
   light?: boolean
 }) {
   return (
-    <div className="mb-5 flex flex-col items-center text-center sm:mb-10">
+    <div className="mb-4 flex flex-col items-center text-center sm:mb-10">
       {eyebrow && (
         <p className={`text-eyebrow ${light ? "text-saffron" : "text-brand"}`}>{eyebrow}</p>
       )}
       {bangla && (
         <h2
-          className={`text-display mt-2 text-[1.75rem] sm:mt-3 sm:text-5xl ${light ? "text-white" : "text-charcoal"}`}
+          className={`text-display mt-1 text-[1.5rem] sm:mt-3 sm:text-5xl ${light ? "text-white" : "text-charcoal"}`}
         >
           {bangla}
         </h2>
       )}
-      <p className={`mt-2 text-base font-semibold ${light ? "text-white/75" : "text-slate"}`}>
+      <p className={`mt-1 text-sm font-semibold sm:mt-2 sm:text-base ${light ? "text-white/75" : "text-slate"}`}>
         {title}
       </p>
       <svg
@@ -195,19 +195,19 @@ const PROMISES = [
 function PromiseStrip() {
   const { tr } = useLang()
   return (
-    <section aria-label={tr("Our promise", "আমাদের প্রতিশ্রুতি")} className="bg-jali relative mt-6 text-white">
+    <section aria-label={tr("Our promise", "আমাদের প্রতিশ্রুতি")} className="bg-jali relative mt-2 text-white sm:mt-6">
       <TornEdge side="top" className="text-brand" />
-      <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-8 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:px-8 lg:py-12">
+      <ul className="no-scrollbar mx-auto flex max-w-7xl gap-5 overflow-x-auto px-5 py-4 sm:grid sm:grid-cols-2 sm:gap-x-4 sm:gap-y-8 sm:overflow-visible sm:px-6 sm:py-10 lg:grid-cols-4 lg:px-8 lg:py-12">
         {PROMISES.map((p) => (
-          <li key={p.title} className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
+          <li key={p.title} className="flex shrink-0 items-center gap-2.5 sm:shrink sm:gap-4">
             <span className="relative shrink-0">
               <img
                 src={p.photo}
                 alt=""
                 loading="lazy"
-                className="size-20 rounded-full object-cover ring-4 ring-white/90 shadow-[0_12px_24px_-10px_rgba(60,0,4,0.8)]"
+                className="size-10 rounded-full object-cover ring-2 ring-white/90 sm:size-20 sm:ring-4 sm:shadow-[0_12px_24px_-10px_rgba(60,0,4,0.8)]"
               />
-              <span className="absolute -bottom-1 -right-1 grid size-8 place-items-center rounded-full bg-saffron text-charcoal ring-2 ring-brand">
+              <span className="absolute -bottom-1 -right-1 hidden size-8 place-items-center rounded-full bg-saffron text-charcoal ring-2 ring-brand sm:grid">
                 <svg
                   className="size-4"
                   viewBox="0 0 24 24"
@@ -223,8 +223,8 @@ function PromiseStrip() {
               </span>
             </span>
             <div>
-              <p className="text-display text-xl">{p.title}</p>
-              <p className="mt-1 text-xs leading-relaxed text-white/75 sm:text-sm">{tr(p.body, p.bodyBn)}</p>
+              <p className="text-display whitespace-nowrap text-base sm:text-xl">{p.title}</p>
+              <p className="mt-1 hidden text-xs leading-relaxed text-white/75 sm:block sm:text-sm">{tr(p.body, p.bodyBn)}</p>
             </div>
           </li>
         ))}
@@ -338,20 +338,20 @@ function LocationSection({ zones }: { zones: ZoneView[] }) {
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:gap-12 sm:px-6 sm:py-20 lg:grid-cols-[1.1fr_1fr] lg:px-8 lg:py-24">
         <div>
           <p className="text-eyebrow text-saffron">{tr("Find us", "আমাদের খুঁজুন")}</p>
-          <h2 className="text-display mt-3 text-[2rem] sm:text-5xl">
+          <h2 className="text-display mt-2 text-[1.6rem] sm:mt-3 sm:text-5xl">
             ড্যাফোডিল স্মার্ট সিটির পাশেই
           </h2>
-          <p className="mt-3 text-lg font-semibold text-white/85">
+          <p className="mt-2 text-base font-semibold text-white/85 sm:mt-3 sm:text-lg">
             {tr("Your biriyani spot next to DIU, Savar", "ডিআইইউর পাশে, সাভারে আপনার বিরিয়ানির ঠিকানা")}
           </p>
-          <p className="mt-5 max-w-xl leading-relaxed text-white/80">
+          <p className="mt-5 hidden max-w-xl leading-relaxed text-white/80 sm:block">
             {tr(
               "Between classes, late-night study sessions or a hostel party, we deliver hot biriyani straight to the DIU campus, hostels and messes, and all around Birulia, Ashulia and Savar.",
               "ক্লাসের ফাঁকে, রাত জেগে পড়ার সময় বা হোস্টেলের আড্ডায়, ডিআইইউ ক্যাম্পাস, হোস্টেল, মেস আর বিরুলিয়া, আশুলিয়া ও সাভারের সব জায়গায় গরম বিরিয়ানি পৌঁছে দিই।",
             )}
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-3">
+          <div className="mt-5 flex flex-wrap gap-3 sm:mt-8">
             <a
               href={MAP_URL}
               target="_blank"
@@ -412,19 +412,19 @@ function LocationSection({ zones }: { zones: ZoneView[] }) {
 function OrderProcess() {
   const { tr } = useLang()
   return (
-    <section id="how" className="mx-auto w-full max-w-7xl scroll-mt-[var(--header-h,120px)] px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
+    <section id="how" className="mx-auto w-full max-w-7xl scroll-mt-[var(--header-h,120px)] px-4 py-8 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
       <SectionTitle
         eyebrow={tr("How to order", "কীভাবে অর্ডার করবেন")}
         bangla="অর্ডার করুন সহজে"
         title={tr("Three steps to a plate of biriyani", "তিন ধাপে এক প্লেট বিরিয়ানি")}
       />
-      <ol className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
+      <ol className="flex flex-col gap-3 sm:grid sm:grid-cols-3 sm:gap-6">
         {STEPS.map((s, i) => (
           <li
             key={s.n}
-            className="group relative w-[78%] shrink-0 snap-center overflow-hidden rounded-card border border-line bg-white p-3 pb-7 shadow-card max-sm:frame-royal sm:w-auto"
+            className="group relative flex items-start gap-3 overflow-hidden rounded-2xl border border-line bg-white p-4 shadow-card max-sm:frame-royal sm:block sm:rounded-card sm:p-3 sm:pb-7"
           >
-            <div className="relative overflow-hidden rounded-[0.9rem]">
+            <div className="relative hidden overflow-hidden rounded-[0.9rem] sm:block">
               <img
                 src={PHOTOS.steps[i]}
                 alt=""
@@ -433,12 +433,12 @@ function OrderProcess() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
-            <span className="text-display relative -mt-7 ml-4 grid size-14 place-items-center rounded-full bg-brand text-lg text-white ring-4 ring-white">
+            <span className="text-display relative grid size-11 shrink-0 place-items-center rounded-full bg-brand text-base text-white sm:-mt-7 sm:ml-4 sm:size-14 sm:text-lg sm:ring-4 sm:ring-white">
               {s.n}
             </span>
-            <div className="px-4">
-              <p className="text-display mt-4 text-xl">{tr(s.title[0], s.title[1])}</p>
-              <p className="mt-2 text-sm leading-relaxed text-slate">{tr(s.body[0], s.body[1])}</p>
+            <div className="sm:px-4">
+              <p className="text-display text-lg sm:mt-4 sm:text-xl">{tr(s.title[0], s.title[1])}</p>
+              <p className="mt-1 text-sm sm:mt-2 leading-relaxed text-slate">{tr(s.body[0], s.body[1])}</p>
             </div>
           </li>
         ))}

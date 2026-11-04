@@ -28,12 +28,12 @@ export function Footer() {
   return (
     <footer
       id="contact"
-      className="bg-jali relative mt-24 scroll-mt-[var(--header-h,120px)] text-white"
+      className="bg-jali relative mt-16 scroll-mt-[var(--header-h,120px)] text-white"
     >
       <TornEdge side="top" className="text-brand" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* Order CTA band */}
-        <div className="relative -mt-12 mb-10 flex flex-col items-start justify-between gap-6 rounded-[1.75rem] bg-saffron px-6 py-8 text-charcoal shadow-[0_24px_50px_-24px_rgba(0,0,0,0.6)] ring-4 ring-white sm:flex-row sm:items-center sm:px-10">
+        <div className="relative -mt-12 mb-6 flex flex-col items-start justify-between gap-4 rounded-[1.75rem] bg-saffron px-5 py-5 sm:mb-10 sm:gap-6 sm:px-6 sm:py-8 text-charcoal shadow-[0_24px_50px_-24px_rgba(0,0,0,0.6)] ring-4 ring-white sm:flex-row sm:items-center sm:px-10">
           <img
             src={PHOTOS.cta}
             alt={tr("A bowl of biryani", "এক বাটি বিরিয়ানি")}
@@ -45,11 +45,11 @@ export function Footer() {
               src={PHOTOS.cta}
               alt=""
               loading="lazy"
-              className="size-20 shrink-0 rounded-full object-cover ring-4 ring-white md:hidden"
+              className="size-14 shrink-0 rounded-full object-cover ring-4 ring-white md:hidden"
             />
             <div>
             <p className="font-bn text-base font-semibold text-charcoal/70">খিদে পেয়েছে?</p>
-            <p className="text-display mt-2 text-3xl sm:text-4xl">
+            <p className="text-display mt-1 text-xl sm:mt-2 sm:text-4xl">
               {tr("Craving something shahi tonight?", "আজ রাতে শাহি কিছু খেতে মন চাইছে?")}
             </p>
             </div>
@@ -62,7 +62,7 @@ export function Footer() {
           </a>
         </div>
 
-        <div className="grid gap-10 pb-12 pt-2 md:grid-cols-[1.4fr_1fr_1fr_1.2fr]">
+        <div className="grid gap-6 pb-8 pt-2 md:grid-cols-[1.4fr_1fr_1fr_1.2fr] md:gap-10 md:pb-12">
           <div>
             <div className="flex items-center gap-3">
               <span className="grid size-16 place-items-center rounded-full bg-alabaster p-1 ring-4 ring-white/30">
@@ -83,7 +83,7 @@ export function Footer() {
 
           <div>
             <p className="text-eyebrow text-saffron">{tr("Explore", "ঘুরে দেখুন")}</p>
-            <ul className="mt-3 space-y-1 text-sm text-white/85">
+            <ul className="mt-2 flex flex-wrap gap-x-5 gap-y-0 text-sm text-white/85 md:mt-3 md:block md:space-y-1">
               {LINKS.map((l) => (
                 <li key={l.href}>
                   <a href={l.href} className="inline-block py-2 transition hover:text-saffron">
