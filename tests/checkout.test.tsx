@@ -45,6 +45,8 @@ describe("checkout", () => {
   test("shows the order, free delivery and cash on delivery", async () => {
     mockApi()
     render(<CheckoutModal />)
+    // Wait for the delivery points to load so no state update happens after the test ends
+    await screen.findByText("Daffodil Smart City")
     expect(screen.getByText("2× Kacchi Biriyani")).toBeInTheDocument()
     expect(screen.getByText("Free")).toBeInTheDocument()
     expect(screen.getByText("Cash on delivery")).toBeInTheDocument()
@@ -56,8 +58,9 @@ describe("checkout", () => {
   test("points out missing details instead of sending the order", async () => {
     const posted = mockApi()
     render(<CheckoutModal />)
+    await screen.findByText("Daffodil Smart City")
     fireEvent.click(screen.getByRole("button", { name: /Place order/ }))
-    expect(screen.getByText("Enter your name")).toBeInTheDocument()
+    expect(await screen.findByText("Enter your name")).toBeInTheDocument()
     expect(screen.getByText("Enter an 11-digit mobile number starting with 01")).toBeInTheDocument()
     expect(screen.getByText("Add your room, house or landmark")).toBeInTheDocument()
     expect(posted).toHaveLength(0)

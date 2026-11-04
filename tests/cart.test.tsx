@@ -1,4 +1,4 @@
-import { describe, test, expect } from "vitest"
+import { describe, test, expect, vi } from "vitest"
 import { act, renderHook } from "@testing-library/react"
 import type { ReactNode } from "react"
 import { CartProvider, useCart } from "../src/context/CartContext"
@@ -56,8 +56,12 @@ describe("cart", () => {
   })
 
   test("corrupt saved data is ignored instead of crashing", () => {
+    // The cart reports the problem with console.error on purpose; capture it so the test output stays clean
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {})
     localStorage.setItem("banglar_biriyani_cart_v1", "{not valid json")
     const { result } = renderHook(() => useCart(), { wrapper })
     expect(result.current.items).toEqual([])
+    expect(consoleError).toHaveBeenCalledTimes(1)
+    consoleError.mockRestore()
   })
 })
