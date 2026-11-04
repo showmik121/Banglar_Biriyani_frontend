@@ -56,11 +56,11 @@ export function ProductCard({
   return (
     <article
       id={`dish-${product.id}`}
-      className={`group flex flex-row overflow-hidden rounded-2xl sm:flex-col sm:rounded-card bg-white shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift scroll-mt-[calc(var(--header-h,120px)+32px)] ${
+      className={`group flex flex-row overflow-hidden rounded-2xl border border-line/80 bg-white sm:flex-col sm:rounded-card sm:border-0 sm:shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift scroll-mt-[calc(var(--header-h,120px)+32px)] ${
         isHighlighted ? "scale-[1.02] ring-4 ring-brand shadow-[0_0_35px_rgba(215,35,43,0.35)]" : ""
       } ${isSoldOut ? "opacity-85" : ""}`}
     >
-      <div className="relative min-h-[7.5rem] w-28 shrink-0 self-stretch overflow-hidden sm:aspect-[4/3] sm:w-auto sm:self-auto bg-gradient-to-br from-saffron/40 via-alabaster to-brand/15">
+      <div className="relative min-h-[6.5rem] w-24 shrink-0 self-stretch overflow-hidden max-sm:m-2 max-sm:rounded-xl sm:aspect-[4/3] sm:w-auto sm:self-auto bg-gradient-to-br from-saffron/40 via-alabaster to-brand/15">
         {product.image ? (
           <img
             src={product.image}
@@ -105,7 +105,7 @@ export function ProductCard({
         )}
 
         <div className="mt-auto flex items-center justify-between gap-2 pt-1 sm:block sm:pt-2">
-        <p className="text-display text-xl text-brand sm:text-2xl">
+        <p className="text-display text-lg text-charcoal sm:text-2xl sm:text-brand">
           {product.basePriceBdt !== undefined && product.basePriceBdt > product.price && (
             <span className="mr-2 text-sm font-normal text-slate line-through">৳{num(product.basePriceBdt)}</span>
           )}
@@ -122,7 +122,7 @@ export function ProductCard({
                 ? tr(`${product.name} cannot be ordered right now`, `${name} এখন অর্ডার করা যাবে না`)
               : tr(`Add ${product.name} to cart`, `${name} কার্টে যোগ করুন`)
           }
-          className={`h-10 shrink-0 rounded-full px-4 text-sm font-bold sm:mt-1 sm:h-11 sm:w-full sm:px-0 transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 ${
+          className={`h-10 shrink-0 rounded-full text-sm font-bold ${isSoldOut || orderClosed ? "px-3 text-xs sm:text-sm" : "max-sm:w-10 max-sm:text-xl"} sm:px-0 sm:mt-1 sm:h-11 sm:w-full sm:px-0 transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 ${
             isSoldOut || orderClosed
               ? "cursor-not-allowed bg-cream text-slate"
               : justAdded
@@ -130,7 +130,7 @@ export function ProductCard({
                 : "bg-brand text-white hover:bg-brand-hover"
           }`}
         >
-          {isSoldOut ? tr("Sold Out", "শেষ") : orderClosed ? tr("Closed now", "এখন বন্ধ") : justAdded ? tr("Added ✓", "যোগ হয়েছে ✓") : <><span className="sm:hidden">{tr("+ Add", "+ যোগ")}</span><span className="hidden sm:inline">{tr("+ Add to cart", "+ কার্টে যোগ করুন")}</span></>}
+          {isSoldOut ? tr("Sold Out", "শেষ") : orderClosed ? tr("Closed now", "এখন বন্ধ") : justAdded ? <><span className="sm:hidden">✓</span><span className="hidden sm:inline">{tr("Added ✓", "যোগ হয়েছে ✓")}</span></> : <><span className="sm:hidden">+</span><span className="hidden sm:inline">{tr("+ Add to cart", "+ কার্টে যোগ করুন")}</span></>}
         </button>
         </div>
       </div>

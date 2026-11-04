@@ -123,13 +123,13 @@ function SectionTitle({
   light?: boolean
 }) {
   return (
-    <div className="mb-8 flex flex-col items-center text-center sm:mb-10">
+    <div className="mb-5 flex flex-col items-center text-center sm:mb-10">
       {eyebrow && (
         <p className={`text-eyebrow ${light ? "text-saffron" : "text-brand"}`}>{eyebrow}</p>
       )}
       {bangla && (
         <h2
-          className={`text-display mt-3 text-[2rem] sm:text-5xl ${light ? "text-white" : "text-charcoal"}`}
+          className={`text-display mt-2 text-[1.75rem] sm:mt-3 sm:text-5xl ${light ? "text-white" : "text-charcoal"}`}
         >
           {bangla}
         </h2>
@@ -138,7 +138,7 @@ function SectionTitle({
         {title}
       </p>
       <svg
-        className={`mt-4 h-3 w-28 ${light ? "text-saffron" : "text-brand"}`}
+        className={`mt-4 hidden h-3 w-28 sm:block ${light ? "text-saffron" : "text-brand"}`}
         viewBox="0 0 120 12"
         fill="none"
         aria-hidden
@@ -189,19 +189,19 @@ const PROMISES = [
 function PromiseStrip() {
   const { tr } = useLang()
   return (
-    <section aria-label={tr("Our promise", "আমাদের প্রতিশ্রুতি")} className="bg-jali relative mt-6 text-white">
-      <TornEdge side="top" className="text-brand" />
-      <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-8 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:px-8 lg:py-12">
+    <section aria-label={tr("Our promise", "আমাদের প্রতিশ্রুতি")} className="relative mt-2 bg-white text-charcoal sm:bg-jali sm:mt-6 sm:text-white">
+      <div className="hidden sm:block"><TornEdge side="top" className="text-brand" /></div>
+      <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-6 px-5 py-6 sm:gap-y-8 sm:px-6 sm:py-10 lg:grid-cols-4 lg:px-8 lg:py-12">
         {PROMISES.map((p) => (
-          <li key={p.title} className="flex flex-col items-center gap-4 text-center sm:flex-row sm:text-left">
+          <li key={p.title} className="flex flex-col items-start gap-3 text-left sm:flex-row sm:items-center sm:gap-4">
             <span className="relative shrink-0">
               <img
                 src={p.photo}
                 alt=""
                 loading="lazy"
-                className="size-20 rounded-full object-cover ring-4 ring-white/90 shadow-[0_12px_24px_-10px_rgba(60,0,4,0.8)]"
+                className="size-12 rounded-full object-cover sm:size-20 sm:ring-4 sm:ring-white/90 sm:shadow-[0_12px_24px_-10px_rgba(60,0,4,0.8)]"
               />
-              <span className="absolute -bottom-1 -right-1 grid size-8 place-items-center rounded-full bg-saffron text-charcoal ring-2 ring-brand">
+              <span className="absolute -bottom-1 -right-1 hidden size-8 place-items-center rounded-full bg-saffron text-charcoal ring-2 ring-brand sm:grid">
                 <svg
                   className="size-4"
                   viewBox="0 0 24 24"
@@ -217,13 +217,13 @@ function PromiseStrip() {
               </span>
             </span>
             <div>
-              <p className="text-display text-xl">{p.title}</p>
-              <p className="mt-1 text-xs leading-relaxed text-white/75 sm:text-sm">{tr(p.body, p.bodyBn)}</p>
+              <p className="text-display text-base sm:text-xl">{p.title}</p>
+              <p className="mt-0.5 text-xs leading-relaxed text-slate sm:mt-1 sm:text-white/75 sm:text-sm">{tr(p.body, p.bodyBn)}</p>
             </div>
           </li>
         ))}
       </ul>
-      <TornEdge side="bottom" className="text-brand" />
+      <div className="hidden sm:block"><TornEdge side="bottom" className="text-brand" /></div>
     </section>
   )
 }
@@ -689,7 +689,7 @@ export default function App() {
 
       {/* Our menu: biriyani and regular dishes */}
       <section id="menu" className="scroll-mt-[calc(var(--header-h,120px)+16px)]">
-        <div className="bg-brand-light/60 px-4 pb-8 pt-10 sm:px-6 sm:pt-12">
+        <div className="px-5 pb-2 pt-8 sm:bg-brand-light/60 sm:px-6 sm:pb-8 sm:pt-12">
           <SectionTitle
             eyebrow={tr("Our Menu", "আমাদের মেনু")}
             bangla="আমাদের শাহি মেনু"
@@ -701,7 +701,7 @@ export default function App() {
             }
           />
         </div>
-        <div className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8 lg:py-10">
+        <div className="mx-auto w-full max-w-7xl px-4 py-3 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
           <div className={grid}>
             {loading
               ? [1, 2, 3, 4].map((n) => <ProductSkeleton key={n} />)

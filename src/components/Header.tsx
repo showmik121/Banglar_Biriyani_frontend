@@ -480,7 +480,7 @@ export function Header({
               onClick={() => setIsSearchRecOpen(true)}
               aria-label={tr("Search dishes", "খাবার খুঁজুন")}
               placeholder={tr("Search biriyani, tehari, borhani…", "বিরিয়ানি, তেহারি, বোরহানি খুঁজুন…")}
-              className="h-11 w-full rounded-full border border-line bg-white pl-10 pr-11 text-sm outline-none transition placeholder:text-slate/80 focus:border-brand focus:ring-4 focus:ring-brand/10"
+              className="h-11 w-full rounded-full border border-transparent bg-cream/80 pl-10 pr-11 text-sm sm:border-line sm:bg-white outline-none transition placeholder:text-slate/80 focus:border-brand focus:ring-4 focus:ring-brand/10"
             />
             {/* Small Search Icon Button on the right */}
             <button

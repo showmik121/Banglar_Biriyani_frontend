@@ -30,5 +30,7 @@ test("phone layout: no sideways scroll, order button and dish cards fit", async 
   await page.getByRole("button", { name: "Add Kacchi Biriyani to cart" }).first().click()
   await page.waitForTimeout(300)
   await page.screenshot({ path: "test-results/mobile-3-cartbar.png" })
+  await page.evaluate(() => window.scrollTo(0, 0))
+  await page.screenshot({ path: "test-results/mobile-4-full.png", fullPage: true })
   await ctx.close()
 })
