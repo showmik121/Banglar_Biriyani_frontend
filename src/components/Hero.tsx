@@ -118,7 +118,7 @@ export function Hero({
           <div className="relative w-full sm:mx-3 sm:my-3 sm:w-[380px] lg:w-[430px]">
             <div className="absolute -inset-3 hidden rounded-full border-2 border-dashed border-saffron/70 sm:block" aria-hidden />
             <div className="absolute -inset-6 -z-10 hidden rounded-full bg-brand/10 sm:block" aria-hidden />
-            <div className="relative aspect-[16/10] overflow-hidden rounded-[28px] bg-charcoal sm:aspect-square sm:rounded-full sm:shadow-2xl sm:ring-8 sm:ring-white">
+            <div className="relative aspect-[16/10] overflow-hidden rounded-[28px] bg-charcoal max-sm:frame-mat sm:aspect-square sm:rounded-full sm:shadow-2xl sm:ring-8 sm:ring-white">
               <div
                 className="absolute inset-0 flex will-change-transform"
                 style={{
@@ -174,7 +174,7 @@ export function Hero({
                   }}
                   aria-label={tr(`Photo ${i + 1}`, `ছবি ${num(i + 1)}`)}
                   aria-current={i === active}
-                  className="grid h-6 min-w-6 place-items-center"
+                  className="grid h-6 min-w-6 place-items-center rounded-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
                 >
                   <span
                     className={`block h-2 rounded-full transition-all ${

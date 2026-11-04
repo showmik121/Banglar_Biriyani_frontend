@@ -153,6 +153,9 @@ function SectionTitle({
           strokeLinecap="round"
         />
       </svg>
+      <div className={`ornament mt-3 sm:hidden ${light ? "!text-saffron" : ""}`} aria-hidden>
+        <span />
+      </div>
       {meta && <p className="mt-3 text-xs font-semibold text-slate">{meta}</p>}
     </div>
   )
@@ -419,7 +422,7 @@ function OrderProcess() {
         {STEPS.map((s, i) => (
           <li
             key={s.n}
-            className="group relative w-[78%] shrink-0 snap-center overflow-hidden rounded-card border border-line bg-white p-3 pb-7 shadow-card sm:w-auto"
+            className="group relative w-[78%] shrink-0 snap-center overflow-hidden rounded-card border border-line bg-white p-3 pb-7 shadow-card max-sm:frame-royal sm:w-auto"
           >
             <div className="relative overflow-hidden rounded-[0.9rem]">
               <img
@@ -788,7 +791,7 @@ export default function App() {
           </div>
 
           {/* Lunch / Dinner */}
-          <div role="tablist" aria-label={tr("Meal time", "বেলা")} className="mb-4 grid grid-cols-2 gap-1 rounded-2xl bg-cream p-1 sm:mb-6 sm:inline-grid sm:min-w-[320px]">
+          <div role="tablist" aria-label={tr("Meal time", "বেলা")} className="mb-4 grid grid-cols-2 gap-1 rounded-2xl border border-gold/35 bg-cream p-1 sm:mb-6 sm:border-0 sm:inline-grid sm:min-w-[320px]">
             {MEAL_TIMES.map((m) => {
               const count = filteredMeals.filter((p) => (p.mealTime || "LUNCH") === m).length
               const active = m === mealTime

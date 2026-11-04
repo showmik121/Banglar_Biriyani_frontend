@@ -56,7 +56,7 @@ export function ProductCard({
   return (
     <article
       id={`dish-${product.id}`}
-      className={`group flex flex-row overflow-hidden rounded-2xl border border-line/80 bg-white sm:flex-col sm:rounded-card sm:border-0 sm:shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift scroll-mt-[calc(var(--header-h,120px)+32px)] ${
+      className={`group flex flex-row overflow-hidden rounded-2xl border border-line/80 bg-white max-sm:frame-royal sm:flex-col sm:rounded-card sm:border-0 sm:shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lift scroll-mt-[calc(var(--header-h,120px)+32px)] ${
         isHighlighted ? "scale-[1.02] ring-4 ring-brand shadow-[0_0_35px_rgba(215,35,43,0.35)]" : ""
       } ${isSoldOut ? "opacity-85" : ""}`}
     >

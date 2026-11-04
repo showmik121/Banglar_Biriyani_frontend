@@ -187,3 +187,41 @@ html[lang="bn"] .text-eyebrow,
 html[lang="bn"] [class*="tracking-"] {
   letter-spacing: 0;
 }
+
+/* Nawabi frames: thin gold double lines, used on phones */
+@utility frame-mat {
+  /* white mat and one gold line around a photo */
+  box-shadow: 0 0 0 4px #fff, 0 0 0 5px rgb(201 138 0 / 0.6);
+}
+@utility frame-royal {
+  /* gold border with a second, fainter line just inside it */
+  border-color: rgb(201 138 0 / 0.45);
+  box-shadow:
+    inset 0 0 0 3px #fff,
+    inset 0 0 0 4px rgb(201 138 0 / 0.3);
+}
+@layer components {
+  /* small diamond between two fading gold lines */
+  .ornament {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--color-gold);
+  }
+  .ornament::before,
+  .ornament::after {
+    content: "";
+    height: 1px;
+    width: 52px;
+    background: linear-gradient(to right, transparent, currentColor);
+  }
+  .ornament::after {
+    transform: scaleX(-1);
+  }
+  .ornament > span {
+    width: 7px;
+    height: 7px;
+    transform: rotate(45deg);
+    background: currentColor;
+  }
+}
