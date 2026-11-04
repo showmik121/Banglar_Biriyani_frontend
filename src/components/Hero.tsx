@@ -12,8 +12,6 @@ type Props = {
   body: string
   primary: { label: string; href: string }
   secondary?: { label: string; href: string }
-  /** Shorter banner for the second section */
-  compact?: boolean
   /** The page's main heading (only the first hero) */
   as?: "h1" | "h2"
 }
@@ -32,7 +30,6 @@ export function Hero({
   body,
   primary,
   secondary,
-  compact,
   as: Heading = "h1",
 }: Props) {
   const { tr, num } = useLang()
@@ -69,89 +66,88 @@ export function Hero({
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
     >
-      <div
-        className="absolute inset-0 -z-10 flex will-change-transform"
-        style={{
-          transform: `translate3d(-${index * 100}%, 0, 0)`,
-          transition: animate ? "transform 900ms cubic-bezier(0.65, 0, 0.35, 1)" : "none",
-        }}
-        onTransitionEnd={handleTransitionEnd}
-      >
-        {track.map((src, i) => (
-          <img
-            key={i}
-            src={src}
-            alt={i === active ? alt : ""}
-            aria-hidden={i !== active}
-            loading={i === 0 ? "eager" : "lazy"}
-            decoding="async"
-            className="size-full shrink-0 object-cover"
-          />
-        ))}
-      </div>
-      {/* Dark fade on the text side so the words stay readable on any photo */}
-      <div className="absolute inset-0 -z-10 bg-gradient-to-r from-charcoal/95 via-charcoal/75 to-charcoal/20" />
+      {/* soft brand glow behind the text */}
+      <div className="pointer-events-none absolute -left-24 top-0 -z-10 size-80 rounded-full bg-brand/25 blur-3xl" aria-hidden />
 
-      <div
-        className={`mx-auto flex max-w-7xl flex-col justify-center px-4 sm:px-6 lg:px-8 ${
-          compact
-            ? "min-h-[320px] py-12 lg:min-h-[380px]"
-            : "min-h-[440px] py-14 md:min-h-[480px] lg:min-h-[520px]"
-        }`}
-      >
-        <span className="w-fit rounded-full bg-saffron px-3 py-1.5 text-xs font-bold text-charcoal">{badge}</span>
-        <Heading
-          className={`text-display mt-5 max-w-2xl leading-[1.15] text-white ${
-            compact ? "text-4xl sm:text-5xl lg:text-6xl" : "text-[2.6rem] sm:text-6xl lg:text-7xl"
-          }`}
-        >
-          {title} <span className="text-saffron">{highlight}</span>
-        </Heading>
-        <p className="text-display mt-4 text-xl text-white/85 sm:text-2xl">
-          <span className="text-brand">—</span> {subtitle}
-        </p>
-        <p className="mt-4 max-w-md leading-relaxed text-white/75">{body}</p>
-        <div className="mt-8 flex flex-wrap gap-3">
-          <a
-            href={primary.href}
-            className="inline-flex h-12 items-center rounded-full bg-brand px-7 text-sm font-bold text-white transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
-          >
-            {primary.label}
-          </a>
-          {secondary && (
-            <a
-              href={secondary.href}
-              className="inline-flex h-12 items-center rounded-full border border-white/40 px-7 text-sm font-bold text-white transition hover:bg-white hover:text-charcoal focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
-            >
-              {secondary.label}
-            </a>
-          )}
-        </div>
-      </div>
-
-      {count > 1 && (
-        <div className="absolute bottom-4 right-4 flex gap-1 sm:bottom-6 sm:right-8">
-          {images.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => {
-                setAnimate(true)
-                setIndex(i)
+      <div className="mx-auto grid max-w-7xl items-center gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:grid-cols-[1fr_1.05fr] lg:gap-12 lg:px-8 lg:py-10">
+        {/* Photo: clear and uncovered, always shown first on phones */}
+        <div className="relative order-1 overflow-hidden rounded-3xl bg-charcoal shadow-2xl ring-1 ring-white/15 lg:order-2">
+          <div className="relative aspect-[16/10] w-full sm:aspect-[2/1] lg:aspect-[4/3] lg:max-h-[400px]">
+            <div
+              className="absolute inset-0 flex will-change-transform"
+              style={{
+                transform: `translate3d(-${index * 100}%, 0, 0)`,
+                transition: animate ? "transform 900ms cubic-bezier(0.65, 0, 0.35, 1)" : "none",
               }}
-              aria-label={tr(`Photo ${i + 1}`, `ছবি ${num(i + 1)}`)}
-              aria-current={i === active}
-              className="grid h-6 place-items-center px-0.5"
+              onTransitionEnd={handleTransitionEnd}
             >
-              <span
-                className={`block h-2.5 rounded-full transition-all ${
-                  i === active ? "w-7 bg-saffron" : "w-2.5 bg-white/50 hover:bg-white/80"
-                }`}
-              />
-            </button>
-          ))}
+              {track.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt={i === active ? alt : ""}
+                  aria-hidden={i !== active}
+                  loading={i === 0 ? "eager" : "lazy"}
+                  decoding="async"
+                  className="size-full shrink-0 object-cover"
+                />
+              ))}
+            </div>
+            {/* only a thin fade at the bottom so the dots stay visible */}
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/45 to-transparent" />
+            {count > 1 && (
+              <div className="absolute inset-x-0 bottom-2 flex justify-center gap-1">
+                {images.map((_, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => {
+                      setAnimate(true)
+                      setIndex(i)
+                    }}
+                    aria-label={tr(`Photo ${i + 1}`, `ছবি ${num(i + 1)}`)}
+                    aria-current={i === active}
+                    className="grid h-6 place-items-center px-0.5"
+                  >
+                    <span
+                      className={`block h-2 rounded-full transition-all ${
+                        i === active ? "w-6 bg-saffron" : "w-2 bg-white/70 hover:bg-white"
+                      }`}
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      )}
+
+        <div className="order-2 flex flex-col pb-2 lg:order-1 lg:pb-0">
+          <span className="w-fit rounded-full bg-saffron px-3 py-1.5 text-xs font-bold text-charcoal">{badge}</span>
+          <Heading className="text-display mt-4 text-[2rem] leading-[1.15] text-white sm:text-5xl lg:text-[3.4rem]">
+            {title} <span className="text-saffron">{highlight}</span>
+          </Heading>
+          <p className="text-display mt-3 text-lg text-white/85 sm:text-xl">
+            <span className="text-brand">—</span> {subtitle}
+          </p>
+          <p className="mt-3 max-w-md text-sm leading-relaxed text-white/75 sm:text-base">{body}</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a
+              href={primary.href}
+              className="inline-flex h-12 items-center rounded-full bg-brand px-7 text-sm font-bold text-white transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+            >
+              {primary.label}
+            </a>
+            {secondary && (
+              <a
+                href={secondary.href}
+                className="inline-flex h-12 items-center rounded-full border border-white/40 px-7 text-sm font-bold text-white transition hover:bg-white hover:text-charcoal focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-white/40"
+              >
+                {secondary.label}
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
     </section>
   )
 }

@@ -103,10 +103,10 @@ const mealGrid = "grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-6 lg:gri
 
 // Hero slider photos
 const HERO_IMAGES = [
-  img("photo-1631515243349-e0cb75fb8d3a", 2000, 1100),
-  img("photo-1633945274405-b6c8069047b0", 2000, 1100),
-  img("photo-1589302168068-964664d93dc0", 2000, 1100),
-  img("photo-1563379091339-03b21ab4a4f8", 2000, 1100),
+  img("photo-1631515243349-e0cb75fb8d3a", 1200, 900),
+  img("photo-1633945274405-b6c8069047b0", 1200, 900),
+  img("photo-1589302168068-964664d93dc0", 1200, 900),
+  img("photo-1563379091339-03b21ab4a4f8", 1200, 900),
 ]
 
 function SectionTitle({
