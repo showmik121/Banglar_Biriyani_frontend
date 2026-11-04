@@ -129,11 +129,7 @@ function SectionTitle({
 }) {
   const rb = redBand
   return (
-    <div
-      className={`mb-4 flex flex-col items-center text-center sm:mb-10 ${
-        rb ? "max-sm:rounded-2xl max-sm:bg-jali max-sm:px-4 max-sm:py-5 max-sm:shadow-md" : ""
-      }`}
-    >
+    <div className="mb-4 flex flex-col items-center text-center max-sm:mb-0 sm:mb-10">
       {eyebrow && (
         <p className={`text-eyebrow ${light ? "text-saffron" : "text-brand"} ${rb ? "max-sm:!text-saffron" : ""}`}>{eyebrow}</p>
       )}
@@ -709,7 +705,8 @@ export default function App() {
 
       {/* Our menu: biriyani and regular dishes */}
       <section id="menu" className="scroll-mt-[calc(var(--header-h,120px)+16px)] max-md:order-1">
-        <div className="px-5 pb-2 pt-8 sm:bg-brand-light/60 sm:px-6 sm:pb-8 sm:pt-12">
+        <div className="bg-jali relative mt-4 px-5 py-6 sm:mt-0 sm:bg-none sm:bg-brand-light/60 sm:px-6 sm:pb-8 sm:pt-12 sm:py-0">
+          <TornEdge side="top" className="text-brand sm:hidden" />
           <SectionTitle
             eyebrow={tr("Our Menu", "আমাদের মেনু")}
             bangla="আমাদের শাহি মেনু"
@@ -721,8 +718,9 @@ export default function App() {
                 : tr(`${filteredMenu.length} ${filteredMenu.length === 1 ? "dish" : "dishes"}`, `${num(filteredMenu.length)}টি খাবার`)
             }
           />
+          <TornEdge side="bottom" className="text-brand sm:hidden" />
         </div>
-        <div className="mx-auto w-full max-w-7xl px-4 py-3 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+        <div className="mx-auto w-full max-w-7xl px-4 pb-3 pt-7 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
           <div className={grid}>
             {loading
               ? [1, 2, 3, 4].map((n) => <ProductSkeleton key={n} />)
