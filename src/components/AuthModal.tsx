@@ -3,15 +3,10 @@ import { useAuth } from "../context/AuthContext"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
 import { useLang } from "../context/LanguageContext"
+import { normalizePhone } from "../utils/phone"
 
 type Tab = "login" | "signup"
 type SignupField = "fullName" | "phone" | "email" | "password"
-
-/** "+880 1711-000001" -> "01711000001" */
-const normalizePhone = (v: string) => {
-  const digits = v.replace(/\D/g, "")
-  return digits.startsWith("880") ? digits.slice(2) : digits
-}
 
 function validateSignup(
   name: string,

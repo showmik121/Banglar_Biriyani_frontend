@@ -10,6 +10,7 @@ import React, {
 import type { Day } from "../components/DayPillBar"
 import type { DayOfWeek, CartItem } from "../types/menu"
 import { MultiDayWarningModal } from "../components/MultiDayWarningModal"
+import { dhakaClock } from "../i18n/mealTimes"
 
 export type { CartItem }
 
@@ -49,28 +50,29 @@ const CartContext = createContext<CartContextType | undefined>(undefined)
 
 const STORAGE_KEY = "banglar_biriyani_cart_v1"
 
+/** Today's weekday in Bangladesh time, whatever time zone the visitor's device is set to */
 function getInitialDay(): Day {
-  const days: Day[] = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
-  const dayName = days[new Date().getDay()]
-  return dayName || "Saturday"
+  const today = dhakaClock().day // e.g. "THURSDAY"
+  return (today.charAt(0) + today.slice(1).toLowerCase()) as Day
 }
+
+// The server accepts at most 50 of one dish per order (whole numbers only)
+const MAX_ITEM_QUANTITY = 50
 
 function isValidCartItem(item: unknown): item is CartItem {
   if (!item || typeof item !== "object") return false
   const candidate = item as Record<string, unknown>
   return (
-    typeof candidate.menuItemId === "number" &&
-    !isNaN(candidate.menuItemId) &&
+    Number.isInteger(candidate.menuItemId) &&
     typeof candidate.name === "string" &&
     candidate.name.trim().length > 0 &&
     typeof candidate.priceBdt === "number" &&
-    !isNaN(candidate.priceBdt) &&
+    Number.isFinite(candidate.priceBdt) &&
     candidate.priceBdt >= 0 &&
     typeof candidate.scheduledDay === "string" &&
     candidate.scheduledDay.trim().length > 0 &&
-    typeof candidate.quantity === "number" &&
-    !isNaN(candidate.quantity) &&
-    candidate.quantity > 0
+    Number.isInteger(candidate.quantity) &&
+    (candidate.quantity as number) > 0
   )
 }
 
@@ -84,8 +86,10 @@ function parseStoredItems(): CartItem[] {
       localStorage.removeItem(STORAGE_KEY)
       return []
     }
-    const validated = parsed.filter(isValidCartItem)
-    if (validated.length !== parsed.length) {
+    const validated = parsed
+      .filter(isValidCartItem)
+      .map((item) => (item.quantity > MAX_ITEM_QUANTITY ? { ...item, quantity: MAX_ITEM_QUANTITY } : item))
+    if (JSON.stringify(validated) !== JSON.stringify(parsed)) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(validated))
     }
     return validated

@@ -50,8 +50,7 @@ export const mealHoursLabel = (m: MealTime, lang: Lang) =>
     ? `${bnClock(MEAL_HOURS[m].start)} থেকে ${bnClock(MEAL_HOURS[m].end)}`
     : `${clock12(MEAL_HOURS[m].start)} to ${clock12(MEAL_HOURS[m].end)}`
 
-/** The meal that fits the time right now: before 5 pm lunch, then dinner */
+/** The meal that fits the time right now in Bangladesh: before 5 pm lunch, then dinner */
 export function mealTimeNow(date = new Date()): MealTime {
-  const h = date.getHours()
-  return h < 17 ? "LUNCH" : "DINNER"
+  return dhakaClock(date).hour < 17 ? "LUNCH" : "DINNER"
 }

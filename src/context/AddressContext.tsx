@@ -50,13 +50,34 @@ export const POPULAR_DHAKA_AREAS = [
   "Diabari",
 ] as const
 
+const MAX_STORED_ADDRESSES = 20
+
+const isText = (value: unknown): value is string => typeof value === "string"
+
+/** Saved data can be edited, truncated or left over from an older version: only trust the right shape. */
+export function isValidAddress(value: unknown): value is Address {
+  if (!value || typeof value !== "object") return false
+  const a = value as Record<string, unknown>
+  return (
+    isText(a.id) &&
+    a.id !== "" &&
+    isText(a.label) &&
+    isText(a.area) &&
+    isText(a.details) &&
+    a.details.trim() !== "" &&
+    (a.contactPhone === undefined || isText(a.contactPhone)) &&
+    (a.instructions === undefined || isText(a.instructions)) &&
+    (a.isDefault === undefined || typeof a.isDefault === "boolean")
+  )
+}
+
 function getStoredAddresses(): Address[] {
   if (typeof window === "undefined") return []
   try {
     const raw = localStorage.getItem(ADDRESSES_STORAGE_KEY)
     if (!raw) return []
     const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
+    return Array.isArray(parsed) ? parsed.filter(isValidAddress).slice(0, MAX_STORED_ADDRESSES) : []
   } catch (e) {
     console.error("Failed to load addresses from localStorage:", e)
     return []

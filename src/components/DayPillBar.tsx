@@ -1,5 +1,6 @@
 import { useCart } from "../context/CartContext"
 import { useLang } from "../context/LanguageContext"
+import { dhakaClock } from "../i18n/mealTimes"
 
 export const DAYS = [
   "Saturday",
@@ -29,17 +30,10 @@ export function dayLabel(day: string, lang: "en" | "bn") {
   return lang === "bn" ? DAY_BN[d] : d
 }
 
+/** Today's weekday in Bangladesh time, whatever time zone the visitor's device is set to */
 export function getTodayDay(): Day {
-  const dayNames: Day[] = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ]
-  return dayNames[new Date().getDay()] || "Saturday"
+  const today = dhakaClock().day // e.g. "THURSDAY"
+  return DAYS.find((d) => d.toUpperCase() === today) ?? "Saturday"
 }
 
 type Props = {
@@ -54,16 +48,7 @@ export function DayPillBar({ active: propActive, onChange: propOnChange }: Props
   const active = propActive ?? activeDay
   const onChange = propOnChange ?? setActiveDay
 
-  const dayNames: Day[] = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ]
-  const todayName = dayNames[new Date().getDay()] || "Saturday"
+  const todayName = getTodayDay()
 
   return (
     <nav aria-label={tr("Menu by day", "দিন অনুযায়ী মেনু")} className="-mx-4 sm:mx-0">

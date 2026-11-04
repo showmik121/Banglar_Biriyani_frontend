@@ -9,6 +9,7 @@ import { STORE } from "../config/store"
 import { useLang } from "../context/LanguageContext"
 import { dishName } from "../i18n/dishes"
 import { dayLabel, getTodayDay } from "./DayPillBar"
+import { normalizePhone } from "../utils/phone"
 import { mealTimeLabel, mealTimeSlot } from "../i18n/mealTimes"
 import type { DayOfWeek, OrderDTO, OrderItemDTO } from "../types/menu"
 
@@ -35,12 +36,6 @@ const ALL_PAYMENT_OPTIONS: PaymentOption[] = [
   { id: "NAGAD", label: "Nagad", labelBn: "নগদ", number: STORE.nagadNumber },
 ]
 const PAYMENT_OPTIONS = ALL_PAYMENT_OPTIONS.filter((p) => p.id === "COD" || p.number !== "")
-
-/** "+880 1711-000001" -> "01711000001" */
-const normalizePhone = (v: string) => {
-  const digits = v.replace(/\D/g, "")
-  return digits.startsWith("880") ? digits.slice(2) : digits
-}
 
 const inputClass = (invalid?: boolean) =>
   `mt-1.5 block w-full rounded-xl border bg-white px-3.5 text-base text-charcoal outline-none transition placeholder:text-slate/50 focus:ring-2 sm:text-sm ${
@@ -287,7 +282,17 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
         throw new Error(json.error?.message || tr("Couldn't place your order. Please try again.", "অর্ডার দেওয়া যায়নি। আবার চেষ্টা করুন।"))
       }
 
-      const orderData: OrderDTO = json.data?.order || json.order
+      const orderData: OrderDTO | undefined = json.data?.order || json.order
+      if (!orderData?.orderNumber) {
+        // The server answered "OK" but not with an order we can show. It may well have been saved,
+        // so do not tell the customer to simply try again (that could order twice).
+        throw new Error(
+          tr(
+            "We couldn't confirm your order. Please check My orders before ordering again.",
+            "অর্ডার নিশ্চিত করা যায়নি। আবার অর্ডার করার আগে \"আমার অর্ডার\" দেখে নিন।",
+          ),
+        )
+      }
       const orderItemsList: OrderItemDTO[] = json.data?.items || json.items || []
       setPlacedZone(selectedZone)
       setPlacedOrder({ order: orderData, items: orderItemsList })

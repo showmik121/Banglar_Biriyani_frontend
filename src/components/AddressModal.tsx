@@ -3,6 +3,7 @@ import { useAddress, POPULAR_DHAKA_AREAS } from "../context/AddressContext"
 import { searchRecommendations } from "../data/dhakaRecommendations"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useLang } from "../context/LanguageContext"
+import { normalizePhone } from "../utils/phone"
 
 type Props = {
   isOpen: boolean
@@ -55,7 +56,8 @@ export function AddressModal({ isOpen, onClose }: Props) {
   const [addressInput, setAddressInput] = useState("")
   const [tag, setTag] = useState<"Home" | "Work" | "Other">("Home")
   const [showDetailedFields, setShowDetailedFields] = useState(false)
-  const [phone, setPhone] = useState("01711234567")
+  // Starts empty: a pre-filled example number could be saved as the customer's real contact number
+  const [phone, setPhone] = useState("")
   const [instructions, setInstructions] = useState("")
   const [error, setError] = useState<string | null>(null)
 
@@ -130,7 +132,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
           POPULAR_DHAKA_AREAS.find((a) => trimmed.toLowerCase().includes(a.toLowerCase())) ||
           "Savar",
         details: trimmed,
-        contactPhone: phone.trim() || undefined,
+        contactPhone: normalizePhone(phone) || undefined,
         instructions: instructions.trim() || undefined,
         isDefault: true,
       })
