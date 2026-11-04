@@ -97,9 +97,9 @@ const INITIAL_MENU: Product[] = [
   },
 ]
 
-const grid = "grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-6 lg:grid-cols-4"
+const grid = "grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4"
 // The 3 meals of a day fill one row on wide screens
-const mealGrid = "grid grid-cols-1 gap-4 min-[420px]:grid-cols-2 sm:gap-6 lg:grid-cols-3"
+const mealGrid = "grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3"
 
 // Hero slider photos
 const HERO_IMAGES = [
@@ -697,7 +697,7 @@ export default function App() {
             meta={
               loading
                 ? tr("Loading...", "লোড হচ্ছে...")
-                : tr(`${filteredMenu.length} dishes`, `${num(filteredMenu.length)}টি খাবার`)
+                : tr(`${filteredMenu.length} ${filteredMenu.length === 1 ? "dish" : "dishes"}`, `${num(filteredMenu.length)}টি খাবার`)
             }
           />
         </div>
