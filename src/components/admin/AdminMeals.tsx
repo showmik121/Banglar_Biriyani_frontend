@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { adminFetch, btnPrimary, btnSecondary, taka } from "./adminApi"
+import { useLang } from "../../context/LanguageContext"
+import { adminFetch, btnPrimary, btnSecondary, dg, taka } from "./adminApi"
 import { Empty, ListSkeleton, Notice, PageHeader } from "./adminUi"
 
 /** Must match MAX_ITEMS_PER_MEAL on the server */
@@ -7,18 +8,28 @@ export const MAX_ITEMS_PER_MEAL = 12
 
 const DAYS = ["SATURDAY", "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"] as const
 type Day = (typeof DAYS)[number]
-const DAY_NAME: Record<Day, string> = {
-  SATURDAY: "Saturday",
-  SUNDAY: "Sunday",
-  MONDAY: "Monday",
-  TUESDAY: "Tuesday",
-  WEDNESDAY: "Wednesday",
-  THURSDAY: "Thursday",
-  FRIDAY: "Friday",
+// [English, Bangla]
+const DAY_NAME: Record<Day, [string, string]> = {
+  SATURDAY: ["Saturday", "শনিবার"],
+  SUNDAY: ["Sunday", "রবিবার"],
+  MONDAY: ["Monday", "সোমবার"],
+  TUESDAY: ["Tuesday", "মঙ্গলবার"],
+  WEDNESDAY: ["Wednesday", "বুধবার"],
+  THURSDAY: ["Thursday", "বৃহস্পতিবার"],
+  FRIDAY: ["Friday", "শুক্রবার"],
+}
+const DAY_SHORT: Record<Day, [string, string]> = {
+  SATURDAY: ["Sat", "শনি"],
+  SUNDAY: ["Sun", "রবি"],
+  MONDAY: ["Mon", "সোম"],
+  TUESDAY: ["Tue", "মঙ্গল"],
+  WEDNESDAY: ["Wed", "বুধ"],
+  THURSDAY: ["Thu", "বৃহ"],
+  FRIDAY: ["Fri", "শুক্র"],
 }
 const MEALS = ["LUNCH", "DINNER"] as const
 type Meal = (typeof MEALS)[number]
-const MEAL_NAME: Record<Meal, string> = { LUNCH: "Lunch", DINNER: "Dinner" }
+const MEAL_NAME: Record<Meal, [string, string]> = { LUNCH: ["Lunch", "দুপুরের খাবার"], DINNER: ["Dinner", "রাতের খাবার"] }
 
 const todayKey = (): Day => {
   const js = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"] as const
@@ -51,6 +62,9 @@ const asMeal = (m?: string): Meal => (MEALS as readonly string[]).includes(m ?? 
 const same = (a: Slot[], b: Slot[]) => JSON.stringify(a) === JSON.stringify(b)
 
 export function AdminMeals() {
+  const { tr } = useLang()
+  const dayName = (d: Day) => tr(DAY_NAME[d][0], DAY_NAME[d][1])
+  const mealName = (m: Meal) => tr(MEAL_NAME[m][0], MEAL_NAME[m][1])
   const [catalog, setCatalog] = useState<Dish[]>([])
   const [saved, setSaved] = useState<Week>(emptyWeek)
   const [draft, setDraft] = useState<Week>(emptyWeek)
@@ -115,7 +129,7 @@ export function AdminMeals() {
       await adminFetch(`/api/admin/schedule/${day}`, { method: "PUT", body: JSON.stringify({ assignments }) })
       setSaved((w) => ({ ...w, [day]: assignments }))
       setDraft((w) => ({ ...w, [day]: assignments }))
-      setNotice(`${DAY_NAME[day]} meals saved`)
+      setNotice(tr(`${DAY_NAME[day][0]} meals saved`, `${DAY_NAME[day][1]}-এর মিল সেভ হয়েছে`))
       window.dispatchEvent(new Event("banglar-biriyani:menu-updated"))
     } catch (e) {
       setError((e as Error).message)
@@ -126,16 +140,18 @@ export function AdminMeals() {
 
   return (
     <div>
-      <PageHeader title="Daily meals" />
+      <PageHeader title={tr("Daily meals", "দৈনিক মিল")} />
       <p className="-mt-3 mb-5 text-sm text-slate">
-        Set lunch and dinner for each day (up to {MAX_ITEMS_PER_MEAL} dishes each). They show in "7-day
-        special meals" on the website. The first dish of each meal is its special.
+        {tr(
+          `Set lunch and dinner for each day (up to ${MAX_ITEMS_PER_MEAL} dishes each). They show in "7-day special meals" on the website. The first dish of each meal is its special.`,
+          `প্রতিদিনের দুপুর ও রাতের খাবার ঠিক করুন (প্রতিবেলায় সর্বোচ্চ ${dg(MAX_ITEMS_PER_MEAL)}টি)। এগুলো ওয়েবসাইটের "৭ দিনের স্পেশাল মিল"-এ দেখায়। প্রতি বেলার প্রথম খাবারটি স্পেশাল।`,
+        )}
       </p>
       {notice && <Notice kind="ok">{notice}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
 
       {/* Day picker */}
-      <div role="tablist" aria-label="Day" className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 pb-1">
+      <div role="tablist" aria-label={tr("Day", "দিন")} className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 pb-1">
         {DAYS.map((d) => {
           const active = d === day
           const unsaved = !same(draft[d], saved[d])
@@ -152,12 +168,12 @@ export function AdminMeals() {
               }`}
             >
               <span>
-                {DAY_NAME[d].slice(0, 3)}
-                {d === todayKey() && <span className={active ? "text-saffron" : "text-brand"}> · today</span>}
+                {tr(DAY_SHORT[d][0], DAY_SHORT[d][1])}
+                {d === todayKey() && <span className={active ? "text-saffron" : "text-brand"}> · {tr("today", "আজ")}</span>}
               </span>
               <span className={`text-[11px] font-medium ${active ? "text-white/80" : "text-slate"}`}>
-                {counts.join(" · ")}
-                {unsaved ? " · not saved" : ""}
+                {counts.map((c) => dg(c)).join(" · ")}
+                {unsaved ? ` · ${tr("not saved", "সেভ হয়নি")}` : ""}
               </span>
             </button>
           )
@@ -167,10 +183,10 @@ export function AdminMeals() {
       {loading ? (
         <ListSkeleton />
       ) : catalog.length === 0 ? (
-        <Empty title="No dishes yet" hint="Add dishes in the Menu tab first." />
+        <Empty title={tr("No dishes yet", "এখনও কোনো খাবার নেই")} hint={tr("Add dishes in the Menu tab first.", "আগে মেনু ট্যাবে খাবার যোগ করুন।")} />
       ) : (
         <div className="space-y-4">
-          <h2 className="font-semibold text-charcoal">{DAY_NAME[day]}</h2>
+          <h2 className="font-semibold text-charcoal">{dayName(day)}</h2>
 
           {MEALS.map((m) => {
             const list = mealSlots(m)
@@ -182,16 +198,16 @@ export function AdminMeals() {
               <section key={m} aria-labelledby={`meal-${m}`} className="rounded-xl border border-line bg-white">
                 <div className="flex items-center justify-between border-b border-line px-4 py-3">
                   <h3 id={`meal-${m}`} className="font-semibold text-charcoal">
-                    {MEAL_NAME[m]}
+                    {mealName(m)}
                   </h3>
                   <span className="text-xs text-slate">
-                    {list.length}/{MAX_ITEMS_PER_MEAL}
+                    {dg(list.length)}/{dg(MAX_ITEMS_PER_MEAL)}
                   </span>
                 </div>
                 <ol className="divide-y divide-line">
                   {list.map((s, i) => {
                     const dish = dishById.get(s.menuItemId)
-                    const name = dish?.name ?? `Dish #${s.menuItemId}`
+                    const name = dish?.name ?? tr(`Dish #${s.menuItemId}`, `খাবার #${dg(s.menuItemId)}`)
                     return (
                       <li key={s.menuItemId} className="flex items-center gap-3 px-4 py-2.5">
                         {dish?.imageUrl ? (
@@ -203,15 +219,15 @@ export function AdminMeals() {
                           <p className="line-clamp-2 text-sm font-medium leading-snug text-charcoal">{name}</p>
                           <p className="text-xs text-slate">
                             {dish ? taka(s.specialPriceBdt ?? dish.basePriceBdt) : ""}
-                            {i === 0 && <span className="ml-2 font-semibold text-brand">Special</span>}
-                            {dish && !dish.isAvailable && <span className="ml-2 text-red-600">Hidden from menu</span>}
+                            {i === 0 && <span className="ml-2 font-semibold text-brand">{tr("Special", "স্পেশাল")}</span>}
+                            {dish && !dish.isAvailable && <span className="ml-2 text-red-600">{tr("Hidden from menu", "মেনু থেকে লুকানো")}</span>}
                           </p>
                         </div>
                         <button
                           type="button"
                           onClick={() => moveUp(m, i)}
                           disabled={i === 0}
-                          aria-label={`Move ${name} up in ${MEAL_NAME[m].toLowerCase()}`}
+                          aria-label={tr(`Move ${name} up in ${MEAL_NAME[m][0].toLowerCase()}`, `${mealName(m)}-এ ${name} ওপরে তুলুন`)}
                           className="grid size-9 shrink-0 place-items-center rounded-lg text-slate hover:bg-cream disabled:opacity-30"
                         >
                           <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
@@ -221,7 +237,7 @@ export function AdminMeals() {
                         <button
                           type="button"
                           onClick={() => remove(m, s.menuItemId)}
-                          aria-label={`Remove ${name} from ${MEAL_NAME[m].toLowerCase()}`}
+                          aria-label={tr(`Remove ${name} from ${MEAL_NAME[m][0].toLowerCase()}`, `${mealName(m)} থেকে ${name} সরান`)}
                           className="grid size-9 shrink-0 place-items-center rounded-lg text-slate hover:bg-red-50 hover:text-red-600"
                         >
                           <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
@@ -231,11 +247,11 @@ export function AdminMeals() {
                       </li>
                     )
                   })}
-                  {list.length === 0 && <li className="px-4 py-3 text-sm text-slate">No {MEAL_NAME[m].toLowerCase()} yet.</li>}
+                  {list.length === 0 && <li className="px-4 py-3 text-sm text-slate">{tr(`No ${MEAL_NAME[m][0].toLowerCase()} yet.`, `${mealName(m)} এখনও ঠিক করা হয়নি।`)}</li>}
                   {list.length < MAX_ITEMS_PER_MEAL && (
                     <li className="px-4 py-3">
                       <label htmlFor={selectId} className="sr-only">
-                        Add a dish to {MEAL_NAME[m].toLowerCase()}
+                        {tr(`Add a dish to ${MEAL_NAME[m][0].toLowerCase()}`, `${mealName(m)}-এ খাবার যোগ করুন`)}
                       </label>
                       <select
                         id={selectId}
@@ -243,7 +259,7 @@ export function AdminMeals() {
                         onChange={(e) => e.target.value && add(m, Number(e.target.value))}
                         className="h-11 w-full rounded-lg border border-line bg-white px-3 text-base text-charcoal outline-none focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm"
                       >
-                        <option value="">+ Add a dish to {MEAL_NAME[m].toLowerCase()}…</option>
+                        <option value="">{tr(`+ Add a dish to ${MEAL_NAME[m][0].toLowerCase()}…`, `+ ${mealName(m)}-এ খাবার যোগ করুন…`)}</option>
                         {[...groups.entries()].map(([cat, dishes]) => (
                           <optgroup key={cat} label={cat}>
                             {dishes.map((d) => (
@@ -263,7 +279,7 @@ export function AdminMeals() {
 
           <div
             className={`flex flex-col-reverse gap-2 sm:flex-row sm:justify-end ${
-              changed ? "sticky bottom-0 -mx-4 border-t border-line bg-alabaster/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0" : ""
+              changed ? "sticky bottom-16 -mx-4 border-t border-line bg-alabaster/95 px-4 py-3 backdrop-blur sm:static sm:mx-0 sm:border-0 sm:bg-transparent sm:px-0" : ""
             }`}
           >
             <button
@@ -272,10 +288,10 @@ export function AdminMeals() {
               disabled={!changed || saving}
               className={`${btnSecondary} h-11 sm:h-10`}
             >
-              Undo changes
+              {tr("Undo changes", "পরিবর্তন বাতিল")}
             </button>
             <button type="button" onClick={save} disabled={!changed || saving} className={`${btnPrimary} h-11 sm:h-10`}>
-              {saving ? "Saving…" : `Save ${DAY_NAME[day]}`}
+              {saving ? tr("Saving…", "সেভ হচ্ছে…") : tr(`Save ${DAY_NAME[day][0]}`, `${DAY_NAME[day][1]} সেভ করুন`)}
             </button>
           </div>
         </div>

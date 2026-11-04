@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react"
 import { useAuth } from "../../context/AuthContext"
+import { useLang } from "../../context/LanguageContext"
 import { ApiError, adminFetch, btnDanger, btnPrimary, btnSecondary, inputClass, labelClass, taka } from "./adminApi"
 import { Empty, FieldError, FormDialog, ListSkeleton, Notice, PageHeader, Toggle } from "./adminUi"
 
@@ -31,6 +32,7 @@ type Form = {
 
 export function AdminMenu() {
   const { user } = useAuth()
+  const { tr } = useLang()
   const isAdmin = user?.role === "ADMIN"
   const [dishes, setDishes] = useState<Dish[]>([])
   const [categories, setCategories] = useState<Category[]>([])
@@ -127,7 +129,7 @@ export function AdminMenu() {
           body: JSON.stringify({ ...base, categoryId: Number(form.categoryId) }),
         })
       }
-      setNotice(`${base.name} saved`)
+      setNotice(tr(`${base.name} saved`, `${base.name} সেভ হয়েছে`))
       setEditing(null)
       load()
     } catch (err) {
@@ -142,7 +144,9 @@ export function AdminMenu() {
     setDishes((list) => list.map((x) => (x.id === d.id ? { ...x, isAvailable } : x)))
     try {
       await adminFetch(`/api/admin/menu/${d.id}`, { method: "PATCH", body: JSON.stringify({ isAvailable }) })
-      setNotice(`${d.name} ${isAvailable ? "is back on the menu" : "is hidden from the menu"}`)
+      setNotice(
+        isAvailable ? tr(`${d.name} is back on the menu`, `${d.name} আবার মেনুতে এসেছে`) : tr(`${d.name} is hidden from the menu`, `${d.name} মেনু থেকে লুকানো হয়েছে`),
+      )
     } catch (err) {
       setError((err as Error).message)
       load()
@@ -151,10 +155,15 @@ export function AdminMenu() {
 
   const remove = async () => {
     if (!editing || editing === "new") return
-    if (!window.confirm(`Delete "${editing.name}"? If it was ever ordered, it will be hidden instead.`)) return
+    if (!window.confirm(
+        tr(
+          `Delete "${editing.name}"? If it was ever ordered, it will be hidden instead.`,
+          `"${editing.name}" মুছে ফেলবেন? আগে অর্ডার হয়ে থাকলে মুছে না গিয়ে লুকানো থাকবে।`,
+        ),
+      )) return
     try {
       await adminFetch(`/api/admin/menu/${editing.id}`, { method: "DELETE" })
-      setNotice(`${editing.name} removed`)
+      setNotice(tr(`${editing.name} removed`, `${editing.name} মুছে ফেলা হয়েছে`))
       setEditing(null)
       load()
     } catch (err) {
@@ -167,11 +176,11 @@ export function AdminMenu() {
   return (
     <div>
       <PageHeader
-        title="Menu"
+        title={tr("Menu", "মেনু")}
         action={
           isAdmin && (
             <button type="button" onClick={() => open("new")} className={btnPrimary}>
-              Add dish
+              {tr("Add dish", "খাবার যোগ করুন")}
             </button>
           )
         }
@@ -182,7 +191,10 @@ export function AdminMenu() {
       {loading ? (
         <ListSkeleton />
       ) : groups.length === 0 ? (
-        <Empty title="No dishes yet" hint={isAdmin ? "Add your first dish with the button above." : undefined} />
+        <Empty
+          title={tr("No dishes yet", "এখনও কোনো খাবার নেই")}
+          hint={isAdmin ? tr("Add your first dish with the button above.", "ওপরের বাটন দিয়ে প্রথম খাবার যোগ করুন।") : undefined}
+        />
       ) : (
         <div className="space-y-6">
           {groups.map((g) => (
@@ -206,11 +218,11 @@ export function AdminMenu() {
                     <Toggle
                       checked={d.isAvailable}
                       onChange={(v) => toggle(d, v)}
-                      label="On menu"
+                      label={tr("On menu", "মেনুতে আছে")}
                       compact
                     />
                     <button type="button" onClick={() => open(d)} className={btnSecondary}>
-                      Edit
+                      {tr("Edit", "এডিট")}
                     </button>
                   </li>
                 ))}
@@ -222,27 +234,27 @@ export function AdminMenu() {
 
       {editing && form && (
         <FormDialog
-          title={editing === "new" ? "Add dish" : `Edit ${editing.name}`}
+          title={editing === "new" ? tr("Add dish", "খাবার যোগ করুন") : tr(`Edit ${editing.name}`, `${editing.name} এডিট`)}
           onClose={close}
           onSubmit={save}
           saving={saving}
-          submitLabel={editing === "new" ? "Add dish" : "Save changes"}
+          submitLabel={editing === "new" ? tr("Add dish", "খাবার যোগ করুন") : tr("Save changes", "পরিবর্তন সেভ করুন")}
           error={formError}
           footerExtra={
             isAdmin &&
             editing !== "new" && (
               <button type="button" onClick={remove} className={btnDanger}>
-                Delete
+                {tr("Delete", "মুছুন")}
               </button>
             )
           }
         >
           <div className="flex items-start gap-3">
             <div className="size-20 shrink-0 overflow-hidden rounded-lg bg-cream">
-              {form.imageUrl && <img src={form.imageUrl} alt="Photo preview" className="size-full object-cover" />}
+              {form.imageUrl && <img src={form.imageUrl} alt={tr("Photo preview", "ছবির প্রিভিউ")} className="size-full object-cover" />}
             </div>
             <label className="min-w-0 flex-1">
-              <span className={labelClass}>Photo link</span>
+              <span className={labelClass}>{tr("Photo link", "ছবির লিংক")}</span>
               <input
                 className={inputClass}
                 type="url"
@@ -255,13 +267,13 @@ export function AdminMenu() {
             </label>
           </div>
           <label>
-            <span className={labelClass}>Name</span>
+            <span className={labelClass}>{tr("Name", "নাম")}</span>
             <input className={inputClass} value={form.name} onChange={(e) => set("name", e.target.value)} required minLength={2} />
             <FieldError message={fe("name")} />
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label>
-              <span className={labelClass}>Price (৳)</span>
+              <span className={labelClass}>{tr("Price (৳)", "দাম (৳)")}</span>
               <input
                 className={inputClass}
                 type="number"
@@ -274,25 +286,25 @@ export function AdminMenu() {
               <FieldError message={fe("basePriceBdt")} />
             </label>
             <label>
-              <span className={labelClass}>Category</span>
+              <span className={labelClass}>{tr("Category", "ক্যাটাগরি")}</span>
               <select className={inputClass} value={form.categoryId} onChange={(e) => set("categoryId", e.target.value)}>
                 {categories.map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.name}
                   </option>
                 ))}
-                {editing === "new" && <option value={NEW_CATEGORY}>New category…</option>}
+                {editing === "new" && <option value={NEW_CATEGORY}>{tr("New category…", "নতুন ক্যাটাগরি…")}</option>}
               </select>
             </label>
           </div>
           {form.categoryId === NEW_CATEGORY && (
             <label>
-              <span className={labelClass}>New category name</span>
+              <span className={labelClass}>{tr("New category name", "নতুন ক্যাটাগরির নাম")}</span>
               <input className={inputClass} value={form.newCategory} onChange={(e) => set("newCategory", e.target.value)} required minLength={2} />
             </label>
           )}
           <label>
-            <span className={labelClass}>Description</span>
+            <span className={labelClass}>{tr("Description", "বিবরণ")}</span>
             <textarea
               className={`${inputClass} h-20 py-2`}
               value={form.description}
@@ -302,7 +314,7 @@ export function AdminMenu() {
             />
             <FieldError message={fe("description")} />
           </label>
-          <Toggle checked={form.isAvailable} onChange={(v) => set("isAvailable", v)} label="Show on the menu" />
+          <Toggle checked={form.isAvailable} onChange={(v) => set("isAvailable", v)} label={tr("Show on the menu", "মেনুতে দেখান")} />
         </FormDialog>
       )}
     </div>

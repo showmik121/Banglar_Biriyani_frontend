@@ -5,13 +5,14 @@ export type Lang = "en" | "bn"
 const STORAGE_KEY = "bb_lang"
 
 /** First visit: Bangla if the phone or browser is set to Bangla, otherwise English. */
-function initialLang(): Lang {
+function initialLang(key: string = STORAGE_KEY, fallback?: Lang): Lang {
   try {
-    const saved = localStorage.getItem(STORAGE_KEY)
+    const saved = localStorage.getItem(key)
     if (saved === "en" || saved === "bn") return saved
   } catch {
     // storage blocked (private mode): fall through
   }
+  if (fallback) return fallback
   if (typeof navigator !== "undefined" && navigator.language?.toLowerCase().startsWith("bn")) return "bn"
   return "en"
 }
@@ -47,17 +48,26 @@ const makeValue = (lang: Lang, setLang: (l: Lang) => void): LanguageValue => ({
 // English by default, so components also work outside the provider (tests, admin).
 const LanguageContext = createContext<LanguageValue>(makeValue("en", () => {}))
 
-export function LanguageProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(initialLang)
+/** storageKey / defaultLang let the admin panel keep its own choice (Bangla by default). */
+export function LanguageProvider({
+  children,
+  storageKey = STORAGE_KEY,
+  defaultLang,
+}: {
+  children: ReactNode
+  storageKey?: string
+  defaultLang?: Lang
+}) {
+  const [lang, setLangState] = useState<Lang>(() => initialLang(storageKey, defaultLang))
 
   const setLang = useCallback((next: Lang) => {
     setLangState(next)
     try {
-      localStorage.setItem(STORAGE_KEY, next)
+      localStorage.setItem(storageKey, next)
     } catch {
       // not saved; still switches for this visit
     }
-  }, [])
+  }, [storageKey])
 
   const value = useMemo(() => makeValue(lang, setLang), [lang, setLang])
   return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>

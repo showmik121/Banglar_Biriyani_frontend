@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react"
 import { AdminOrders } from "../src/components/admin/AdminOrders"
 
@@ -46,6 +46,7 @@ function mockApi() {
   return calls
 }
 
+beforeEach(() => localStorage.setItem("bb_admin_lang", "en"))
 afterEach(() => vi.unstubAllGlobals())
 
 describe("admin orders", () => {

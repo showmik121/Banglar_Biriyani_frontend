@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import { adminFetch, btnDanger, btnPrimary, btnSecondary, inputClass, taka, timeAgo } from "./adminApi"
+import { useLang } from "../../context/LanguageContext"
+import { adminFetch, btnDanger, btnPrimary, btnSecondary, dg, inputClass, taka, timeAgo } from "./adminApi"
 import { Empty, ListSkeleton, Notice, PageHeader } from "./adminUi"
 
 type Status = "PENDING" | "CONFIRMED" | "PREPARING" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
@@ -27,13 +28,14 @@ interface OrderRow {
   items: { id: number; itemNameSnapshot: string; quantity: number }[]
 }
 
-const STATUS_LABEL: Record<Status, string> = {
-  PENDING: "New",
-  CONFIRMED: "Confirmed",
-  PREPARING: "Cooking",
-  OUT_FOR_DELIVERY: "On the way",
-  DELIVERED: "Delivered",
-  CANCELLED: "Cancelled",
+// [English, Bangla]
+const STATUS_LABEL: Record<Status, [string, string]> = {
+  PENDING: ["New", "নতুন"],
+  CONFIRMED: ["Confirmed", "কনফার্মড"],
+  PREPARING: ["Cooking", "রান্না হচ্ছে"],
+  OUT_FOR_DELIVERY: ["On the way", "পথে আছে"],
+  DELIVERED: ["Delivered", "ডেলিভারি হয়েছে"],
+  CANCELLED: ["Cancelled", "বাতিল"],
 }
 
 const STATUS_STYLE: Record<Status, string> = {
@@ -46,22 +48,33 @@ const STATUS_STYLE: Record<Status, string> = {
 }
 
 // The one button that moves an order forward
-const NEXT_STEP: Partial<Record<Status, { to: Status; label: string }>> = {
-  PENDING: { to: "CONFIRMED", label: "Confirm order" },
-  CONFIRMED: { to: "PREPARING", label: "Start cooking" },
-  PREPARING: { to: "OUT_FOR_DELIVERY", label: "Send for delivery" },
-  OUT_FOR_DELIVERY: { to: "DELIVERED", label: "Mark delivered" },
+const NEXT_STEP: Partial<Record<Status, { to: Status; label: [string, string] }>> = {
+  PENDING: { to: "CONFIRMED", label: ["Confirm order", "অর্ডার কনফার্ম করুন"] },
+  CONFIRMED: { to: "PREPARING", label: ["Start cooking", "রান্না শুরু করুন"] },
+  PREPARING: { to: "OUT_FOR_DELIVERY", label: ["Send for delivery", "ডেলিভারিতে পাঠান"] },
+  OUT_FOR_DELIVERY: { to: "DELIVERED", label: ["Mark delivered", "ডেলিভারি হয়েছে"] },
 }
 
 const ACTIVE: Status[] = ["PENDING", "CONFIRMED", "PREPARING", "OUT_FOR_DELIVERY"]
 
 type Filter = "active" | "DELIVERED" | "CANCELLED" | "all"
-const FILTERS: { id: Filter; label: string }[] = [
-  { id: "active", label: "Active" },
-  { id: "DELIVERED", label: "Delivered" },
-  { id: "CANCELLED", label: "Cancelled" },
-  { id: "all", label: "All" },
+const FILTERS: { id: Filter; label: [string, string] }[] = [
+  { id: "active", label: ["Active", "চলমান"] },
+  { id: "DELIVERED", label: ["Delivered", "ডেলিভারি হয়েছে"] },
+  { id: "CANCELLED", label: ["Cancelled", "বাতিল"] },
+  { id: "all", label: ["All", "সব"] },
 ]
+
+const SLOT_BN: Record<string, string> = { Breakfast: "সকাল", Lunch: "দুপুর", Dinner: "রাত" }
+const DAY_BN: Record<string, string> = {
+  SAT: "শনি",
+  SUN: "রবি",
+  MON: "সোম",
+  TUE: "মঙ্গল",
+  WED: "বুধ",
+  THU: "বৃহ",
+  FRI: "শুক্র",
+}
 
 interface Summary {
   today: { orders: number; revenueBdt: number }
@@ -70,17 +83,19 @@ interface Summary {
   activeOrders: number
 }
 
-const plural = (n: number) => `${n.toLocaleString("en-IN")} ${n === 1 ? "order" : "orders"}`
+const plural = (n: number, bn: boolean) =>
+  bn ? `${dg(n.toLocaleString("en-IN"))}টি অর্ডার` : `${n.toLocaleString("en-IN")} ${n === 1 ? "order" : "orders"}`
 
 /** Today / this month / all time at a glance. Cancelled orders are not counted. */
 function SummaryCards({ summary }: { summary: Summary | null }) {
+  const { tr, lang } = useLang()
   const cards = [
-    { label: "Today", data: summary?.today },
-    { label: "This month", data: summary?.month },
-    { label: "All time", data: summary?.allTime },
+    { label: tr("Today", "আজ"), data: summary?.today },
+    { label: tr("This month", "এই মাস"), data: summary?.month },
+    { label: tr("All time", "মোট"), data: summary?.allTime },
   ]
   return (
-    <section aria-label="Sales summary" className="mb-6 grid grid-cols-3 gap-2 sm:gap-3">
+    <section aria-label={tr("Sales summary", "বিক্রির সারসংক্ষেপ")} className="mb-6 grid grid-cols-3 gap-2 sm:gap-3">
       {cards.map((c, i) => (
         <div
           key={c.label}
@@ -97,7 +112,7 @@ function SummaryCards({ summary }: { summary: Summary | null }) {
                 {taka(c.data.revenueBdt)}
               </p>
               <p className={`truncate text-xs tabular-nums sm:text-sm ${i === 0 ? "text-white/80" : "text-slate"}`}>
-                {plural(c.data.orders)}
+                {plural(c.data.orders, lang === "bn")}
               </p>
             </>
           ) : (
@@ -113,6 +128,8 @@ function SummaryCards({ summary }: { summary: Summary | null }) {
 }
 
 export function AdminOrders() {
+  const { tr, lang } = useLang()
+  const bn = lang === "bn"
   const [summary, setSummary] = useState<Summary | null>(null)
   const [rows, setRows] = useState<OrderRow[]>([])
   const [zones, setZones] = useState<Record<number, string>>({})
@@ -183,7 +200,12 @@ export function AdminOrders() {
     patch(row, `/api/admin/orders/${row.order.id}/status`, { status })
 
   const cancel = (row: OrderRow) => {
-    if (window.confirm(`Cancel order ${row.order.orderNumber} for ${row.order.customerName}?`)) {
+    if (window.confirm(
+        tr(
+          `Cancel order ${row.order.orderNumber} for ${row.order.customerName}?`,
+          `${row.order.customerName}-এর অর্ডার ${row.order.orderNumber} বাতিল করবেন?`,
+        ),
+      )) {
       setStatus(row, "CANCELLED")
     }
   }
@@ -191,10 +213,10 @@ export function AdminOrders() {
   return (
     <div>
       <PageHeader
-        title="Orders"
+        title={tr("Orders", "অর্ডার")}
         action={
           <button type="button" onClick={load} className={btnSecondary}>
-            Refresh
+            {tr("Refresh", "রিফ্রেশ")}
           </button>
         }
       />
@@ -202,7 +224,7 @@ export function AdminOrders() {
       <SummaryCards summary={summary} />
 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <div role="tablist" aria-label="Filter orders" className="flex gap-1 overflow-x-auto">
+        <div role="tablist" aria-label={tr("Filter orders", "অর্ডার ফিল্টার")} className="flex gap-1 overflow-x-auto">
           {FILTERS.map((f) => (
             <button
               key={f.id}
@@ -214,18 +236,18 @@ export function AdminOrders() {
                 filter === f.id ? "bg-brand text-white" : "bg-white text-slate ring-1 ring-line hover:bg-cream"
               }`}
             >
-              {f.label}
-              {f.id === "active" && activeCount > 0 && <span className="ml-1.5 tabular-nums">{activeCount}</span>}
+              {tr(f.label[0], f.label[1])}
+              {f.id === "active" && activeCount > 0 && <span className="ml-1.5 tabular-nums">{dg(activeCount)}</span>}
             </button>
           ))}
         </div>
         <label className="sm:ml-auto sm:w-64">
-          <span className="sr-only">Search orders</span>
+          <span className="sr-only">{tr("Search orders", "অর্ডার খুঁজুন")}</span>
           <input
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search name, phone, order no."
+            placeholder={tr("Search name, phone, order no.", "নাম, ফোন বা অর্ডার নম্বর খুঁজুন")}
             className={inputClass}
           />
         </label>
@@ -237,8 +259,8 @@ export function AdminOrders() {
         <ListSkeleton />
       ) : visible.length === 0 ? (
         <Empty
-          title={filter === "active" ? "No active orders" : "No orders here"}
-          hint={filter === "active" ? "New orders appear here automatically." : undefined}
+          title={filter === "active" ? tr("No active orders", "কোনো চলমান অর্ডার নেই") : tr("No orders here", "এখানে কোনো অর্ডার নেই")}
+          hint={filter === "active" ? tr("New orders appear here automatically.", "নতুন অর্ডার এখানে নিজে থেকেই আসবে।") : undefined}
         />
       ) : (
         <ul className="space-y-3">
@@ -255,16 +277,18 @@ export function AdminOrders() {
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <span className="font-semibold text-charcoal">{order.customerName}</span>
                   <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${STATUS_STYLE[order.status]}`}>
-                    {STATUS_LABEL[order.status]}
+                    {tr(STATUS_LABEL[order.status][0], STATUS_LABEL[order.status][1])}
                   </span>
                   {order.deliverySlot && ["Breakfast", "Lunch", "Dinner"].includes(order.deliverySlot) && (
                     <span className="rounded-full bg-saffron/30 px-2 py-0.5 text-xs font-semibold text-charcoal">
-                      {order.deliverySlot}
-                      {order.scheduledDay ? ` · ${order.scheduledDay.charAt(0)}${order.scheduledDay.slice(1, 3).toLowerCase()}` : ""}
+                      {bn ? SLOT_BN[order.deliverySlot] : order.deliverySlot}
+                      {order.scheduledDay
+                        ? ` · ${bn ? (DAY_BN[order.scheduledDay.slice(0, 3)] ?? "") : `${order.scheduledDay.charAt(0)}${order.scheduledDay.slice(1, 3).toLowerCase()}`}`
+                        : ""}
                     </span>
                   )}
                   <span className="w-full text-xs text-slate sm:ml-auto sm:w-auto sm:text-sm">
-                    {order.orderNumber} · {timeAgo(order.createdAt)}
+                    {bn ? dg(order.orderNumber) : order.orderNumber} · {timeAgo(order.createdAt)}
                   </span>
                 </div>
 
@@ -272,13 +296,13 @@ export function AdminOrders() {
                   <div className="space-y-1 text-slate">
                     <a
                       href={`tel:${order.customerPhone}`}
-                      aria-label={`Call ${order.customerName} at ${order.customerPhone}`}
-                      className="inline-flex h-9 items-center gap-1.5 rounded-lg bg-cream px-3 font-semibold text-charcoal hover:bg-brand-light hover:text-brand"
+                      aria-label={tr(`Call ${order.customerName} at ${order.customerPhone}`, `${order.customerName}-কে ফোন করুন: ${order.customerPhone}`)}
+                      className="inline-flex h-11 items-center gap-2 rounded-lg bg-cream px-3.5 font-semibold text-charcoal hover:bg-brand-light hover:text-brand sm:h-9"
                     >
                       <svg viewBox="0 0 24 24" className="size-4 text-brand" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
                         <path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2" strokeLinejoin="round" />
                       </svg>
-                      {order.customerPhone}
+                      {dg(order.customerPhone)}
                     </a>
                     <p>
                       {order.deliveryZoneId && zones[order.deliveryZoneId] && (
@@ -286,11 +310,11 @@ export function AdminOrders() {
                       )}
                       {order.customerAddress}
                     </p>
-                    {order.notes && <p className="text-slate">Note: {order.notes}</p>}
+                    {order.notes && <p className="text-slate">{tr("Note", "নোট")}: {order.notes}</p>}
                   </div>
                   <div className="space-y-1">
                     <p className="text-charcoal">
-                      {items.map((i) => `${i.quantity}× ${i.itemNameSnapshot}`).join(", ")}
+                      {items.map((i) => `${dg(i.quantity)}× ${i.itemNameSnapshot}`).join(", ")}
                     </p>
                     <p className="text-slate">
                       <span className="font-semibold text-charcoal">{taka(order.totalBdt)}</span>
@@ -301,13 +325,13 @@ export function AdminOrders() {
                           {order.paymentMethod === "BKASH" ? "bKash" : "Nagad"}
                           {order.paymentTrxId && <span className="font-mono text-xs"> {order.paymentTrxId}</span>}
                           {order.isPaymentVerified ? (
-                            <span className="ml-1 font-medium text-emerald-700">✓ paid</span>
+                            <span className="ml-1 font-medium text-emerald-700">{tr("✓ paid", "✓ পেইড")}</span>
                           ) : (
-                            <span className="ml-1 font-medium text-amber-700">not checked</span>
+                            <span className="ml-1 font-medium text-amber-700">{tr("not checked", "যাচাই হয়নি")}</span>
                           )}
                         </>
                       ) : (
-                        "Cash on delivery"
+                        tr("Cash on delivery", "ক্যাশ অন ডেলিভারি")
                       )}
                     </p>
                   </div>
@@ -322,7 +346,7 @@ export function AdminOrders() {
                         onClick={() => setStatus(row, next.to)}
                         className={`${btnPrimary} h-11 flex-1 sm:h-10 sm:flex-none`}
                       >
-                        {busy ? "Saving…" : next.label}
+                        {busy ? tr("Saving…", "সেভ হচ্ছে…") : tr(next.label[0], next.label[1])}
                       </button>
                     )}
                     {online && !order.isPaymentVerified && order.status !== "CANCELLED" && (
@@ -334,12 +358,12 @@ export function AdminOrders() {
                         }
                         className={`${btnSecondary} h-11 flex-1 sm:h-10 sm:flex-none`}
                       >
-                        Mark as paid
+                        {tr("Mark as paid", "পেমেন্ট পেয়েছি")}
                       </button>
                     )}
                     {next && (
                       <button type="button" disabled={busy} onClick={() => cancel(row)} className={`${btnDanger} w-full sm:ml-auto sm:w-auto`}>
-                        Cancel order
+                        {tr("Cancel order", "অর্ডার বাতিল")}
                       </button>
                     )}
                   </div>
@@ -352,7 +376,8 @@ export function AdminOrders() {
 
       {updatedAt && (
         <p className="mt-4 text-xs text-slate/70">
-          Updated {updatedAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" })} · refreshes every 30 seconds
+          {tr("Updated", "আপডেট")} {dg(updatedAt.toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }))} ·{" "}
+          {tr("refreshes every 30 seconds", "প্রতি ৩০ সেকেন্ডে নিজে থেকে রিফ্রেশ হয়")}
         </p>
       )}
     </div>

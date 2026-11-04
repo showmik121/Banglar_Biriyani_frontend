@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react"
 import { useAuth } from "../../context/AuthContext"
-import { ApiError, adminFetch, btnDanger, btnPrimary, btnSecondary, inputClass, labelClass, taka } from "./adminApi"
+import { useLang } from "../../context/LanguageContext"
+import { ApiError, adminFetch, adminIsBangla, btnDanger, btnPrimary, btnSecondary, dg, inputClass, labelClass, taka } from "./adminApi"
 import { Empty, FieldError, FormDialog, ListSkeleton, Notice, PageHeader, Toggle } from "./adminUi"
 
 export interface OfferRecord {
@@ -33,10 +34,17 @@ type Form = {
 const TZ = "Asia/Dhaka"
 const toDateInput = (iso: string) => new Date(iso).toLocaleDateString("en-CA", { timeZone: TZ })
 const prettyDate = (iso: string) =>
-  new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: TZ })
+  new Date(iso).toLocaleDateString(adminIsBangla() ? "bn-BD" : "en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: TZ })
 
 /** "10% off (max ৳100) · orders from ৳300" */
 export function describeOffer(o: Pick<OfferRecord, "discountType" | "discountValue" | "maxDiscountBdt" | "minOrderBdt">) {
+  if (adminIsBangla()) {
+    const amount =
+      o.discountType === "PERCENT"
+        ? `${dg(o.discountValue)}% ছাড়${o.maxDiscountBdt ? ` (সর্বোচ্চ ${taka(o.maxDiscountBdt)})` : ""}`
+        : `${taka(o.discountValue)} ছাড়`
+    return o.minOrderBdt > 0 ? `${amount} · ${taka(o.minOrderBdt)}-এর বেশি অর্ডারে` : amount
+  }
   const amount =
     o.discountType === "PERCENT"
       ? `${o.discountValue}% off${o.maxDiscountBdt ? ` (max ${taka(o.maxDiscountBdt)})` : ""}`
@@ -46,14 +54,16 @@ export function describeOffer(o: Pick<OfferRecord, "discountType" | "discountVal
 
 function stateOf(o: OfferRecord): { label: string; style: string } {
   const now = Date.now()
-  if (o.endsAt && new Date(o.endsAt).getTime() < now) return { label: "Ended", style: "bg-cream text-slate" }
-  if (!o.isActive) return { label: "Paused", style: "bg-cream text-slate" }
-  if (o.startsAt && new Date(o.startsAt).getTime() > now) return { label: "Starts later", style: "bg-sky-100 text-sky-800" }
-  return { label: "Live", style: "bg-emerald-100 text-emerald-800" }
+  const bn = adminIsBangla()
+  if (o.endsAt && new Date(o.endsAt).getTime() < now) return { label: bn ? "শেষ" : "Ended", style: "bg-cream text-slate" }
+  if (!o.isActive) return { label: bn ? "বন্ধ আছে" : "Paused", style: "bg-cream text-slate" }
+  if (o.startsAt && new Date(o.startsAt).getTime() > now) return { label: bn ? "পরে শুরু" : "Starts later", style: "bg-sky-100 text-sky-800" }
+  return { label: bn ? "চালু" : "Live", style: "bg-emerald-100 text-emerald-800" }
 }
 
 export function AdminOffers() {
   const { user } = useAuth()
+  const { tr } = useLang()
   const isAdmin = user?.role === "ADMIN"
   const [offers, setOffers] = useState<OfferRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -134,7 +144,7 @@ export function AdminOffers() {
     try {
       if (editing === "new") await adminFetch("/api/admin/offers", { method: "POST", body })
       else await adminFetch(`/api/admin/offers/${editing.id}`, { method: "PATCH", body })
-      setNotice(`${form.code.toUpperCase()} saved`)
+      setNotice(tr(`${form.code.toUpperCase()} saved`, `${form.code.toUpperCase()} সেভ হয়েছে`))
       setEditing(null)
       load()
     } catch (err) {
@@ -148,7 +158,7 @@ export function AdminOffers() {
   const togglePause = async (o: OfferRecord) => {
     try {
       await adminFetch(`/api/admin/offers/${o.id}`, { method: "PATCH", body: JSON.stringify({ isActive: !o.isActive }) })
-      setNotice(`${o.code} ${o.isActive ? "paused" : "turned on"}`)
+      setNotice(o.isActive ? tr(`${o.code} paused`, `${o.code} বন্ধ করা হয়েছে`) : tr(`${o.code} turned on`, `${o.code} চালু করা হয়েছে`))
       load()
     } catch (err) {
       setError((err as Error).message)
@@ -157,10 +167,15 @@ export function AdminOffers() {
 
   const remove = async () => {
     if (!editing || editing === "new") return
-    if (!window.confirm(`Delete offer ${editing.code}? Customers will no longer be able to use it.`)) return
+    if (!window.confirm(
+        tr(
+          `Delete offer ${editing.code}? Customers will no longer be able to use it.`,
+          `${editing.code} অফার মুছে ফেলবেন? কাস্টমার আর এটা ব্যবহার করতে পারবে না।`,
+        ),
+      )) return
     try {
       await adminFetch(`/api/admin/offers/${editing.id}`, { method: "DELETE" })
-      setNotice(`${editing.code} deleted`)
+      setNotice(tr(`${editing.code} deleted`, `${editing.code} মুছে ফেলা হয়েছে`))
       setEditing(null)
       load()
     } catch (err) {
@@ -173,11 +188,11 @@ export function AdminOffers() {
   return (
     <div>
       <PageHeader
-        title="Offers"
+        title={tr("Offers", "অফার")}
         action={
           isAdmin && (
             <button type="button" onClick={() => open("new")} className={btnPrimary}>
-              New offer
+              {tr("New offer", "নতুন অফার")}
             </button>
           )
         }
@@ -188,7 +203,10 @@ export function AdminOffers() {
       {loading ? (
         <ListSkeleton />
       ) : offers.length === 0 ? (
-        <Empty title="No offers yet" hint="Create a promo code like DIU10 that customers type at checkout." />
+        <Empty
+          title={tr("No offers yet", "এখনও কোনো অফার নেই")}
+          hint={tr("Create a promo code like DIU10 that customers type at checkout.", "DIU10-এর মতো একটা প্রোমো কোড বানান, যা কাস্টমার চেকআউটে লিখবে।")}
+        />
       ) : (
         <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
           {offers.map((o) => {
@@ -201,15 +219,15 @@ export function AdminOffers() {
                     <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${st.style}`}>{st.label}</span>
                   </p>
                   <p className="mt-0.5 text-sm text-slate">{describeOffer(o)}</p>
-                  {o.endsAt && <p className="text-sm text-slate">Until {prettyDate(o.endsAt)}</p>}
+                  {o.endsAt && <p className="text-sm text-slate">{tr("Until", "শেষ তারিখ")} {prettyDate(o.endsAt)}</p>}
                 </div>
                 {isAdmin && (
                   <div className="flex gap-2">
                     <button type="button" onClick={() => togglePause(o)} className={btnSecondary}>
-                      {o.isActive ? "Pause" : "Turn on"}
+                      {o.isActive ? tr("Pause", "বন্ধ করুন") : tr("Turn on", "চালু করুন")}
                     </button>
                     <button type="button" onClick={() => open(o)} className={btnSecondary}>
-                      Edit
+                      {tr("Edit", "এডিট")}
                     </button>
                   </div>
                 )}
@@ -221,22 +239,22 @@ export function AdminOffers() {
 
       {editing && form && (
         <FormDialog
-          title={editing === "new" ? "New offer" : `Edit ${editing.code}`}
+          title={editing === "new" ? tr("New offer", "নতুন অফার") : tr(`Edit ${editing.code}`, `${editing.code} এডিট`)}
           onClose={close}
           onSubmit={save}
           saving={saving}
-          submitLabel={editing === "new" ? "Create offer" : "Save changes"}
+          submitLabel={editing === "new" ? tr("Create offer", "অফার তৈরি করুন") : tr("Save changes", "পরিবর্তন সেভ করুন")}
           error={formError}
           footerExtra={
             editing !== "new" && (
               <button type="button" onClick={remove} className={btnDanger}>
-                Delete
+                {tr("Delete", "মুছুন")}
               </button>
             )
           }
         >
           <label>
-            <span className={labelClass}>Promo code</span>
+            <span className={labelClass}>{tr("Promo code", "প্রোমো কোড")}</span>
             <input
               className={`${inputClass} font-mono uppercase`}
               value={form.code}
@@ -250,12 +268,12 @@ export function AdminOffers() {
             <FieldError message={fe("code")} />
           </label>
           <label>
-            <span className={labelClass}>Title customers see</span>
+            <span className={labelClass}>{tr("Title customers see", "কাস্টমার যে শিরোনাম দেখবে")}</span>
             <input
               className={inputClass}
               value={form.title}
               onChange={(e) => set("title", e.target.value)}
-              placeholder="10% off for DIU students"
+              placeholder={tr("10% off for DIU students", "DIU শিক্ষার্থীদের ১০% ছাড়")}
               required
               minLength={2}
             />
@@ -263,18 +281,18 @@ export function AdminOffers() {
           </label>
           <div className="grid grid-cols-2 gap-3">
             <label>
-              <span className={labelClass}>Discount</span>
+              <span className={labelClass}>{tr("Discount", "ছাড়")}</span>
               <select
                 className={inputClass}
                 value={form.discountType}
                 onChange={(e) => set("discountType", e.target.value as Form["discountType"])}
               >
-                <option value="PERCENT">Percent (%)</option>
-                <option value="FLAT">Fixed amount (৳)</option>
+                <option value="PERCENT">{tr("Percent (%)", "শতাংশ (%)")}</option>
+                <option value="FLAT">{tr("Fixed amount (৳)", "নির্দিষ্ট টাকা (৳)")}</option>
               </select>
             </label>
             <label>
-              <span className={labelClass}>{form.discountType === "PERCENT" ? "Percent" : "Amount (৳)"}</span>
+              <span className={labelClass}>{form.discountType === "PERCENT" ? tr("Percent", "শতাংশ") : tr("Amount (৳)", "টাকার পরিমাণ (৳)")}</span>
               <input
                 className={inputClass}
                 type="number"
@@ -290,7 +308,7 @@ export function AdminOffers() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <label>
-              <span className={labelClass}>Minimum order (৳)</span>
+              <span className={labelClass}>{tr("Minimum order (৳)", "সর্বনিম্ন অর্ডার (৳)")}</span>
               <input
                 className={inputClass}
                 type="number"
@@ -302,7 +320,7 @@ export function AdminOffers() {
             </label>
             {form.discountType === "PERCENT" && (
               <label>
-                <span className={labelClass}>Max discount (৳)</span>
+                <span className={labelClass}>{tr("Max discount (৳)", "সর্বোচ্চ ছাড় (৳)")}</span>
                 <input
                   className={inputClass}
                   type="number"
@@ -310,18 +328,18 @@ export function AdminOffers() {
                   min={1}
                   value={form.maxDiscountBdt}
                   onChange={(e) => set("maxDiscountBdt", e.target.value)}
-                  placeholder="No limit"
+                  placeholder={tr("No limit", "সীমা নেই")}
                 />
               </label>
             )}
           </div>
           <label>
-            <span className={labelClass}>Last day (optional)</span>
+            <span className={labelClass}>{tr("Last day (optional)", "শেষ দিন (ঐচ্ছিক)")}</span>
             <input className={inputClass} type="date" value={form.endsOn} onChange={(e) => set("endsOn", e.target.value)} />
             <FieldError message={fe("endsAt")} />
           </label>
-          <Toggle checked={form.isActive} onChange={(v) => set("isActive", v)} label="Customers can use this code" />
-          <Toggle checked={form.showOnHomepage} onChange={(v) => set("showOnHomepage", v)} label="Show on the homepage" />
+          <Toggle checked={form.isActive} onChange={(v) => set("isActive", v)} label={tr("Customers can use this code", "কাস্টমার এই কোড ব্যবহার করতে পারবে")} />
+          <Toggle checked={form.showOnHomepage} onChange={(v) => set("showOnHomepage", v)} label={tr("Show on the homepage", "হোমপেজে দেখান")} />
         </FormDialog>
       )}
     </div>

@@ -1,4 +1,5 @@
 import { useEffect, useRef, type FormEvent, type ReactNode } from "react"
+import { useLang } from "../../context/LanguageContext"
 import { btnPrimary, btnSecondary } from "./adminApi"
 
 export function PageHeader({ title, action }: { title: string; action?: ReactNode }) {
@@ -87,6 +88,7 @@ export function FormDialog({
   children: ReactNode
   footerExtra?: ReactNode
 }) {
+  const { tr } = useLang()
   const ref = useRef<HTMLFormElement>(null)
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null
@@ -110,7 +112,7 @@ export function FormDialog({
         role="dialog"
         aria-modal="true"
         aria-labelledby="admin-dialog-title"
-        className="flex max-h-[92dvh] w-full max-w-md flex-col rounded-t-2xl bg-white shadow-xl sm:rounded-2xl"
+        className="flex max-h-[92dvh] w-full max-w-md flex-col rounded-t-3xl bg-white shadow-xl sm:rounded-2xl"
       >
         <div className="flex items-center justify-between border-b border-line px-5 py-4">
           <h2 id="admin-dialog-title" className="font-semibold text-charcoal">
@@ -119,7 +121,7 @@ export function FormDialog({
           <button
             type="button"
             onClick={onClose}
-            aria-label="Close"
+            aria-label={tr("Close", "বন্ধ করুন")}
             className="grid size-9 place-items-center rounded-lg text-slate hover:bg-cream"
           >
             <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -135,14 +137,14 @@ export function FormDialog({
           )}
           {children}
         </div>
-        <div className="flex items-center gap-2 border-t border-line px-5 py-4">
+        <div className="flex items-center gap-2 border-t border-line px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
           {footerExtra}
           <div className="ml-auto flex gap-2">
             <button type="button" onClick={onClose} className={btnSecondary}>
-              Cancel
+              {tr("Cancel", "বাতিল")}
             </button>
             <button type="submit" disabled={saving} className={btnPrimary}>
-              {saving ? "Saving…" : submitLabel}
+              {saving ? tr("Saving…", "সেভ হচ্ছে…") : submitLabel}
             </button>
           </div>
         </div>

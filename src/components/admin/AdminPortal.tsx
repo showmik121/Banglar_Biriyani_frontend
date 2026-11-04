@@ -1,3 +1,4 @@
+import { LanguageProvider } from "../../context/LanguageContext"
 import { useCurrentPath } from "../../utils/navigation"
 import { AdminGuard } from "../AdminGuard"
 import { AdminLayout } from "./AdminLayout"
@@ -6,6 +7,7 @@ import { AdminMenu } from "./AdminMenu"
 import { AdminMeals } from "./AdminMeals"
 import { AdminOffers } from "./AdminOffers"
 import { AdminDeliveryZones } from "./AdminDeliveryZones"
+import { ADMIN_LANG_KEY } from "./adminApi"
 
 export function AdminPortal() {
   const path = useCurrentPath()
@@ -24,8 +26,10 @@ export function AdminPortal() {
   )
 
   return (
-    <AdminGuard>
-      <AdminLayout>{view}</AdminLayout>
-    </AdminGuard>
+    <LanguageProvider storageKey={ADMIN_LANG_KEY} defaultLang="bn">
+      <AdminGuard>
+        <AdminLayout>{view}</AdminLayout>
+      </AdminGuard>
+    </LanguageProvider>
   )
 }

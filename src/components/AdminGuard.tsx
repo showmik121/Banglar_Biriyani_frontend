@@ -1,11 +1,13 @@
 import { useState, type FormEvent, type ReactNode } from "react"
 import { useAuth } from "../context/AuthContext"
+import { useLang } from "../context/LanguageContext"
 import { navigateTo } from "../utils/navigation"
 import { btnPrimary, btnSecondary, inputClass, labelClass } from "./admin/adminApi"
 
 /** Shows the sign-in form until an ADMIN or STAFF user is signed in. */
 export function AdminGuard({ children }: { children: ReactNode }) {
   const { user, isLoading, login, logout } = useAuth()
+  const { tr, lang, setLang } = useLang()
   const [identifier, setIdentifier] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
@@ -16,7 +18,7 @@ export function AdminGuard({ children }: { children: ReactNode }) {
     return (
       <div className="grid min-h-screen place-items-center bg-alabaster" role="status" aria-live="polite">
         <div className="size-8 animate-spin rounded-full border-2 border-line border-t-brand" />
-        <span className="sr-only">Loading</span>
+        <span className="sr-only">{tr("Loading", "লোড হচ্ছে")}</span>
       </div>
     )
   }
@@ -27,7 +29,7 @@ export function AdminGuard({ children }: { children: ReactNode }) {
       setError(null)
       setSubmitting(true)
       const result = await login(identifier, password)
-      if (!result.ok) setError(result.error || "Wrong email or password.")
+      if (!result.ok) setError(result.error || tr("Wrong email or password.", "ইমেইল/ফোন বা পাসওয়ার্ড ভুল।"))
       setSubmitting(false)
     }
 
@@ -36,7 +38,7 @@ export function AdminGuard({ children }: { children: ReactNode }) {
         <div className="w-full max-w-sm">
           <div className="mb-6 text-center">
             <img src="/logo-mark.png" alt="" className="mx-auto size-14 rounded-full" />
-            <h1 className="mt-3 text-xl font-semibold text-charcoal">Banglar Biriyani Admin</h1>
+            <h1 className="mt-3 text-xl font-semibold text-charcoal">{tr("Banglar Biriyani Admin", "বাংলার বিরিয়ানি অ্যাডমিন")}</h1>
           </div>
           <form onSubmit={submit} className="space-y-4 rounded-2xl border border-line bg-white p-6">
             {error && (
@@ -45,7 +47,7 @@ export function AdminGuard({ children }: { children: ReactNode }) {
               </p>
             )}
             <label className="block">
-              <span className={labelClass}>Email or phone</span>
+              <span className={labelClass}>{tr("Email or phone", "ইমেইল অথবা ফোন")}</span>
               <input
                 className={inputClass}
                 type="text"
@@ -58,14 +60,14 @@ export function AdminGuard({ children }: { children: ReactNode }) {
             <div>
               <div className="flex items-center justify-between">
                 <label htmlFor="admin-password" className={labelClass}>
-                  Password
+                  {tr("Password", "পাসওয়ার্ড")}
                 </label>
                 <button
                   type="button"
                   onClick={() => setShowPassword((v) => !v)}
                   className="-mt-1.5 px-1 text-sm text-slate hover:text-charcoal"
                 >
-                  {showPassword ? "Hide" : "Show"}
+                  {showPassword ? tr("Hide", "লুকান") : tr("Show", "দেখুন")}
                 </button>
               </div>
               <input
@@ -79,12 +81,15 @@ export function AdminGuard({ children }: { children: ReactNode }) {
               />
             </div>
             <button type="submit" disabled={submitting} className={`${btnPrimary} h-11 w-full`}>
-              {submitting ? "Signing in…" : "Sign in"}
+              {submitting ? tr("Signing in…", "সাইন ইন হচ্ছে…") : tr("Sign in", "সাইন ইন")}
             </button>
           </form>
-          <p className="mt-4 text-center">
+          <p className="mt-4 flex items-center justify-center gap-4">
+            <button type="button" onClick={() => setLang(lang === "bn" ? "en" : "bn")} className="text-sm text-slate hover:text-charcoal">
+              {lang === "bn" ? "English" : "বাংলা"}
+            </button>
             <button type="button" onClick={() => navigateTo("/")} className="text-sm text-slate hover:text-charcoal">
-              ← Back to the website
+              {tr("← Back to the website", "← ওয়েবসাইটে ফিরুন")}
             </button>
           </p>
         </div>
@@ -96,16 +101,20 @@ export function AdminGuard({ children }: { children: ReactNode }) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-alabaster px-4" role="alert">
         <div className="max-w-sm text-center">
-          <h1 className="text-xl font-semibold text-charcoal">This account can't open the admin panel</h1>
+          <h1 className="text-xl font-semibold text-charcoal">{tr("This account can't open the admin panel", "এই অ্যাকাউন্ট দিয়ে অ্যাডমিন প্যানেল খোলা যাবে না")}</h1>
           <p className="mt-2 text-sm text-slate">
-            <strong>{user.email ?? user.phone}</strong> is a customer account. Sign out and sign in with an admin or staff account.
+            <strong>{user.email ?? user.phone}</strong>{" "}
+            {tr(
+              "is a customer account. Sign out and sign in with an admin or staff account.",
+              "একটি কাস্টমার অ্যাকাউন্ট। সাইন আউট করে অ্যাডমিন বা স্টাফ অ্যাকাউন্টে সাইন ইন করুন।",
+            )}
           </p>
           <div className="mt-6 flex justify-center gap-2">
             <button type="button" onClick={() => logout()} className={btnPrimary}>
-              Sign out
+              {tr("Sign out", "সাইন আউট")}
             </button>
             <button type="button" onClick={() => navigateTo("/")} className={btnSecondary}>
-              Back to the website
+              {tr("Back to the website", "ওয়েবসাইটে ফিরুন")}
             </button>
           </div>
         </div>

@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test, vi } from "vitest"
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { AdminMeals } from "../src/components/admin/AdminMeals"
 
@@ -19,6 +19,7 @@ const row = (menuItemId: number, mealTime: string) => ({
 })
 const days = ["SATURDAY", "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"]
 
+beforeEach(() => localStorage.setItem("bb_admin_lang", "en"))
 afterEach(() => vi.unstubAllGlobals())
 
 function mockApi() {

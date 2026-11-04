@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, type FormEvent } from "react"
 import { useAuth } from "../../context/AuthContext"
-import { ApiError, adminFetch, btnDanger, btnPrimary, btnSecondary, inputClass, labelClass } from "./adminApi"
+import { useLang } from "../../context/LanguageContext"
+import { ApiError, adminFetch, btnDanger, btnPrimary, btnSecondary, dg, inputClass, labelClass } from "./adminApi"
 import { Empty, FieldError, FormDialog, ListSkeleton, Notice, PageHeader, Toggle } from "./adminUi"
 
 export interface DeliveryZoneRecord {
@@ -16,6 +17,7 @@ type Form = { name: string; area: string; etaMinutes: string; isActive: boolean 
 
 export function AdminDeliveryZones() {
   const { user } = useAuth()
+  const { tr } = useLang()
   const isAdmin = user?.role === "ADMIN"
   const [zones, setZones] = useState<DeliveryZoneRecord[]>([])
   const [loading, setLoading] = useState(true)
@@ -76,7 +78,7 @@ export function AdminDeliveryZones() {
       } else {
         await adminFetch(`/api/admin/delivery-zones/${editing.id}`, { method: "PATCH", body: JSON.stringify(fields) })
       }
-      setNotice(`${form.name} saved`)
+      setNotice(tr(`${form.name} saved`, `${form.name} সেভ হয়েছে`))
       setEditing(null)
       load()
     } catch (err) {
@@ -91,7 +93,7 @@ export function AdminDeliveryZones() {
     setZones((list) => list.map((x) => (x.id === z.id ? { ...x, isActive } : x)))
     try {
       await adminFetch(`/api/admin/delivery-zones/${z.id}`, { method: "PATCH", body: JSON.stringify({ isActive }) })
-      setNotice(`${z.name} ${isActive ? "is open for delivery" : "is paused"}`)
+      setNotice(isActive ? tr(`${z.name} is open for delivery`, `${z.name}-এ ডেলিভারি চালু`) : tr(`${z.name} is paused`, `${z.name}-এ ডেলিভারি বন্ধ`))
     } catch (err) {
       setError((err as Error).message)
       load()
@@ -100,10 +102,15 @@ export function AdminDeliveryZones() {
 
   const remove = async () => {
     if (!editing || editing === "new") return
-    if (!window.confirm(`Delete delivery point "${editing.name}"? Customers will no longer be able to choose it.`)) return
+    if (!window.confirm(
+        tr(
+          `Delete delivery point "${editing.name}"? Customers will no longer be able to choose it.`,
+          `"${editing.name}" ডেলিভারি পয়েন্ট মুছে ফেলবেন? কাস্টমার আর এটা বেছে নিতে পারবে না।`,
+        ),
+      )) return
     try {
       await adminFetch(`/api/admin/delivery-zones/${editing.id}`, { method: "DELETE" })
-      setNotice(`${editing.name} deleted`)
+      setNotice(tr(`${editing.name} deleted`, `${editing.name} মুছে ফেলা হয়েছে`))
       setEditing(null)
       load()
     } catch (err) {
@@ -116,23 +123,26 @@ export function AdminDeliveryZones() {
   return (
     <div>
       <PageHeader
-        title="Delivery points"
+        title={tr("Delivery points", "ডেলিভারি পয়েন্ট")}
         action={
           isAdmin && (
             <button type="button" onClick={() => open("new")} className={btnPrimary}>
-              Add point
+              {tr("Add point", "পয়েন্ট যোগ করুন")}
             </button>
           )
         }
       />
-      <p className="-mt-3 mb-5 text-sm text-slate">Customers pick one of these at checkout. Delivery is free everywhere.</p>
+      <p className="-mt-3 mb-5 text-sm text-slate">{tr("Customers pick one of these at checkout. Delivery is free everywhere.", "কাস্টমার চেকআউটে এর একটা বেছে নেয়। সব জায়গায় ডেলিভারি ফ্রি।")}</p>
       {notice && <Notice kind="ok">{notice}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
 
       {loading ? (
         <ListSkeleton />
       ) : zones.length === 0 ? (
-        <Empty title="No delivery points yet" hint="Add places like DIU campus, Khagan or Birulia." />
+        <Empty
+          title={tr("No delivery points yet", "এখনও কোনো ডেলিভারি পয়েন্ট নেই")}
+          hint={tr("Add places like DIU campus, Khagan or Birulia.", "DIU ক্যাম্পাস, খাগান বা বিরুলিয়ার মতো জায়গা যোগ করুন।")}
+        />
       ) : (
         <ul className="divide-y divide-line overflow-hidden rounded-xl border border-line bg-white">
           {zones.map((z) => (
@@ -141,14 +151,14 @@ export function AdminDeliveryZones() {
                 <p className={`font-medium ${z.isActive ? "text-charcoal" : "text-slate/70"}`}>{z.name}</p>
                 <p className="text-sm text-slate">
                   {z.area ? `${z.area} · ` : ""}
-                  {z.etaMinutes} min
+                  {dg(z.etaMinutes)} {tr("min", "মিনিট")}
                 </p>
               </div>
               {isAdmin && (
                 <>
-                  <Toggle checked={z.isActive} onChange={(v) => toggle(z, v)} label="Open" compact />
+                  <Toggle checked={z.isActive} onChange={(v) => toggle(z, v)} label={tr("Open", "চালু")} compact />
                   <button type="button" onClick={() => open(z)} className={btnSecondary}>
-                    Edit
+                    {tr("Edit", "এডিট")}
                   </button>
                 </>
               )}
@@ -159,22 +169,22 @@ export function AdminDeliveryZones() {
 
       {editing && form && (
         <FormDialog
-          title={editing === "new" ? "Add delivery point" : `Edit ${editing.name}`}
+          title={editing === "new" ? tr("Add delivery point", "ডেলিভারি পয়েন্ট যোগ করুন") : tr(`Edit ${editing.name}`, `${editing.name} এডিট`)}
           onClose={close}
           onSubmit={save}
           saving={saving}
-          submitLabel={editing === "new" ? "Add point" : "Save changes"}
+          submitLabel={editing === "new" ? tr("Add point", "পয়েন্ট যোগ করুন") : tr("Save changes", "পরিবর্তন সেভ করুন")}
           error={formError}
           footerExtra={
             editing !== "new" && (
               <button type="button" onClick={remove} className={btnDanger}>
-                Delete
+                {tr("Delete", "মুছুন")}
               </button>
             )
           }
         >
           <label>
-            <span className={labelClass}>Name</span>
+            <span className={labelClass}>{tr("Name", "নাম")}</span>
             <input
               className={inputClass}
               value={form.name}
@@ -186,11 +196,11 @@ export function AdminDeliveryZones() {
             <FieldError message={fe("name")} />
           </label>
           <label>
-            <span className={labelClass}>Area or landmark (optional)</span>
-            <input className={inputClass} value={form.area} onChange={(e) => set("area", e.target.value)} placeholder="Campus & hostels" />
+            <span className={labelClass}>{tr("Area or landmark (optional)", "এলাকা বা চেনা জায়গা (ঐচ্ছিক)")}</span>
+            <input className={inputClass} value={form.area} onChange={(e) => set("area", e.target.value)} placeholder={tr("Campus & hostels", "ক্যাম্পাস ও হোস্টেল")} />
           </label>
           <label>
-            <span className={labelClass}>Delivery time (minutes)</span>
+            <span className={labelClass}>{tr("Delivery time (minutes)", "ডেলিভারি সময় (মিনিট)")}</span>
             <input
               className={inputClass}
               value={form.etaMinutes}
@@ -201,7 +211,7 @@ export function AdminDeliveryZones() {
             />
             <FieldError message={fe("etaMinutes")} />
           </label>
-          <Toggle checked={form.isActive} onChange={(v) => set("isActive", v)} label="Customers can choose this point" />
+          <Toggle checked={form.isActive} onChange={(v) => set("isActive", v)} label={tr("Customers can choose this point", "কাস্টমার এই পয়েন্ট বেছে নিতে পারবে")} />
         </FormDialog>
       )}
     </div>
