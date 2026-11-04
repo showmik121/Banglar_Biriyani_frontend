@@ -135,12 +135,12 @@ function SectionTitle({
       )}
       {bangla && (
         <h2
-          className={`text-display mt-1 text-[1.5rem] sm:mt-3 sm:text-5xl ${light ? "text-white" : "text-charcoal"} ${rb ? "max-sm:!text-white" : ""}`}
+          className={`text-display mt-0.5 text-[1.5rem] sm:mt-3 sm:text-5xl ${light ? "text-white" : "text-charcoal"} ${rb ? "max-sm:!text-white max-sm:!text-[1.3rem] max-sm:leading-tight" : ""}`}
         >
           {bangla}
         </h2>
       )}
-      <p className={`mt-1 text-sm font-semibold sm:mt-2 sm:text-base ${light ? "text-white/75" : "text-slate"} ${rb ? "max-sm:!text-white/85" : ""}`}>
+      <p className={`mt-1 text-sm font-semibold sm:mt-2 sm:text-base ${light ? "text-white/75" : "text-slate"} ${rb ? "max-sm:!mt-0.5 max-sm:!text-xs max-sm:!text-white/85" : ""}`}>
         {title}
       </p>
       <svg
@@ -156,10 +156,10 @@ function SectionTitle({
           strokeLinecap="round"
         />
       </svg>
-      <div className={`ornament mt-3 sm:hidden ${light || rb ? "!text-saffron" : ""}`} aria-hidden>
+      <div className={`ornament mt-3 sm:hidden ${light ? "!text-saffron" : ""} ${rb ? "max-sm:!hidden" : ""}`} aria-hidden>
         <span />
       </div>
-      {meta && <p className={`mt-3 text-xs font-semibold text-slate ${rb ? "max-sm:!text-white/85" : ""}`}>{meta}</p>}
+      {meta && <p className={`mt-3 text-xs font-semibold text-slate ${rb ? "max-sm:!mt-1 max-sm:!text-white/85" : ""}`}>{meta}</p>}
     </div>
   )
 }
@@ -705,7 +705,7 @@ export default function App() {
 
       {/* Our menu: biriyani and regular dishes */}
       <section id="menu" className="scroll-mt-[calc(var(--header-h,120px)+16px)] max-md:order-1">
-        <div className="bg-jali relative mt-4 px-5 py-6 sm:mt-0 sm:bg-none sm:bg-brand-light/60 sm:px-6 sm:pb-8 sm:pt-12 sm:py-0">
+        <div className="bg-jali relative mt-3 px-5 py-3.5 sm:mt-0 sm:bg-none sm:bg-brand-light/60 sm:px-6 sm:pb-8 sm:pt-12 sm:py-0">
           <TornEdge side="top" className="text-brand sm:hidden" />
           <SectionTitle
             eyebrow={tr("Our Menu", "আমাদের মেনু")}
@@ -720,7 +720,7 @@ export default function App() {
           />
           <TornEdge side="bottom" className="text-brand sm:hidden" />
         </div>
-        <div className="mx-auto w-full max-w-7xl px-4 pb-3 pt-7 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+        <div className="mx-auto w-full max-w-7xl px-4 pb-3 pt-5 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
           <div className={grid}>
             {loading
               ? [1, 2, 3, 4].map((n) => <ProductSkeleton key={n} />)
