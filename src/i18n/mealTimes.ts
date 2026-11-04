@@ -20,6 +20,36 @@ export const mealTimeShort = (m: string, lang: Lang) => (known(m) ? LABELS[m].sh
 /** English name saved on the order for the kitchen, e.g. "Lunch" */
 export const mealTimeSlot = (m: string) => (known(m) ? LABELS[m].en : m)
 
+/**
+ * Hours (Bangladesh time) when each meal can be ordered for the same day. Orders for another
+ * day are not limited. Keep these the same as MEAL_WINDOWS in the backend (server/utils/mealWindows.ts).
+ */
+export const MEAL_HOURS: Record<MealTime, { start: number; end: number }> = {
+  LUNCH: { start: 12, end: 16 },
+  DINNER: { start: 18, end: 22 },
+}
+
+const DAY_NAMES = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"]
+
+/** Day and hour in Bangladesh (UTC+6, no daylight saving), whatever the visitor's own time zone */
+export function dhakaClock(date = new Date()): { day: string; hour: number } {
+  const local = new Date(date.getTime() + 6 * 60 * 60 * 1000)
+  return { day: DAY_NAMES[local.getUTCDay()], hour: local.getUTCHours() + local.getUTCMinutes() / 60 }
+}
+
+export const mealIsOpen = (m: MealTime, hour: number) => hour >= MEAL_HOURS[m].start && hour < MEAL_HOURS[m].end
+
+const clock12 = (h: number) => `${h % 12 === 0 ? 12 : h % 12}:00 ${h < 12 ? "am" : "pm"}`
+const BN_DIGITS = "০১২৩৪৫৬৭৮৯"
+const bnClock = (h: number) =>
+  `${h < 12 ? "সকাল" : h < 16 ? "দুপুর" : h < 18 ? "বিকাল" : h < 20 ? "সন্ধ্যা" : "রাত"} ${String(h % 12 === 0 ? 12 : h % 12).replace(/\d/g, (d) => BN_DIGITS[+d])}টা`
+
+/** "12:00 pm to 4:00 pm" / "দুপুর ১২টা থেকে বিকাল ৪টা" */
+export const mealHoursLabel = (m: MealTime, lang: Lang) =>
+  lang === "bn"
+    ? `${bnClock(MEAL_HOURS[m].start)} থেকে ${bnClock(MEAL_HOURS[m].end)}`
+    : `${clock12(MEAL_HOURS[m].start)} to ${clock12(MEAL_HOURS[m].end)}`
+
 /** The meal that fits the time right now: before 5 pm lunch, then dinner */
 export function mealTimeNow(date = new Date()): MealTime {
   const h = date.getHours()

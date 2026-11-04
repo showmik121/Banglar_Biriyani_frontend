@@ -23,10 +23,13 @@ export function ProductCard({
   product,
   onAdd,
   isHighlighted = false,
+  orderClosed = false,
 }: {
   product: Product
   onAdd?: (p: Product) => void
   isHighlighted?: boolean
+  /** Same-day orders for this meal are closed right now (outside its hours) */
+  orderClosed?: boolean
 }) {
   const { addItem, activeDay } = useCart()
   const [justAdded, setJustAdded] = useState(false)
@@ -40,7 +43,7 @@ export function ProductCard({
     product.remainingPortions <= 15
 
   const handleAdd = () => {
-    if (isSoldOut) return
+    if (isSoldOut || orderClosed) return
     if (onAdd) {
       onAdd(product)
     } else {
@@ -109,22 +112,24 @@ export function ProductCard({
         </p>
         <button
           type="button"
-          disabled={isSoldOut}
+          disabled={isSoldOut || orderClosed}
           onClick={handleAdd}
           aria-label={
             isSoldOut
               ? tr(`${product.name} is sold out`, `${name} শেষ হয়ে গেছে`)
+              : orderClosed
+                ? tr(`${product.name} cannot be ordered right now`, `${name} এখন অর্ডার করা যাবে না`)
               : tr(`Add ${product.name} to cart`, `${name} কার্টে যোগ করুন`)
           }
           className={`mt-1 h-11 w-full rounded-full text-sm font-bold transition active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 ${
-            isSoldOut
+            isSoldOut || orderClosed
               ? "cursor-not-allowed bg-cream text-slate"
               : justAdded
                 ? "border-2 border-brand bg-brand-light text-brand"
                 : "bg-brand text-white hover:bg-brand-hover"
           }`}
         >
-          {isSoldOut ? tr("Sold Out", "শেষ") : justAdded ? tr("Added ✓", "যোগ হয়েছে ✓") : tr("+ Add to cart", "+ কার্টে যোগ করুন")}
+          {isSoldOut ? tr("Sold Out", "শেষ") : orderClosed ? tr("Closed now", "এখন বন্ধ") : justAdded ? tr("Added ✓", "যোগ হয়েছে ✓") : tr("+ Add to cart", "+ কার্টে যোগ করুন")}
         </button>
       </div>
     </article>

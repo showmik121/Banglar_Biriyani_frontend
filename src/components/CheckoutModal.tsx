@@ -258,7 +258,11 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
         notes: notes.trim() || undefined,
         deliveryZoneId: selectedZone?.id ?? null,
         offerCode: appliedOffer?.code ?? null,
-        items: items.map((i) => ({ menuItemId: i.menuItemId, quantity: i.quantity })),
+        items: items.map((i) => ({
+          menuItemId: i.menuItemId,
+          quantity: i.quantity,
+          ...(i.mealTime === "LUNCH" || i.mealTime === "DINNER" ? { mealTime: i.mealTime } : {}),
+        })),
       }
 
       const res = await fetch("/api/orders", {

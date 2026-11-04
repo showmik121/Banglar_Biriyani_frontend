@@ -18,7 +18,7 @@ import { useCart } from "./context/CartContext"
 import { useAddress } from "./context/AddressContext"
 import { useLang } from "./context/LanguageContext"
 import { DayPillBar, dayLabel, getTodayDay } from "./components/DayPillBar"
-import { MEAL_TIMES, mealTimeLabel, mealTimeNow, mealTimeShort, type MealTime } from "./i18n/mealTimes"
+import { MEAL_TIMES, dhakaClock, mealHoursLabel, mealIsOpen, mealTimeLabel, mealTimeNow, mealTimeShort, type MealTime } from "./i18n/mealTimes"
 import { categoryName, dishDescription, dishName } from "./i18n/dishes"
 
 const img = (id: string, w = 800, h = 600) =>
@@ -592,6 +592,15 @@ export default function App() {
   const filteredMenu = useMemo(() => menu.filter(matches), [menu, q]) // eslint-disable-line react-hooks/exhaustive-deps
   const filteredMeals = useMemo(() => meals.filter(matches), [meals, q]) // eslint-disable-line react-hooks/exhaustive-deps
   const visibleMenu = showAll || q ? filteredMenu : filteredMenu.slice(0, 4)
+  // Same-day orders are taken only in each meal's hours (re-checked every minute)
+  const [clockTick, setClockTick] = useState(0)
+  useEffect(() => {
+    const id = window.setInterval(() => setClockTick((n) => n + 1), 60_000)
+    return () => window.clearInterval(id)
+  }, [])
+  void clockTick
+  const dhaka = dhakaClock()
+  const orderClosed = String(activeDay).toUpperCase() === dhaka.day && !mealIsOpen(mealTime, dhaka.hour)
   const mealsNow = filteredMeals.filter((p) => (p.mealTime || "LUNCH") === mealTime)
 
   const allSearchableDishes: SearchableDish[] = useMemo(
@@ -793,6 +802,15 @@ export default function App() {
             })}
           </div>
 
+          {orderClosed && !loading && (
+            <p role="status" className="mb-5 rounded-2xl bg-saffron/15 px-4 py-3 text-sm font-semibold text-maroon">
+              {tr(
+                `Today's ${mealTimeLabel(mealTime, "en").toLowerCase()} orders are open ${mealHoursLabel(mealTime, "en")}. To order now, pick another day or meal and we'll deliver then.`,
+                `আজকের ${mealTimeLabel(mealTime, "bn")} অর্ডার নেওয়া হয় ${mealHoursLabel(mealTime, "bn")}। এখনই অর্ডার করতে অন্য দিন বা বেলা বেছে নিন।`,
+              )}
+            </p>
+          )}
+
           <div className={mealGrid}>
             {loading
               ? [1, 2, 3].map((n) => <ProductSkeleton key={n} />)
@@ -801,6 +819,7 @@ export default function App() {
                     key={`meal-${mealTime}-${p.id}`}
                     product={p}
                     isHighlighted={highlightedDishId === String(p.id)}
+                    orderClosed={orderClosed}
                     onAdd={(item) => addItem({ ...item, mealTime }, activeDay)}
                   />
                 ))}
