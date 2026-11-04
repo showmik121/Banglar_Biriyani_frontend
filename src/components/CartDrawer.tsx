@@ -2,6 +2,8 @@ import { useEffect, useRef, useState, useMemo } from "react"
 import { useCart, type CartItem } from "../context/CartContext"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
+import { useLang } from "../context/LanguageContext"
+import { dishName } from "../i18n/dishes"
 
 interface UpsellItem {
   id: number
@@ -76,6 +78,7 @@ export function CartDrawer({
     deliveryFeeBdt,
     totalBdt,
   } = useCart()
+  const { lang, tr, num, taka } = useLang()
 
   const isOpen = propIsOpen ?? isCartOpen
   const handleClose = propOnClose ?? (() => setIsCartOpen(false))
@@ -169,10 +172,10 @@ export function CartDrawer({
         <div className="flex items-center justify-between border-b border-line px-6 py-4">
           <div className="flex items-center gap-2.5">
             <h2 id="cart-drawer-title" className="text-display text-2xl text-charcoal">
-              Your Cart
+              {tr("Your Cart", "আপনার কার্ট")}
             </h2>
             <span className="rounded-full bg-brand-light px-2.5 py-0.5 text-xs font-bold text-brand">
-              {totalItems} {totalItems === 1 ? "item" : "items"}
+              {tr(`${totalItems} ${totalItems === 1 ? "item" : "items"}`, `${num(totalItems)}টি আইটেম`)}
             </span>
           </div>
           <button
@@ -180,7 +183,7 @@ export function CartDrawer({
             type="button"
             onClick={handleClose}
             className="rounded-full p-2 text-slate transition hover:bg-alabaster hover:text-charcoal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
-            aria-label="Close cart drawer"
+            aria-label={tr("Close cart", "কার্ট বন্ধ করুন")}
           >
             <svg
               className="size-5"
@@ -196,7 +199,7 @@ export function CartDrawer({
         </div>
 
         {/* Items List */}
-        <div className="flex-1 overflow-y-auto p-6" tabIndex={0} aria-label="Cart items list">
+        <div className="flex-1 overflow-y-auto p-6" tabIndex={0} aria-label={tr("Cart items", "কার্টের আইটেম")}>
           {items.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <div className="mb-4 grid size-16 place-items-center rounded-full bg-brand-light text-brand">
@@ -211,9 +214,12 @@ export function CartDrawer({
                   <path d="M6 7h12l-1.2 11.2a2 2 0 0 1-2 1.8H9.2a2 2 0 0 1-2-1.8L6 7Zm3 0V6a3 3 0 0 1 6 0v1" />
                 </svg>
               </div>
-              <h3 className="text-display text-lg text-charcoal">Your cart is empty</h3>
+              <h3 className="text-display text-lg text-charcoal">{tr("Your cart is empty", "আপনার কার্ট খালি")}</h3>
               <p className="mt-1 max-w-xs text-sm text-slate">
-                Pick your favourite biriyani, tehari or kabab to start an order.
+                {tr(
+                  "Pick your favourite biriyani, tehari or kabab to start an order.",
+                  "পছন্দের বিরিয়ানি, তেহারি বা কাবাব বেছে নিয়ে অর্ডার শুরু করুন।",
+                )}
               </p>
             </div>
           ) : (
@@ -226,22 +232,22 @@ export function CartDrawer({
                   {item.imageUrl ? (
                     <img
                       src={item.imageUrl}
-                      alt={item.name}
+                      alt={dishName(item.name, lang)}
                       className="size-16 shrink-0 rounded-lg object-cover"
                     />
                   ) : (
                     <div
                       className="grid size-16 shrink-0 place-items-center rounded-lg bg-brand-light text-display text-xl text-brand"
-                      aria-label={item.name}
+                      aria-label={dishName(item.name, lang)}
                     >
                       <img src="/logo-mark.png" alt="" className="size-3/4 object-contain opacity-60" />
                     </div>
                   )}
 
                   <div className="min-w-0 flex-1 basis-[calc(100%-4.75rem)]">
-                    <h4 className="line-clamp-2 text-sm font-semibold leading-snug text-charcoal">{item.name}</h4>
+                    <h4 className="line-clamp-2 text-sm font-semibold leading-snug text-charcoal">{dishName(item.name, lang)}</h4>
                     <div className="mt-0.5 flex items-center gap-2">
-                      <span className="text-sm font-bold text-brand">৳{item.priceBdt}</span>
+                      <span className="text-sm font-bold text-brand">{taka(item.priceBdt)}</span>
                     </div>
                   </div>
 
@@ -252,15 +258,15 @@ export function CartDrawer({
                         updateQuantity(item.menuItemId, item.scheduledDay, item.quantity - 1)
                       }
                       className="grid size-9 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-brand hover:bg-brand hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                      aria-label={`Decrease quantity of ${item.name}`}
+                      aria-label={tr(`Decrease quantity of ${item.name}`, `${dishName(item.name, lang)} একটি কমান`)}
                     >
                       -
                     </button>
                     <span
                       className="w-5 text-center text-sm font-semibold text-charcoal"
-                      aria-label={`Quantity: ${item.quantity}`}
+                      aria-label={tr(`Quantity: ${item.quantity}`, `পরিমাণ: ${num(item.quantity)}`)}
                     >
-                      {item.quantity}
+                      {num(item.quantity)}
                     </span>
                     <button
                       type="button"
@@ -268,7 +274,7 @@ export function CartDrawer({
                         updateQuantity(item.menuItemId, item.scheduledDay, item.quantity + 1)
                       }
                       className="grid size-9 place-items-center rounded-full border border-line bg-alabaster text-sm font-semibold text-charcoal transition hover:border-brand hover:bg-brand hover:text-white cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                      aria-label={`Increase quantity of ${item.name}`}
+                      aria-label={tr(`Increase quantity of ${item.name}`, `${dishName(item.name, lang)} একটি বাড়ান`)}
                     >
                       +
                     </button>
@@ -276,8 +282,8 @@ export function CartDrawer({
                       type="button"
                       onClick={() => removeItem(item.menuItemId, item.scheduledDay)}
                       className="ml-auto grid size-9 place-items-center rounded-full text-slate transition hover:text-brand cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
-                      title="Remove item"
-                      aria-label={`Remove ${item.name} from cart`}
+                      title={tr("Remove item", "সরিয়ে দিন")}
+                      aria-label={tr(`Remove ${item.name} from cart`, `${dishName(item.name, lang)} কার্ট থেকে সরান`)}
                     >
                       <svg
                         className="size-4"
@@ -305,12 +311,12 @@ export function CartDrawer({
               <div className="rounded-xl border border-brand/15 bg-brand-light p-3">
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-xs font-bold text-charcoal">Complete Your Biriyani</span>
+                    <span className="text-xs font-bold text-charcoal">{tr("Complete Your Biriyani", "বিরিয়ানির সাথে নিন")}</span>
                     <span className="rounded-full bg-brand px-1.5 py-0.2 text-[11px] font-bold uppercase tracking-wider text-white">
-                      Add-ons
+                      {tr("Add-ons", "সাথে")}
                     </span>
                   </div>
-                  <span className="text-[11px] font-medium text-slate">Pairs best</span>
+                  <span className="text-[11px] font-medium text-slate">{tr("Pairs best", "দারুণ মানায়")}</span>
                 </div>
 
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
@@ -321,19 +327,19 @@ export function CartDrawer({
                     >
                       <img
                         src={upsell.imageUrl}
-                        alt={upsell.name}
+                        alt={dishName(upsell.name, lang)}
                         className="size-10 shrink-0 rounded-md bg-alabaster object-cover"
                         loading="lazy"
                       />
                       <div className="min-w-0 flex-1">
                         <p
                           className="truncate text-xs font-semibold text-charcoal"
-                          title={upsell.name}
+                          title={dishName(upsell.name, lang)}
                         >
-                          {upsell.name}
+                          {dishName(upsell.name, lang)}
                         </p>
                         <p className="font-mono text-xs font-bold text-brand">
-                          ৳{upsell.priceBdt}
+                          {taka(upsell.priceBdt)}
                         </p>
                       </div>
                       <button
@@ -342,7 +348,7 @@ export function CartDrawer({
                         disabled={addingId === upsell.id}
                         className="inline-flex h-9 shrink-0 items-center rounded-full bg-brand px-3 text-xs font-bold text-white shadow-2xs transition hover:bg-brand-hover active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
                       >
-                        {addingId === upsell.id ? "✓" : "+ Add"}
+                        {addingId === upsell.id ? "✓" : tr("+ Add", "+ যোগ")}
                       </button>
                     </div>
                   ))}
@@ -352,16 +358,18 @@ export function CartDrawer({
 
             <div className="space-y-1.5 text-sm">
               <div className="flex justify-between text-slate">
-                <span>Subtotal</span>
-                <span className="font-medium text-charcoal">৳{subtotalBdt}</span>
+                <span>{tr("Subtotal", "সাবটোটাল")}</span>
+                <span className="font-medium text-charcoal">{taka(subtotalBdt)}</span>
               </div>
               <div className="flex justify-between text-slate">
-                <span>Delivery</span>
-                <span className="font-semibold text-emerald-700">{deliveryFeeBdt === 0 ? "Free" : `৳${deliveryFeeBdt}`}</span>
+                <span>{tr("Delivery", "ডেলিভারি")}</span>
+                <span className="font-semibold text-emerald-700">
+                  {deliveryFeeBdt === 0 ? tr("Free", "ফ্রি") : taka(deliveryFeeBdt)}
+                </span>
               </div>
               <div className="flex justify-between border-t border-line/60 pt-2 text-base font-bold text-charcoal">
-                <span>Total</span>
-                <span className="text-display text-xl text-brand">৳{totalBdt}</span>
+                <span>{tr("Total", "মোট")}</span>
+                <span className="text-display text-xl text-brand">{taka(totalBdt)}</span>
               </div>
             </div>
 
@@ -374,7 +382,7 @@ export function CartDrawer({
               }}
               className="flex w-full items-center justify-center gap-2 rounded-full bg-brand py-3 text-center text-sm font-semibold text-white shadow-md transition hover:bg-brand-hover active:scale-[0.98] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 cursor-pointer"
             >
-              <span>Proceed to Checkout</span>
+              <span>{tr("Proceed to Checkout", "চেকআউটে যান")}</span>
               <svg
                 className="size-4"
                 viewBox="0 0 24 24"

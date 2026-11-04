@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useRef } from "react"
 import { useAddress } from "../context/AddressContext"
 import { searchRecommendations, type RecommendationItem } from "../data/dhakaRecommendations"
+import { useLang } from "../context/LanguageContext"
+import { addressLabel } from "../i18n/dishes"
 
 type Props = {
   isOpen: boolean
@@ -38,6 +40,7 @@ const ICONS = {
 
 export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModal }: Props) {
   const { addresses, selectedAddress, selectAddress, setFreeformAddress } = useAddress()
+  const { lang, tr, num } = useLang()
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<RecommendationItem[]>(() => searchRecommendations(""))
   const popupRef = useRef<HTMLDivElement>(null)
@@ -107,7 +110,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
         ref={popupRef}
         className="absolute left-1/2 top-full z-50 mt-2 w-[calc(100vw-32px)] max-w-md -translate-x-1/2 overflow-hidden rounded-2xl border border-line bg-white shadow-2xl transition-all animate-in fade-in duration-150 sm:w-[440px]"
         role="dialog"
-        aria-label="Address Recommendations"
+        aria-label={tr("Address suggestions", "ঠিকানার পরামর্শ")}
       >
         {/* Header / Search Input */}
         <div className="border-b border-line p-3.5 bg-alabaster/40">
@@ -131,7 +134,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                   }
                 }
               }}
-              placeholder="Search area, road or write any address..."
+              placeholder={tr("Search area, road or write any address...", "এলাকা, রাস্তা খুঁজুন বা যেকোনো ঠিকানা লিখুন...")}
               className="w-full rounded-xl border border-line bg-white py-2.5 pl-9 pr-8 text-sm text-charcoal outline-none transition focus:border-brand focus:ring-2 focus:ring-brand/20"
             />
             {query && (
@@ -139,7 +142,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                 type="button"
                 onClick={() => handleQueryChange("")}
                 className="absolute right-2.5 text-slate/60 hover:text-charcoal p-1"
-                aria-label="Clear search"
+                aria-label={tr("Clear search", "খোঁজা মুছুন")}
               >
                 <Icon d={ICONS.close} className="size-3.5" />
               </button>
@@ -161,12 +164,12 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
               </div>
               <div className="min-w-0 flex-1">
                 <span className="block text-xs font-bold text-brand">
-                  Use exact custom address
+                  {tr("Use exact custom address", "ঠিক এই ঠিকানাটাই নিন")}
                 </span>
                 <p className="truncate text-sm font-medium text-charcoal">"{query}"</p>
               </div>
               <span className="rounded-full bg-brand px-2.5 py-1 text-[11px] font-bold text-white">
-                Deliver Here
+                {tr("Deliver Here", "এখানে দিন")}
               </span>
             </button>
           )}
@@ -175,7 +178,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
           {!query && addresses.length > 0 && (
             <div>
               <div className="px-2 pb-1.5 pt-1 text-[11px] font-bold uppercase tracking-wider text-slate">
-                Your Saved Locations
+                {tr("Your Saved Locations", "আপনার সেভ করা ঠিকানা")}
               </div>
               <div className="space-y-1">
                 {addresses.map((addr) => {
@@ -207,10 +210,10 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                       </div>
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <span className="text-xs font-bold text-charcoal">{addr.label}</span>
+                          <span className="text-xs font-bold text-charcoal">{addressLabel(addr.label, lang)}</span>
                           <span className="text-[10px] text-slate font-medium">{addr.area}</span>
                           {isSelected && (
-                            <span className="text-[10px] font-bold text-brand">• Active</span>
+                            <span className="text-[10px] font-bold text-brand">• {tr("Active", "চালু")}</span>
                           )}
                         </div>
                         <p className="truncate text-xs text-slate">{addr.details}</p>
@@ -226,11 +229,13 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
           <div>
             <div className="flex items-center justify-between px-2 pb-1.5 pt-1">
               <span className="text-[11px] font-bold uppercase tracking-wider text-slate">
-                {query ? `Recommended Matches (${results.length})` : "Popular Delivery Hotspots"}
+                {query
+                  ? tr(`Recommended Matches (${results.length})`, `মিলে যাওয়া জায়গা (${num(results.length)})`)
+                  : tr("Popular Delivery Hotspots", "জনপ্রিয় ডেলিভারির জায়গা")}
               </span>
               <span className="flex items-center gap-1 text-[10px] font-semibold text-brand">
                 <Icon d={ICONS.sparkles} className="size-3" />
-                Near DIU
+                {tr("Near DIU", "ডিআইইউর কাছে")}
               </span>
             </div>
 
@@ -265,8 +270,10 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
             ) : (
               <div className="p-4 text-center">
                 <p className="text-xs text-slate">
-                  No matching preset found. Click "Use exact custom address" above to set your
-                  location!
+                  {tr(
+                    'No matching place found. Tap "Use exact custom address" above to use what you typed.',
+                    'কোনো জায়গা মেলেনি। যা লিখেছেন সেটাই নিতে ওপরের "ঠিক এই ঠিকানাটাই নিন" চাপুন।',
+                  )}
                 </p>
               </div>
             )}

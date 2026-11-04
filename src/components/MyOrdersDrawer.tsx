@@ -3,6 +3,8 @@ import { useAuth } from "../context/AuthContext"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
 import { forgetTrackedOrder, getTrackedOrders, saveTrackedOrder } from "../lib/trackedOrders"
+import { useLang, type Lang } from "../context/LanguageContext"
+import { dishName } from "../i18n/dishes"
 
 type Status = "PENDING" | "CONFIRMED" | "PREPARING" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
 
@@ -23,31 +25,57 @@ interface OrderGroup {
   items: { id: number; itemNameSnapshot: string; quantity: number; lineTotalBdt: number }[]
 }
 
-const STEPS: { status: Status; label: string }[] = [
-  { status: "PENDING", label: "Placed" },
-  { status: "CONFIRMED", label: "Confirmed" },
-  { status: "PREPARING", label: "Cooking" },
-  { status: "OUT_FOR_DELIVERY", label: "On the way" },
-  { status: "DELIVERED", label: "Delivered" },
+type Pair = [en: string, bn: string]
+
+const STEPS: { status: Status; label: Pair }[] = [
+  { status: "PENDING", label: ["Placed", "অর্ডার হয়েছে"] },
+  { status: "CONFIRMED", label: ["Confirmed", "কনফার্ম"] },
+  { status: "PREPARING", label: ["Cooking", "রান্না হচ্ছে"] },
+  { status: "OUT_FOR_DELIVERY", label: ["On the way", "পথে আছে"] },
+  { status: "DELIVERED", label: ["Delivered", "পৌঁছে গেছে"] },
 ]
 
-const MESSAGE: Record<Status, { title: string; detail: string }> = {
-  PENDING: { title: "Order received", detail: "Waiting for the restaurant to confirm it. This usually takes a few minutes." },
-  CONFIRMED: { title: "Order confirmed", detail: "We'll start cooking your food shortly." },
-  PREPARING: { title: "Cooking your food", detail: "Your biriyani is in the handi." },
-  OUT_FOR_DELIVERY: { title: "On the way", detail: "The rider is bringing your order. Keep your phone close." },
-  DELIVERED: { title: "Delivered", detail: "Enjoy your meal!" },
-  CANCELLED: { title: "Cancelled", detail: "This order was cancelled." },
+const MESSAGE: Record<Status, { title: Pair; detail: Pair }> = {
+  PENDING: {
+    title: ["Order received", "অর্ডার পেয়েছি"],
+    detail: [
+      "Waiting for the restaurant to confirm it. This usually takes a few minutes.",
+      "রেস্টুরেন্ট কনফার্ম করার অপেক্ষায়। সাধারণত কয়েক মিনিট লাগে।",
+    ],
+  },
+  CONFIRMED: {
+    title: ["Order confirmed", "অর্ডার কনফার্ম হয়েছে"],
+    detail: ["We'll start cooking your food shortly.", "একটু পরেই রান্না শুরু করব।"],
+  },
+  PREPARING: {
+    title: ["Cooking your food", "রান্না হচ্ছে"],
+    detail: ["Your biriyani is in the handi.", "আপনার বিরিয়ানি এখন হাঁড়িতে।"],
+  },
+  OUT_FOR_DELIVERY: {
+    title: ["On the way", "পথে আছে"],
+    detail: [
+      "The rider is bringing your order. Keep your phone close.",
+      "রাইডার আপনার অর্ডার নিয়ে আসছে। ফোন কাছে রাখুন।",
+    ],
+  },
+  DELIVERED: { title: ["Delivered", "পৌঁছে গেছে"], detail: ["Enjoy your meal!", "মজা করে খান!"] },
+  CANCELLED: { title: ["Cancelled", "বাতিল"], detail: ["This order was cancelled.", "এই অর্ডারটি বাতিল হয়েছে।"] },
 }
 
 const isActive = (s: Status) => s !== "DELIVERED" && s !== "CANCELLED"
-const taka = (n: number) => `৳${n.toLocaleString("en-IN")}`
-const when = (iso: string) =>
-  new Date(iso).toLocaleString("en-GB", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" })
-const paymentLabel = (o: OrderGroup["order"]) =>
+const when = (iso: string, lang: Lang) =>
+  new Date(iso).toLocaleString(lang === "bn" ? "bn-BD" : "en-GB", {
+    day: "numeric",
+    month: "short",
+    hour: "numeric",
+    minute: "2-digit",
+  })
+const paymentLabel = (o: OrderGroup["order"], tr: (en: string, bn: string) => string) =>
   o.paymentMethod === "COD"
-    ? "Cash on delivery"
-    : `${o.paymentMethod === "BKASH" ? "bKash" : "Nagad"}${o.isPaymentVerified ? " · paid ✓" : " · payment being checked"}`
+    ? tr("Cash on delivery", "ক্যাশ অন ডেলিভারি")
+    : `${o.paymentMethod === "BKASH" ? tr("bKash", "বিকাশ") : tr("Nagad", "নগদ")}${
+        o.isPaymentVerified ? tr(" · paid ✓", " · পেমেন্ট হয়েছে ✓") : tr(" · payment being checked", " · পেমেন্ট যাচাই হচ্ছে")
+      }`
 
 async function fetchTracked(orderNumber: string, phone: string): Promise<OrderGroup | "gone" | null> {
   try {
@@ -64,6 +92,7 @@ async function fetchTracked(orderNumber: string, phone: string): Promise<OrderGr
 
 export function MyOrdersDrawer() {
   const { isMyOrdersOpen, closeMyOrders, user, openAuthModal } = useAuth()
+  const { lang, tr, taka } = useLang()
   const drawerRef = useRef<HTMLDivElement>(null)
   useBodyScrollLock(isMyOrdersOpen)
   useFocusTrap(drawerRef, isMyOrdersOpen)
@@ -79,7 +108,7 @@ export function MyOrdersDrawer() {
       const found = new Map<string, OrderGroup>()
       if (user) {
         const res = await fetch("/api/orders/my-orders", { credentials: "include" })
-        if (!res.ok) throw new Error("Could not load your orders. Please try again.")
+        if (!res.ok) throw new Error(tr("Could not load your orders. Please try again.", "অর্ডার লোড করা যায়নি। আবার চেষ্টা করুন।"))
         for (const g of ((await res.json()).data || []) as OrderGroup[]) found.set(g.order.orderNumber, g)
       }
       // Orders placed on this device (for example without signing in)
@@ -92,12 +121,12 @@ export function MyOrdersDrawer() {
       setOrders([...found.values()].sort((a, b) => b.order.createdAt.localeCompare(a.order.createdAt)))
       setError(null)
     } catch (e) {
-      setError((e as Error).message || "Could not load your orders. Please try again.")
+      setError((e as Error).message || tr("Could not load your orders. Please try again.", "অর্ডার লোড করা যায়নি। আবার চেষ্টা করুন।"))
     } finally {
       setLoading(false)
       setLoaded(true)
     }
-  }, [user])
+  }, [user, tr])
 
   // Load when opened, then keep the status fresh every 20 seconds
   useEffect(() => {
@@ -138,16 +167,16 @@ export function MyOrdersDrawer() {
         <div className="flex items-center justify-between border-b border-line bg-white px-5 py-4">
           <div>
             <h2 id="my-orders-title" className="text-lg font-bold text-charcoal">
-              My orders
+              {tr("My orders", "আমার অর্ডার")}
             </h2>
             <p className="text-xs text-slate" aria-live="polite">
-              {loading ? "Updating…" : "Status updates automatically"}
+              {loading ? tr("Updating…", "আপডেট হচ্ছে…") : tr("Status updates automatically", "অবস্থা নিজে থেকেই আপডেট হয়")}
             </p>
           </div>
           <button
             type="button"
             onClick={closeMyOrders}
-            aria-label="Close my orders"
+            aria-label={tr("Close my orders", "আমার অর্ডার বন্ধ করুন")}
             className="grid size-10 place-items-center rounded-full text-slate hover:bg-cream hover:text-charcoal"
           >
             <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -161,7 +190,7 @@ export function MyOrdersDrawer() {
             <div role="alert" className="rounded-xl bg-rose-50 px-4 py-3 text-sm text-rose-700">
               {error}{" "}
               <button type="button" onClick={load} className="font-semibold underline">
-                Try again
+                {tr("Try again", "আবার চেষ্টা করুন")}
               </button>
             </div>
           )}
@@ -173,8 +202,10 @@ export function MyOrdersDrawer() {
             </div>
           ) : orders.length === 0 && !error ? (
             <div className="rounded-2xl bg-white px-5 py-10 text-center">
-              <p className="font-bold text-charcoal">No orders yet</p>
-              <p className="mt-1 text-sm text-slate">Orders you place on this phone will show up here.</p>
+              <p className="font-bold text-charcoal">{tr("No orders yet", "এখনো কোনো অর্ডার নেই")}</p>
+              <p className="mt-1 text-sm text-slate">
+                {tr("Orders you place on this phone will show up here.", "এই ফোন থেকে দেওয়া অর্ডার এখানে দেখা যাবে।")}
+              </p>
               <button
                 type="button"
                 onClick={() => {
@@ -183,7 +214,7 @@ export function MyOrdersDrawer() {
                 }}
                 className="mt-4 rounded-full bg-brand px-5 py-2.5 text-sm font-bold text-white hover:bg-brand-hover"
               >
-                Browse the menu
+                {tr("Browse the menu", "মেনু দেখুন")}
               </button>
             </div>
           ) : null}
@@ -191,7 +222,7 @@ export function MyOrdersDrawer() {
           {active.length > 0 && (
             <section aria-labelledby="active-orders" className="space-y-3">
               <h3 id="active-orders" className="text-sm font-bold text-charcoal">
-                Current order{active.length > 1 ? "s" : ""}
+                {tr(`Current order${active.length > 1 ? "s" : ""}`, "চলমান অর্ডার")}
               </h3>
               {active.map((g) => (
                 <ActiveOrderCard key={g.order.orderNumber} group={g} />
@@ -202,17 +233,17 @@ export function MyOrdersDrawer() {
           {previous.length > 0 && (
             <section aria-labelledby="previous-orders" className="space-y-2">
               <h3 id="previous-orders" className="text-sm font-bold text-charcoal">
-                Previous orders
+                {tr("Previous orders", "আগের অর্ডার")}
               </h3>
               <ul className="divide-y divide-line overflow-hidden rounded-2xl bg-white">
                 {previous.map(({ order, items }) => (
                   <li key={order.orderNumber} className="px-4 py-3">
                     <div className="flex items-baseline justify-between gap-3">
-                      <span className="text-sm font-semibold text-charcoal">{when(order.createdAt)}</span>
+                      <span className="text-sm font-semibold text-charcoal">{when(order.createdAt, lang)}</span>
                       <span className="text-sm font-bold text-charcoal">{taka(order.totalBdt)}</span>
                     </div>
                     <p className="mt-0.5 truncate text-sm text-slate">
-                      {items.map((i) => `${i.quantity}× ${i.itemNameSnapshot}`).join(", ")}
+                      {items.map((i) => `${i.quantity}× ${dishName(i.itemNameSnapshot, lang)}`).join(", ")}
                     </p>
                     <p className="mt-1 flex items-center gap-2 text-xs text-slate">
                       <span
@@ -220,7 +251,7 @@ export function MyOrdersDrawer() {
                           order.status === "DELIVERED" ? "bg-emerald-50 text-emerald-700" : "bg-slate-100 text-slate-600"
                         }`}
                       >
-                        {MESSAGE[order.status].title}
+                        {tr(...MESSAGE[order.status].title)}
                       </span>
                       <span className="font-mono">{order.orderNumber}</span>
                     </p>
@@ -244,9 +275,9 @@ export function MyOrdersDrawer() {
           {!user && (
             <p className="text-center text-xs text-slate">
               <button type="button" onClick={() => openAuthModal("login")} className="font-semibold text-brand underline">
-                Sign in
-              </button>{" "}
-              to see your orders on any device.
+                {tr("Sign in", "সাইন ইন করুন")}
+              </button>
+              {tr(" to see your orders on any device.", ", যেকোনো ডিভাইস থেকে অর্ডার দেখতে।")}
             </p>
           )}
         </div>
@@ -256,24 +287,25 @@ export function MyOrdersDrawer() {
 }
 
 function ActiveOrderCard({ group: { order, items } }: { group: OrderGroup }) {
+  const { lang, tr, taka, num } = useLang()
   const step = STEPS.findIndex((s) => s.status === order.status)
   const msg = MESSAGE[order.status]
   return (
     <article className="rounded-2xl bg-white p-4 shadow-xs ring-1 ring-line">
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-base font-bold text-brand">{msg.title}</p>
+        <p className="text-base font-bold text-brand">{tr(...msg.title)}</p>
         <span className="font-mono text-xs text-slate">{order.orderNumber}</span>
       </div>
-      <p className="mt-0.5 text-sm text-slate">{msg.detail}</p>
+      <p className="mt-0.5 text-sm text-slate">{tr(...msg.detail)}</p>
 
-      <ol className="mt-4 grid grid-cols-5 gap-1" aria-label="Order progress">
+      <ol className="mt-4 grid grid-cols-5 gap-1" aria-label={tr("Order progress", "অর্ডারের অগ্রগতি")}>
         {STEPS.map((s, i) => {
           const done = i <= step
           return (
             <li key={s.status} aria-current={i === step ? "step" : undefined}>
               <span className={`block h-1.5 rounded-full ${done ? "bg-brand" : "bg-line"}`} />
               <span className={`mt-1.5 block text-[11px] leading-tight ${done ? "font-semibold text-charcoal" : "text-slate"}`}>
-                {s.label}
+                {tr(...s.label)}
               </span>
             </li>
           )
@@ -284,19 +316,21 @@ function ActiveOrderCard({ group: { order, items } }: { group: OrderGroup }) {
         {items.map((i) => (
           <div key={i.id} className="flex justify-between gap-3 text-charcoal">
             <span>
-              {i.quantity}× {i.itemNameSnapshot}
+              {num(i.quantity)}× {dishName(i.itemNameSnapshot, lang)}
             </span>
             <span>{taka(i.lineTotalBdt)}</span>
           </div>
         ))}
         <div className="flex justify-between gap-3 pt-1 font-bold text-charcoal">
-          <span>Total · free delivery</span>
+          <span>{tr("Total · free delivery", "মোট · ফ্রি ডেলিভারি")}</span>
           <span>{taka(order.totalBdt)}</span>
         </div>
         <p className="pt-1 text-xs text-slate">
-          {paymentLabel(order)} · Ordered {when(order.createdAt)}
+          {paymentLabel(order, tr)} · {tr("Ordered", "অর্ডার")} {when(order.createdAt, lang)}
         </p>
-        <p className="text-xs text-slate">Deliver to: {order.customerAddress}</p>
+        <p className="text-xs text-slate">
+          {tr("Deliver to:", "ডেলিভারি:")} {order.customerAddress}
+        </p>
       </div>
     </article>
   )
@@ -309,6 +343,7 @@ function TrackForm({ onFound }: { onFound: (g: OrderGroup, phone: string) => voi
   const [phone, setPhone] = useState("")
   const [busy, setBusy] = useState(false)
   const [message, setMessage] = useState<string | null>(null)
+  const { tr } = useLang()
 
   const submit = async (e: FormEvent) => {
     e.preventDefault()
@@ -323,8 +358,11 @@ function TrackForm({ onFound }: { onFound: (g: OrderGroup, phone: string) => voi
     } else {
       setMessage(
         result === "gone"
-          ? "We couldn't find that order. Check the order number and the phone number you used."
-          : "Couldn't check right now. Please try again.",
+          ? tr(
+              "We couldn't find that order. Check the order number and the phone number you used.",
+              "অর্ডারটি পাওয়া যায়নি। অর্ডার নম্বর আর যে ফোন নম্বর দিয়েছিলেন তা দেখে নিন।",
+            )
+          : tr("Couldn't check right now. Please try again.", "এখন যাচাই করা যাচ্ছে না। আবার চেষ্টা করুন।"),
       )
     }
   }
@@ -336,7 +374,7 @@ function TrackForm({ onFound }: { onFound: (g: OrderGroup, phone: string) => voi
         onClick={() => setOpen(true)}
         className="w-full rounded-2xl border border-dashed border-line bg-white px-4 py-3 text-sm font-semibold text-charcoal hover:border-brand hover:text-brand"
       >
-        Track an order with its order number
+        {tr("Track an order with its order number", "অর্ডার নম্বর দিয়ে অর্ডার ট্র্যাক করুন")}
       </button>
     )
   }
@@ -345,9 +383,9 @@ function TrackForm({ onFound }: { onFound: (g: OrderGroup, phone: string) => voi
     "mt-1 h-11 w-full rounded-xl border border-line bg-white px-3 text-base text-charcoal outline-none focus:border-brand focus:ring-2 focus:ring-brand/15 sm:text-sm"
   return (
     <form onSubmit={submit} className="space-y-3 rounded-2xl bg-white p-4 ring-1 ring-line">
-      <p className="text-sm font-bold text-charcoal">Track an order</p>
+      <p className="text-sm font-bold text-charcoal">{tr("Track an order", "অর্ডার ট্র্যাক করুন")}</p>
       <label className="block text-sm text-charcoal">
-        Order number
+        {tr("Order number", "অর্ডার নম্বর")}
         <input
           className={`${field} font-mono uppercase`}
           value={orderNumber}
@@ -357,7 +395,7 @@ function TrackForm({ onFound }: { onFound: (g: OrderGroup, phone: string) => voi
         />
       </label>
       <label className="block text-sm text-charcoal">
-        Phone number used for the order
+        {tr("Phone number used for the order", "অর্ডারে দেওয়া ফোন নম্বর")}
         <input
           className={field}
           type="tel"
@@ -380,14 +418,14 @@ function TrackForm({ onFound }: { onFound: (g: OrderGroup, phone: string) => voi
           disabled={busy}
           className="h-11 flex-1 rounded-full bg-brand text-sm font-bold text-white hover:bg-brand-hover disabled:opacity-60"
         >
-          {busy ? "Checking…" : "Find order"}
+          {busy ? tr("Checking…", "খোঁজা হচ্ছে…") : tr("Find order", "অর্ডার খুঁজুন")}
         </button>
         <button
           type="button"
           onClick={() => setOpen(false)}
           className="h-11 rounded-full px-4 text-sm font-semibold text-slate hover:bg-cream"
         >
-          Cancel
+          {tr("Cancel", "বাতিল")}
         </button>
       </div>
     </form>

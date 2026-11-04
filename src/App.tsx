@@ -16,6 +16,8 @@ import { useCurrentPath } from "./utils/navigation"
 import { type SearchableDish } from "./components/SearchRecommendationPopup"
 import { useCart } from "./context/CartContext"
 import { useAddress } from "./context/AddressContext"
+import { useLang } from "./context/LanguageContext"
+import { categoryName, dishDescription, dishName } from "./i18n/dishes"
 
 const img = (id: string, w = 800, h = 600) =>
   `https://images.unsplash.com/${id}?crop=entropy&cs=tinysrgb&fit=crop&fm=jpg&q=80&w=${w}&h=${h}`
@@ -147,31 +149,36 @@ const PROMISES = [
     title: "দমে রান্না",
     photo: PHOTOS.promise.dum,
     body: "Sealed handi, slow-cooked for hours",
+    bodyBn: "মুখ বন্ধ হাঁড়িতে ঘণ্টার পর ঘণ্টা ধীরে রান্না",
     d: "M4 11h16M5 11a7 7 0 0 0 14 0M9 7c0-1 1-1.5 1-2.5M13 7c0-1 1-1.5 1-2.5M3 18h18",
   },
   {
     title: "প্রতিদিন তাজা",
     photo: PHOTOS.promise.fresh,
     body: "Cooked fresh every single day",
+    bodyBn: "প্রতিদিন নতুন করে তাজা রান্না",
     d: "M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M6 18l2-2M16 8l2-2M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z",
   },
   {
     title: "খাঁটি ঘি ও মশলা",
     photo: PHOTOS.promise.spices,
     body: "Aged basmati, pure ghee, whole spices",
+    bodyBn: "পুরোনো বাসমতি, খাঁটি ঘি আর আস্ত মসলা",
     d: "M12 21c-4-2-7-6-7-11 3 0 5 1 7 3 2-2 4-3 7-3 0 5-3 9-7 11ZM12 13V3",
   },
   {
     title: "ফ্রি ডেলিভারি",
     photo: PHOTOS.promise.delivery,
     body: "Free, hot delivery to DIU campus, hostels & Ashulia",
+    bodyBn: "ডিআইইউ ক্যাম্পাস, হোস্টেল ও আশুলিয়ায় ফ্রি, গরম ডেলিভারি",
     d: "M3 7h11v9H3zM14 10h4l3 3v3h-7M7 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4ZM17 19a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z",
   },
 ]
 
 function PromiseStrip() {
+  const { tr } = useLang()
   return (
-    <section aria-label="Our promise" className="bg-jali relative mt-6 text-white">
+    <section aria-label={tr("Our promise", "আমাদের প্রতিশ্রুতি")} className="bg-jali relative mt-6 text-white">
       <TornEdge side="top" className="text-brand" />
       <ul className="mx-auto grid max-w-7xl grid-cols-2 gap-x-4 gap-y-8 px-4 py-10 sm:px-6 lg:grid-cols-4 lg:px-8 lg:py-12">
         {PROMISES.map((p) => (
@@ -200,7 +207,7 @@ function PromiseStrip() {
             </span>
             <div>
               <p className="text-display text-xl">{p.title}</p>
-              <p className="mt-1 text-xs leading-relaxed text-white/75 sm:text-sm">{p.body}</p>
+              <p className="mt-1 text-xs leading-relaxed text-white/75 sm:text-sm">{tr(p.body, p.bodyBn)}</p>
             </div>
           </li>
         ))}
@@ -211,14 +218,17 @@ function PromiseStrip() {
 }
 
 function AnnouncementBar() {
+  const { tr } = useLang()
   return (
     <div className="bg-charcoal text-white">
       <p className="mx-auto flex max-w-7xl items-center justify-center gap-2 px-4 py-2 text-center text-xs sm:px-6 lg:px-8">
         <span className="font-bn font-semibold text-saffron">গরম গরম বিরিয়ানি</span>
         <span className="text-white/40">•</span>
         <span>
-          <span className="hidden sm:inline">Delivering hot around Daffodil Smart City, Savar. </span>
-          <span className="font-semibold text-saffron">Order online now</span>
+          <span className="hidden sm:inline">
+            {tr("Delivering hot around Daffodil Smart City, Savar. ", "ড্যাফোডিল স্মার্ট সিটি, সাভারের আশেপাশে গরম গরম ডেলিভারি। ")}
+          </span>
+          <span className="font-semibold text-saffron">{tr("Order online now", "এখনই অনলাইনে অর্ডার করুন")}</span>
         </span>
       </p>
     </div>
@@ -226,20 +236,32 @@ function AnnouncementBar() {
 }
 
 const STEPS = [
-  { n: "০১", title: "Pick your dish", body: "Browse the menu and add your favourites to the cart." },
-  { n: "০২", title: "Place the order", body: "Enter your address and pay cash or online at checkout." },
-  { n: "০৩", title: "Enjoy it hot", body: "We pack it straight from the handi and ride it to you." },
-]
+  {
+    n: "০১",
+    title: ["Pick your dish", "খাবার বেছে নিন"],
+    body: ["Browse the menu and add your favourites to the cart.", "মেনু দেখে পছন্দের খাবার কার্টে যোগ করুন।"],
+  },
+  {
+    n: "০২",
+    title: ["Place the order", "অর্ডার দিন"],
+    body: ["Enter your address and pay cash when it arrives.", "ঠিকানা দিন, খাবার পৌঁছালে ক্যাশে টাকা দিন।"],
+  },
+  {
+    n: "০৩",
+    title: ["Enjoy it hot", "গরম গরম খান"],
+    body: ["We pack it straight from the handi and ride it to you.", "হাঁড়ি থেকে সরাসরি প্যাক করে আপনার কাছে পৌঁছে দিই।"],
+  },
+] as const
 
-type ZoneView = { name: string; note: string; time: string }
+type ZoneView = { name: string; note: string; time: string } // time = "15-20"
 
 // Shown until the delivery points set in the admin panel load
 const FALLBACK_ZONES: ZoneView[] = [
-  { name: "Daffodil Smart City", note: "Campus & hostels", time: "15–20 min" },
-  { name: "Khagan", note: "Student mess area", time: "15–20 min" },
-  { name: "Birulia", note: "Bazar & around", time: "20–25 min" },
-  { name: "Ashulia", note: "Zirabo, Baipail", time: "30–40 min" },
-  { name: "Savar", note: "Nabinagar, Savar Bazar", time: "35–45 min" },
+  { name: "Daffodil Smart City", note: "Campus & hostels", time: "15-20" },
+  { name: "Khagan", note: "Student mess area", time: "15-20" },
+  { name: "Birulia", note: "Bazar & around", time: "20-25" },
+  { name: "Ashulia", note: "Zirabo, Baipail", time: "30-40" },
+  { name: "Savar", note: "Nabinagar, Savar Bazar", time: "35-45" },
 ]
 
 type PublicOffer = {
@@ -263,7 +285,7 @@ function useStoreData() {
             rows.map((z: { name: string; area: string; etaMinutes: string }) => ({
               name: z.name,
               note: z.area,
-              time: `${z.etaMinutes.replace("-", "–")} min`,
+              time: z.etaMinutes,
             })),
           )
         }
@@ -278,9 +300,10 @@ function useStoreData() {
 }
 
 function OffersBand({ offers }: { offers: PublicOffer[] }) {
+  const { tr, num, taka } = useLang()
   if (offers.length === 0) return null
   return (
-    <section id="offers" aria-label="Current offers" className="mx-auto w-full max-w-7xl scroll-mt-[var(--header-h,120px)] px-4 pt-14 sm:px-6 lg:px-8">
+    <section id="offers" aria-label={tr("Current offers", "চলতি অফার")} className="mx-auto w-full max-w-7xl scroll-mt-[var(--header-h,120px)] px-4 pt-14 sm:px-6 lg:px-8">
       <div className="no-scrollbar -mx-4 flex snap-x gap-3 overflow-x-auto px-4 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-3">
         {offers.map((o) => (
           <article
@@ -289,12 +312,14 @@ function OffersBand({ offers }: { offers: PublicOffer[] }) {
           >
             <span className="absolute -right-6 -top-6 size-24 rounded-full bg-white/25" aria-hidden />
             <p className="text-display text-3xl">
-              {o.discountType === "PERCENT" ? `${o.discountValue}% OFF` : `৳${o.discountValue} OFF`}
+              {o.discountType === "PERCENT"
+                ? tr(`${o.discountValue}% OFF`, `${num(o.discountValue)}% ছাড়`)
+                : tr(`৳${o.discountValue} OFF`, `${taka(o.discountValue)} ছাড়`)}
             </p>
             <p className="mt-1 font-bold">{o.title}</p>
             {o.description && <p className="mt-1 text-sm text-charcoal/75">{o.description}</p>}
             <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white px-3 py-1.5 text-sm">
-              Code <strong className="font-mono tracking-wider text-brand">{o.code}</strong>
+              {tr("Code", "কোড")} <strong className="font-mono tracking-wider text-brand">{o.code}</strong>
             </p>
           </article>
         ))}
@@ -307,22 +332,24 @@ const MAP_URL =
   "https://www.google.com/maps/search/?api=1&query=Daffodil+Smart+City+Birulia+Savar"
 
 function LocationSection({ zones }: { zones: ZoneView[] }) {
+  const { tr, num, digits } = useLang()
   return (
     <section id="location" className="bg-jali relative scroll-mt-[var(--header-h,120px)] text-white">
       <TornEdge side="top" className="text-brand" />
       <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-14 sm:gap-12 sm:px-6 sm:py-20 lg:grid-cols-[1.1fr_1fr] lg:px-8 lg:py-24">
         <div>
-          <p className="text-eyebrow text-saffron">Find us</p>
+          <p className="text-eyebrow text-saffron">{tr("Find us", "আমাদের খুঁজুন")}</p>
           <h2 className="text-display mt-3 text-[2rem] sm:text-5xl">
             ড্যাফোডিল স্মার্ট সিটির পাশেই
           </h2>
           <p className="mt-3 text-lg font-semibold text-white/85">
-            Your biriyani spot next to DIU, Savar
+            {tr("Your biriyani spot next to DIU, Savar", "ডিআইইউর পাশে, সাভারে আপনার বিরিয়ানির ঠিকানা")}
           </p>
           <p className="mt-5 max-w-xl leading-relaxed text-white/80">
-            Between classes, late-night study sessions or a hostel party, we deliver hot
-            biriyani straight to the DIU campus, hostels and messes, and all around Birulia,
-            Ashulia and Savar.
+            {tr(
+              "Between classes, late-night study sessions or a hostel party, we deliver hot biriyani straight to the DIU campus, hostels and messes, and all around Birulia, Ashulia and Savar.",
+              "ক্লাসের ফাঁকে, রাত জেগে পড়ার সময় বা হোস্টেলের আড্ডায়, ডিআইইউ ক্যাম্পাস, হোস্টেল, মেস আর বিরুলিয়া, আশুলিয়া ও সাভারের সব জায়গায় গরম বিরিয়ানি পৌঁছে দিই।",
+            )}
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">
@@ -335,20 +362,20 @@ function LocationSection({ zones }: { zones: ZoneView[] }) {
               <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
                 <path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12Zm0-9.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z" />
               </svg>
-              Open in Google Maps
+              {tr("Open in Google Maps", "গুগল ম্যাপে দেখুন")}
             </a>
             <a
               href="#menu"
               className="inline-flex h-12 items-center rounded-full border-2 border-white/70 px-7 text-sm font-bold text-white transition hover:bg-white hover:text-brand"
             >
-              Order Now
+              {tr("Order Now", "অর্ডার করুন")}
             </a>
           </div>
         </div>
 
         <div className="rounded-[1.75rem] bg-white p-5 text-charcoal shadow-[0_30px_60px_-30px_rgba(60,0,4,0.9)] sm:p-7">
           <div className="flex items-center justify-between">
-            <p className="text-display text-2xl">Delivery zones</p>
+            <p className="text-display text-2xl">{tr("Delivery zones", "ডেলিভারি এলাকা")}</p>
             <span className="font-bn rounded-full bg-brand-light px-3 py-1 text-sm font-semibold text-brand">
               সাভার
             </span>
@@ -361,7 +388,7 @@ function LocationSection({ zones }: { zones: ZoneView[] }) {
                     i === 0 ? "bg-brand text-white" : "bg-cream text-brand"
                   }`}
                 >
-                  {i + 1}
+                  {num(i + 1)}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="font-bold">{z.name}</p>
@@ -369,9 +396,9 @@ function LocationSection({ zones }: { zones: ZoneView[] }) {
                 </div>
                 <span className="shrink-0 text-right">
                   <span className="block rounded-full bg-gold-light px-3 py-1 text-xs font-bold text-gold">
-                    {z.time}
+                    {tr(`${z.time.replace("-", "–")} min`, `${digits(z.time.replace("-", "–"))} মিনিট`)}
                   </span>
-                  <span className="mt-1 block text-xs font-semibold text-emerald-700">Free delivery</span>
+                  <span className="mt-1 block text-xs font-semibold text-emerald-700">{tr("Free delivery", "ফ্রি ডেলিভারি")}</span>
                 </span>
               </li>
             ))}
@@ -384,9 +411,14 @@ function LocationSection({ zones }: { zones: ZoneView[] }) {
 }
 
 function OrderProcess() {
+  const { tr } = useLang()
   return (
     <section id="how" className="mx-auto w-full max-w-7xl scroll-mt-[var(--header-h,120px)] px-4 py-14 sm:px-6 sm:py-20 lg:px-8 lg:py-24">
-      <SectionTitle eyebrow="How to order" bangla="অর্ডার করুন সহজে" title="Three steps to a plate of biriyani" />
+      <SectionTitle
+        eyebrow={tr("How to order", "কীভাবে অর্ডার করবেন")}
+        bangla="অর্ডার করুন সহজে"
+        title={tr("Three steps to a plate of biriyani", "তিন ধাপে এক প্লেট বিরিয়ানি")}
+      />
       <ol className="no-scrollbar -mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-3 sm:gap-6 sm:overflow-visible sm:px-0 sm:pb-0">
         {STEPS.map((s, i) => (
           <li
@@ -406,8 +438,8 @@ function OrderProcess() {
               {s.n}
             </span>
             <div className="px-4">
-              <p className="text-display mt-4 text-xl">{s.title}</p>
-              <p className="mt-2 text-sm leading-relaxed text-slate">{s.body}</p>
+              <p className="text-display mt-4 text-xl">{tr(s.title[0], s.title[1])}</p>
+              <p className="mt-2 text-sm leading-relaxed text-slate">{tr(s.body[0], s.body[1])}</p>
             </div>
           </li>
         ))}
@@ -458,10 +490,20 @@ type MenuByDay = Record<string, ApiMenuItem[]>
 const HIDDEN_CATEGORIES = new Set(["home-style-meals"])
 
 function AboutSection() {
+  const { tr } = useLang()
   const points = [
-    { title: "Shahi recipes", body: "Old Dhaka nawabi recipes, made the slow way." },
-    { title: "Sealed dum handi", body: "Meat and rice layered, sealed and slow-cooked." },
-    { title: "Fiery & fragrant", body: "Whole spices, saffron, kewra and pure ghee." },
+    {
+      title: tr("Shahi recipes", "শাহি রেসিপি"),
+      body: tr("Old Dhaka nawabi recipes, made the slow way.", "পুরান ঢাকার নবাবি রেসিপি, ধীরে ধীরে রান্না।"),
+    },
+    {
+      title: tr("Sealed dum handi", "মুখ বন্ধ দমের হাঁড়ি"),
+      body: tr("Meat and rice layered, sealed and slow-cooked.", "মাংস আর চালের স্তর, মুখ বন্ধ করে ধীরে রান্না।"),
+    },
+    {
+      title: tr("Fiery & fragrant", "ঝাল ও সুগন্ধি"),
+      body: tr("Whole spices, saffron, kewra and pure ghee.", "আস্ত মসলা, জাফরান, কেওড়া আর খাঁটি ঘি।"),
+    },
   ]
   return (
     <section
@@ -474,33 +516,36 @@ function AboutSection() {
           <div className="relative overflow-hidden rounded-[1.75rem] ring-8 ring-white shadow-lift">
             <img
               src={PHOTOS.about}
-              alt="A plate of biryani with tender meat"
+              alt={tr("A plate of biryani with tender meat", "নরম মাংসের এক প্লেট বিরিয়ানি")}
               loading="lazy"
               className="aspect-[6/7] w-full object-cover"
             />
           </div>
           <img
             src={PHOTOS.aboutInset}
-            alt="Whole spices used in our biriyani"
+            alt={tr("Whole spices used in our biriyani", "আমাদের বিরিয়ানির আস্ত মসলা")}
             loading="lazy"
             className="absolute -left-4 -top-4 size-20 rounded-full object-cover shadow-lift ring-4 ring-white sm:-left-10 sm:-top-6 sm:size-36 sm:ring-[6px]"
           />
           <div className="absolute -bottom-6 -right-3 rotate-[4deg] rounded-2xl bg-saffron px-4 py-3 text-charcoal shadow-lift sm:-right-8 sm:px-6 sm:py-4">
             <p className="font-calli text-2xl leading-none sm:text-3xl">ভালোবাসায় রান্না</p>
-            <p className="text-eyebrow mt-1.5 text-charcoal/70">Cooked with love</p>
+            <p className="text-eyebrow mt-1.5 text-charcoal/70">{tr("Cooked with love", "যত্ন নিয়ে রান্না")}</p>
           </div>
         </div>
 
         <div>
-          <p className="text-eyebrow text-brand">Our story</p>
+          <p className="text-eyebrow text-brand">{tr("Our story", "আমাদের গল্প")}</p>
           <h2 className="text-display mt-3 text-4xl text-charcoal sm:text-5xl">
             ঐতিহ্যের স্বাদ, <span className="text-brand">প্রতিটি লোকমায়</span>
           </h2>
-          <p className="mt-3 text-lg font-semibold text-slate">A royal feast from the nawab's kitchen</p>
+          <p className="mt-3 text-lg font-semibold text-slate">
+            {tr("A royal feast from the nawab's kitchen", "নবাবের রান্নাঘরের রাজকীয় ভোজ")}
+          </p>
           <p className="mt-6 max-w-xl leading-relaxed text-slate">
-            Banglar Biriyani brings the rich, spicy biriyani of Puran Dhaka to Savar, right next
-            to Daffodil Smart City. Our meat is marinated overnight, layered with fragrant rice
-            and cooked slowly in a sealed handi, just the way it has always been made.
+            {tr(
+              "Banglar Biriyani brings the rich, spicy biriyani of Puran Dhaka to Savar, right next to Daffodil Smart City. Our meat is marinated overnight, layered with fragrant rice and cooked slowly in a sealed handi, just the way it has always been made.",
+              "বাংলার বিরিয়ানি পুরান ঢাকার মসলাদার, জমকালো বিরিয়ানি নিয়ে এসেছে সাভারে, ড্যাফোডিল স্মার্ট সিটির ঠিক পাশে। সারা রাত মাংস মেরিনেট করে, সুগন্ধি চালের সাথে স্তরে সাজিয়ে মুখ বন্ধ হাঁড়িতে ধীরে রান্না করি, ঠিক যেভাবে সবসময় রান্না হয়ে এসেছে।",
+            )}
           </p>
           <ul className="mt-9 grid gap-4 sm:grid-cols-3">
             {points.map((pt) => (
@@ -519,6 +564,12 @@ function AboutSection() {
 
 export default function App() {
   const currentPath = useCurrentPath()
+  const { lang, tr, num, taka } = useLang()
+  const isAdmin = currentPath.startsWith("/admin")
+  // The admin panel is English only
+  useEffect(() => {
+    document.documentElement.lang = isAdmin ? "en" : lang
+  }, [isAdmin, lang])
   const { zones: storeZones, offers: storeOffers } = useStoreData()
   const {
     totalItems,
@@ -605,7 +656,10 @@ export default function App() {
       menu.filter(
         (p) =>
           (category === "All" || p.category === category) &&
-          (p.name.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q)),
+          (p.name.toLowerCase().includes(q) ||
+            dishName(p.name, "bn").includes(q) ||
+            p.category?.toLowerCase().includes(q) ||
+            categoryName(p.category ?? "", "bn").includes(q)),
       ),
     [menu, q, category],
   )
@@ -615,14 +669,14 @@ export default function App() {
     () =>
       menu.map((p) => ({
         id: p.id,
-        name: p.name,
-        description: p.description,
+        name: dishName(p.name, lang),
+        description: dishDescription(p.name, p.description, lang),
         price: p.price,
         image: p.image,
         bestseller: p.bestseller,
-        categoryName: p.category,
+        categoryName: p.category ? categoryName(p.category, lang) : p.category,
       })),
-    [menu],
+    [menu, lang],
   )
 
   const handleSelectDish = (dish: SearchableDish) => {
@@ -680,15 +734,18 @@ export default function App() {
 
       <Hero
         image={PHOTOS.hero}
-        alt="A plate of fragrant biriyani with tender mutton"
+        alt={tr("A plate of fragrant biriyani with tender mutton", "নরম খাসির মাংসের সুগন্ধি বিরিয়ানি")}
         kicker="ড্যাফোডিল স্মার্ট সিটির পাশেই, সাভার"
         lineOne="দমে রান্না"
         lineTwo="শাহি বিরিয়ানি"
-        english="The royal taste of Bengal"
-        body="Old Dhaka style shahi biriyani, tehari, jali kabab and ice-cold borhani. Spicy, smoky and cooked the traditional way, delivered hot to DIU campus, hostels and all around Savar."
-        primary={{ label: "Order Now", href: "#menu" }}
-        secondary={{ label: "View Menu", href: "#menu" }}
-        special={{ name: "Shahi Mutton Kacchi", price: 450 }}
+        english={tr("The royal taste of Bengal", "বাংলার রাজকীয় স্বাদ")}
+        body={tr(
+          "Old Dhaka style shahi biriyani, tehari, jali kabab and ice-cold borhani. Spicy, smoky and cooked the traditional way, delivered hot to DIU campus, hostels and all around Savar.",
+          "পুরান ঢাকার শাহি বিরিয়ানি, তেহারি, জালি কাবাব আর ঠান্ডা বোরহানি। ঝাল, ধোঁয়া ওঠা আর ঐতিহ্যবাহী রান্না, ডিআইইউ ক্যাম্পাস, হোস্টেল আর সাভারের সব জায়গায় গরম গরম পৌঁছে দিই।",
+        )}
+        primary={{ label: tr("Order Now", "অর্ডার করুন"), href: "#menu" }}
+        secondary={{ label: tr("View Menu", "মেনু দেখুন"), href: "#menu" }}
+        special={{ name: tr("Shahi Mutton Kacchi", "শাহি মাটন কাচ্চি"), price: 450 }}
       />
 
       <PromiseStrip />
@@ -700,16 +757,20 @@ export default function App() {
         className="mx-auto w-full max-w-7xl scroll-mt-[calc(var(--header-h,120px)+16px)] px-4 pb-14 pt-16 sm:px-6 sm:pb-16 sm:pt-20 lg:px-8 lg:pb-24 lg:pt-28"
       >
         <SectionTitle
-          eyebrow="Our Menu"
+          eyebrow={tr("Our Menu", "আমাদের মেনু")}
           bangla="আমাদের শাহি মেনু"
-          title="Straight from the nawab's handi"
-          meta={loading ? "Loading..." : `${filteredMenu.length} dishes`}
+          title={tr("Straight from the nawab's handi", "সরাসরি নবাবি হাঁড়ি থেকে")}
+          meta={
+            loading
+              ? tr("Loading...", "লোড হচ্ছে...")
+              : tr(`${filteredMenu.length} dishes`, `${num(filteredMenu.length)}টি খাবার`)
+          }
         />
 
         {categories.length > 1 && (
           <div
             role="tablist"
-            aria-label="Menu categories"
+            aria-label={tr("Menu categories", "মেনুর ক্যাটাগরি")}
             className="no-scrollbar -mx-4 mb-10 flex gap-2 overflow-x-auto px-4 sm:mx-0 sm:flex-wrap sm:justify-center sm:px-0"
           >
             {categories.map((c) => {
@@ -730,7 +791,7 @@ export default function App() {
                       : "border-line bg-white text-charcoal hover:border-brand/40 hover:text-brand"
                   }`}
                 >
-                  {c}
+                  {categoryName(c, lang)}
                 </button>
               )
             })}
@@ -751,8 +812,13 @@ export default function App() {
         </div>
         {!loading && filteredMenu.length === 0 && (
           <div className="py-14 text-center">
-            <p className="text-display text-2xl">No dishes found</p>
-            <p className="mt-2 text-slate">Nothing matches "{query}". Try biriyani, tehari or kabab.</p>
+            <p className="text-display text-2xl">{tr("No dishes found", "কোনো খাবার পাওয়া যায়নি")}</p>
+            <p className="mt-2 text-slate">
+              {tr(
+                `Nothing matches "${query}". Try biriyani, tehari or kabab.`,
+                `"${query}" এর সাথে কিছু মেলেনি। বিরিয়ানি, তেহারি বা কাবাব লিখে দেখুন।`,
+              )}
+            </p>
             <button
               type="button"
               onClick={() => {
@@ -761,7 +827,7 @@ export default function App() {
               }}
               className="mt-5 inline-flex h-11 items-center rounded-full bg-brand px-6 text-sm font-bold text-white transition hover:bg-brand-hover"
             >
-              Show full menu
+              {tr("Show full menu", "পুরো মেনু দেখুন")}
             </button>
           </div>
         )}
@@ -773,7 +839,7 @@ export default function App() {
               aria-expanded={showAll}
               className="inline-flex h-12 items-center gap-2 rounded-full border border-maroon/80 bg-white px-7 text-sm font-bold text-maroon transition hover:bg-maroon hover:text-white"
             >
-              {showAll ? "Show fewer dishes" : "See full menu"}
+              {showAll ? tr("Show fewer dishes", "কম খাবার দেখান") : tr("See full menu", "পুরো মেনু দেখুন")}
               <svg
                 className={`size-4 transition ${showAll ? "rotate-180" : ""}`}
                 viewBox="0 0 24 24"
@@ -807,12 +873,12 @@ export default function App() {
           >
             <span className="flex items-center gap-3">
               <span className="grid size-8 place-items-center rounded-full bg-saffron text-sm font-extrabold text-charcoal">
-                {totalItems}
+                {num(totalItems)}
               </span>
-              <span className="text-sm font-bold">View cart</span>
+              <span className="text-sm font-bold">{tr("View cart", "কার্ট দেখুন")}</span>
             </span>
             <span className="flex items-center gap-1.5 text-base font-extrabold">
-              ৳{totalBdt}
+              {taka(totalBdt)}
               <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden>
                 <path d="M9 6l6 6-6 6" />
               </svg>

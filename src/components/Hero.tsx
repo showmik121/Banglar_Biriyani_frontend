@@ -1,4 +1,5 @@
 import { TornEdge, TornPanel } from "./TornEdge"
+import { useLang } from "../context/LanguageContext"
 
 type Props = {
   image: string
@@ -40,6 +41,7 @@ export function Hero({
   secondary,
   special,
 }: Props) {
+  const { tr, num } = useLang()
   return (
     <section className="bg-halftone relative isolate overflow-hidden">
       {/* Red torn-paper panel: right side on desktop */}
@@ -89,10 +91,11 @@ export function Hero({
 
           <ul className="mt-9 flex flex-wrap gap-x-6 gap-y-2 text-sm font-semibold text-charcoal/80">
             <li className="flex items-center gap-2">
-              <span className="text-saffron">★★★★★</span> Loved by DIU students
+              <span className="text-saffron">★★★★★</span> {tr("Loved by DIU students", "ডিআইইউ শিক্ষার্থীদের প্রিয়")}
             </li>
             <li className="flex items-center gap-2">
-              <span className="size-2 rounded-full bg-brand" /> Free delivery in Savar & Ashulia
+              <span className="size-2 rounded-full bg-brand" />{" "}
+              {tr("Free delivery in Savar & Ashulia", "সাভার ও আশুলিয়ায় ফ্রি ডেলিভারি")}
             </li>
           </ul>
         </div>
@@ -126,8 +129,8 @@ export function Hero({
             {special && (
               <div className="animate-float-slow absolute -left-2 bottom-2 grid size-32 rotate-[-10deg] place-items-center rounded-full bg-saffron text-center text-charcoal shadow-lift ring-4 ring-white sm:-left-8 sm:size-36">
                 <div>
-                  <p className="font-bn text-xs font-semibold">মাত্র</p>
-                  <p className="text-display text-3xl leading-none sm:text-4xl">৳{special.price}</p>
+                  <p className="text-xs font-semibold">{tr("Only", "মাত্র")}</p>
+                  <p className="text-display text-3xl leading-none sm:text-4xl">৳{num(special.price)}</p>
                   <p className="mt-1 px-3 text-[11px] font-bold leading-tight">{special.name}</p>
                 </div>
               </div>

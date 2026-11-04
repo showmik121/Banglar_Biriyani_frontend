@@ -1,5 +1,7 @@
 import { useState } from "react"
 import { useCart } from "../context/CartContext"
+import { useLang } from "../context/LanguageContext"
+import { dishDescription, dishName, portionName } from "../i18n/dishes"
 
 export type Product = {
   id: string | number
@@ -28,6 +30,8 @@ export function ProductCard({
 }) {
   const { addItem, activeDay } = useCart()
   const [justAdded, setJustAdded] = useState(false)
+  const { lang, tr, num } = useLang()
+  const name = dishName(product.name, lang)
 
   const isSoldOut = product.remainingPortions !== undefined && product.remainingPortions <= 0
   const isLowStock =
@@ -57,7 +61,7 @@ export function ProductCard({
         {product.image ? (
           <img
             src={product.image}
-            alt={product.name}
+            alt={name}
             loading="lazy"
             className={`size-full object-cover transition duration-700 group-hover:scale-[1.06] ${
               isSoldOut ? "grayscale" : ""
@@ -72,28 +76,26 @@ export function ProductCard({
 
         {product.bestseller && (
           <span className="text-eyebrow absolute left-1.5 top-1.5 inline-flex items-center gap-1 rounded-full bg-maroon/90 px-2 py-1 text-[11px] tracking-[0.12em] text-saffron backdrop-blur min-[560px]:left-2.5 min-[560px]:top-2.5 min-[560px]:px-2.5 min-[560px]:py-1.5 min-[560px]:text-[11px]">
-            ★ <span className="hidden min-[560px]:inline">Bestseller</span><span className="min-[560px]:hidden">Top</span>
+            ★ <span className="hidden min-[560px]:inline">{tr("Bestseller", "বেস্টসেলার")}</span>
+            <span className="min-[560px]:hidden">{tr("Top", "সেরা")}</span>
           </span>
         )}
         {isSoldOut && (
           <span className="text-eyebrow absolute inset-x-1.5 bottom-1.5 rounded-full bg-charcoal/85 px-2 py-1 text-center text-[10px] text-white backdrop-blur min-[560px]:inset-x-auto min-[560px]:bottom-auto min-[560px]:right-2.5 min-[560px]:top-2.5 min-[560px]:px-2.5 min-[560px]:py-1.5 min-[560px]:text-[11px]">
-            Sold Out
+            {tr("Sold Out", "শেষ")}
           </span>
         )}
         {product.portionSize && !isSoldOut && (
           <span className="absolute bottom-2.5 left-2.5 hidden rounded-full bg-white/90 px-2.5 py-1 text-[11px] font-semibold text-charcoal backdrop-blur min-[560px]:inline">
-            {product.portionSize}
+            {portionName(product.portionSize, lang)}
           </span>
         )}
       </div>
 
       <div className="flex min-w-0 flex-1 flex-col py-0.5 pr-0.5 min-[560px]:px-2 min-[560px]:pb-1.5 min-[560px]:pt-4">
-        <h3 className="text-display line-clamp-2 text-[1.05rem] leading-snug min-[560px]:text-[1.2rem]">{product.name}</h3>
-        {product.banglaName && (
-          <p className="font-bn mt-0.5 text-sm text-gold">{product.banglaName}</p>
-        )}
+        <h3 className="text-display line-clamp-2 text-[1.05rem] leading-snug min-[560px]:text-[1.2rem]">{name}</h3>
         <p className="mt-1 line-clamp-2 text-[13px] leading-relaxed text-slate min-[560px]:mt-1.5 min-[560px]:text-sm">
-          {product.description}
+          {dishDescription(product.name, product.description, lang)}
         </p>
 
         {isLowStock && (
@@ -102,7 +104,7 @@ export function ProductCard({
               <span className="absolute inline-flex size-full animate-ping rounded-full bg-chili opacity-75"></span>
               <span className="relative inline-flex size-2 rounded-full bg-chili"></span>
             </span>
-            Only {product.remainingPortions} left today
+            {tr(`Only ${product.remainingPortions} left today`, `আজ মাত্র ${num(product.remainingPortions ?? 0)}টি বাকি`)}
           </p>
         )}
 
@@ -110,19 +112,23 @@ export function ProductCard({
           <div className="leading-none">
             {product.basePriceBdt !== undefined && product.basePriceBdt > product.price && (
               <span className="mb-1 block text-xs text-slate line-through">
-                ৳{product.basePriceBdt}
+                ৳{num(product.basePriceBdt)}
               </span>
             )}
             <span className="text-display text-xl text-brand min-[560px]:text-2xl">
               <span className="mr-0.5 text-lg">৳</span>
-              {product.price}
+              {num(product.price)}
             </span>
           </div>
           <button
             type="button"
             disabled={isSoldOut}
             onClick={handleAdd}
-            aria-label={isSoldOut ? `${product.name} is sold out` : `Add ${product.name} to cart`}
+            aria-label={
+              isSoldOut
+                ? tr(`${product.name} is sold out`, `${name} শেষ হয়ে গেছে`)
+                : tr(`Add ${product.name} to cart`, `${name} কার্টে যোগ করুন`)
+            }
             className={`inline-flex h-10 shrink-0 items-center justify-center gap-1.5 rounded-full px-3.5 text-sm font-bold min-[560px]:h-11 min-[560px]:px-4 transition active:scale-[0.97] focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 ${
               isSoldOut
                 ? "cursor-not-allowed bg-cream text-slate"
@@ -132,15 +138,16 @@ export function ProductCard({
             }`}
           >
             {isSoldOut ? (
-              "Sold Out"
+              tr("Sold Out", "শেষ")
             ) : justAdded ? (
-              "Added ✓"
+              tr("Added ✓", "যোগ হয়েছে ✓")
             ) : (
               <>
                 <svg className="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" aria-hidden>
                   <path d="M12 5v14M5 12h14" />
                 </svg>
-                Add<span className="hidden min-[560px]:inline"> to Cart</span>
+                {tr("Add", "যোগ করুন")}
+                <span className="hidden min-[560px]:inline">{tr(" to Cart", "")}</span>
               </>
             )}
           </button>

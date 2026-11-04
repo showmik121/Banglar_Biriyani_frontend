@@ -2,6 +2,8 @@ import { useState, useEffect, useRef } from "react"
 import { useCart } from "../context/CartContext"
 import { useAddress } from "../context/AddressContext"
 import { useAuth } from "../context/AuthContext"
+import { useLang } from "../context/LanguageContext"
+import { addressLabel } from "../i18n/dishes"
 import { navigateTo } from "../utils/navigation"
 import { AddressRecommendationPopup } from "./AddressRecommendationPopup"
 import { SearchRecommendationPopup, type SearchableDish } from "./SearchRecommendationPopup"
@@ -46,12 +48,41 @@ const ICONS = {
 }
 
 const NAV = [
-  { label: "Menu", href: "#menu" },
-  { label: "Our Story", href: "#about" },
-  { label: "How to Order", href: "#how" },
-  { label: "Location", href: "#location" },
-  { label: "Contact", href: "#contact" },
+  { en: "Menu", bn: "মেনু", href: "#menu" },
+  { en: "Our Story", bn: "আমাদের গল্প", href: "#about" },
+  { en: "How to Order", bn: "কীভাবে অর্ডার করবেন", href: "#how" },
+  { en: "Location", bn: "লোকেশন", href: "#location" },
+  { en: "Contact", bn: "যোগাযোগ", href: "#contact" },
 ]
+
+/** EN | বাংলা switch */
+function LanguageSwitch({ className = "" }: { className?: string }) {
+  const { lang, setLang } = useLang()
+  return (
+    <div role="group" aria-label="Language / ভাষা" className={`flex rounded-full bg-cream p-0.5 ${className}`}>
+      {(
+        [
+          ["en", "EN", "English"],
+          ["bn", "বাংলা", "বাংলা"],
+        ] as const
+      ).map(([code, label, full]) => (
+        <button
+          key={code}
+          type="button"
+          lang={code}
+          aria-pressed={lang === code}
+          aria-label={full}
+          onClick={() => setLang(code)}
+          className={`h-9 rounded-full px-3 text-xs font-bold transition ${
+            lang === code ? "bg-white text-brand shadow-sm" : "text-slate hover:text-charcoal"
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  )
+}
 
 const iconBtn =
   "grid size-10 shrink-0 place-items-center rounded-full text-charcoal transition hover:bg-cream hover:text-brand focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/25"
@@ -76,6 +107,7 @@ export function Header({
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isNavOpen, setIsNavOpen] = useState(false)
   const cartCount = propCartCount ?? totalItems
+  const { lang, setLang, tr, num } = useLang()
 
   // Close user dropdown when clicking outside
   useEffect(() => {
@@ -112,13 +144,17 @@ export function Header({
     >
       {/* Row 1: logo, address, account */}
       <div className="mx-auto flex max-w-7xl items-center gap-2 px-3 py-2.5 sm:gap-3 sm:px-6 sm:py-3 lg:px-8">
-        <a href="#" className="group flex shrink-0 items-center gap-2.5" aria-label="Banglar Biriyani home">
+        <a href="#" className="group flex shrink-0 items-center gap-2.5" aria-label={tr("Banglar Biriyani home", "বাংলার বিরিয়ানি হোম")}>
           <span className="grid size-10 place-items-center rounded-full bg-white p-0.5 shadow-card ring-2 ring-gold/40 transition group-hover:ring-gold sm:size-12">
             <img src="/logo-mark.png" alt="" className="size-full rounded-full object-contain" />
           </span>
           <span className="hidden flex-col leading-none sm:flex">
-            <span className="text-display text-lg text-maroon sm:text-xl">Banglar Biriyani</span>
-            <span className="font-bn mt-1 text-[11px] text-gold sm:text-xs">বাংলার বিরিয়ানি</span>
+            <span className="text-display text-lg text-maroon sm:text-xl">
+              {tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}
+            </span>
+            <span className="font-bn mt-1 text-[11px] text-gold sm:text-xs">
+              {tr("বাংলার বিরিয়ানি", "Banglar Biriyani")}
+            </span>
           </span>
         </a>
 
@@ -126,13 +162,13 @@ export function Header({
         <button
           type="button"
           onClick={() => setIsAddressModalOpen(true)}
-          aria-label="Change delivery address"
+          aria-label={tr("Change delivery address", "ডেলিভারির ঠিকানা বদলান")}
           className="flex h-10 min-w-0 items-center gap-1.5 rounded-full bg-cream px-3 text-xs text-charcoal transition hover:bg-gold-light md:hidden"
-          title="Change delivery address"
+          title={tr("Change delivery address", "ডেলিভারির ঠিকানা বদলান")}
         >
           <Icon d={ICONS.pin} className="size-3.5 text-brand" />
           <span className="hidden max-w-[88px] truncate font-medium min-[360px]:inline min-[380px]:max-w-[120px]">
-            {selectedAddress ? selectedAddress.area : "Address"}
+            {selectedAddress ? selectedAddress.area : tr("Address", "ঠিকানা")}
           </span>
           <Icon d={ICONS.chevron} className="size-3 text-slate" />
         </button>
@@ -144,14 +180,14 @@ export function Header({
             onClick={() => setIsRecommendationOpen((prev) => !prev)}
             aria-expanded={isRecommendationOpen}
             className="flex items-center gap-2 rounded-full border border-line bg-white px-4 py-2 text-sm transition hover:border-gold/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/30 cursor-pointer"
-            title="Change delivery address"
+            title={tr("Change delivery address", "ডেলিভারির ঠিকানা বদলান")}
           >
             <Icon d={ICONS.pin} className="size-4 text-brand" />
             <span className="font-semibold text-charcoal">
-              {selectedAddress?.label ? `${selectedAddress.label} address` : "New address"}
+              {selectedAddress?.label ? tr(`${selectedAddress.label} address`, `${addressLabel(selectedAddress.label, lang)}-এর ঠিকানা`) : tr("New address", "নতুন ঠিকানা")}
             </span>
             <span className="max-w-[110px] truncate text-slate lg:max-w-[200px]">
-              {selectedAddress ? selectedAddress.details : "Select your address"}
+              {selectedAddress ? selectedAddress.details : tr("Select your address", "আপনার ঠিকানা দিন")}
             </span>
             <Icon
               d={ICONS.chevron}
@@ -194,7 +230,7 @@ export function Header({
               <button
                 type="button"
                 onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                aria-label={`Account menu for ${user.fullName}`}
+                aria-label={tr(`Account menu for ${user.fullName}`, `${user.fullName}-এর অ্যাকাউন্ট মেনু`)}
                 className={`${iconBtn} text-brand lg:hidden`}
               >
                 <Icon d={ICONS.user} />
@@ -238,7 +274,7 @@ export function Header({
                         <path d="M3 6h18" />
                         <path d="M16 10a4 4 0 0 1-8 0" />
                       </svg>
-                      My Orders
+                      {tr("My Orders", "আমার অর্ডার")}
                     </button>
 
                     {(user.role === "ADMIN" || user.role === "STAFF") && (
@@ -262,7 +298,7 @@ export function Header({
                           <path d="M9 3v18" />
                           <path d="m14 9 3 3-3 3" />
                         </svg>
-                        Admin Panel
+                        {tr("Admin Panel", "অ্যাডমিন প্যানেল")}
                       </button>
                     )}
                   </div>
@@ -288,7 +324,7 @@ export function Header({
                         <polyline points="16 17 21 12 16 7" />
                         <line x1="21" y1="12" x2="9" y2="12" />
                       </svg>
-                      Sign Out
+                      {tr("Sign Out", "সাইন আউট")}
                     </button>
                   </div>
                 </div>
@@ -302,7 +338,7 @@ export function Header({
                 className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
               >
                 <Icon d={RECEIPT_ICON} className="size-4" />
-                My orders
+                {tr("My orders", "আমার অর্ডার")}
               </button>
               <button
                 type="button"
@@ -310,44 +346,44 @@ export function Header({
                 className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
               >
                 <Icon d={ICONS.user} className="size-4" />
-                Sign In
+                {tr("Sign In", "সাইন ইন")}
                 <Icon d={ICONS.chevron} className="size-4 text-brand" />
               </button>
               <button
                 type="button"
                 onClick={() => openAuthModal("login")}
-                aria-label="Sign In"
+                aria-label={tr("Sign In", "সাইন ইন")}
                 className={`${iconBtn} lg:hidden`}
               >
                 <Icon d={ICONS.user} />
               </button>
             </>
           )}
+          <LanguageSwitch className="mx-1 hidden lg:flex" />
+          {/* Phones and tablets: one tap switches to the other language */}
           <button
             type="button"
-            className="hidden items-center gap-1.5 rounded-full px-3 py-2 text-sm font-semibold transition hover:bg-cream lg:flex"
+            onClick={() => setLang(lang === "en" ? "bn" : "en")}
+            lang={lang === "en" ? "bn" : "en"}
+            aria-label={lang === "en" ? "বাংলায় দেখুন" : "Switch to English"}
+            className="grid h-10 min-w-10 shrink-0 place-items-center rounded-full px-2 text-xs font-bold text-charcoal transition hover:bg-cream hover:text-brand lg:hidden"
           >
-            <Icon d={ICONS.globe} className="size-4" />
-            EN
-            <Icon d={ICONS.chevron} className="size-4 text-brand" />
-          </button>
-          <button type="button" aria-label="Favourites" className={`${iconBtn} hidden lg:grid`}>
-            <Icon d={ICONS.heart} />
+            {lang === "en" ? "বাং" : "EN"}
           </button>
           <button
             type="button"
             onClick={handleOpenCart}
-            aria-label={`Cart, ${cartCount} items`}
+            aria-label={tr(`Cart, ${cartCount} items`, `কার্ট, ${num(cartCount)}টি আইটেম`)}
             className="relative ml-1 inline-flex h-10 shrink-0 items-center gap-2 rounded-full bg-brand px-3 text-sm font-bold text-white shadow-[0_8px_20px_-10px_rgba(168,20,31,0.9)] transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/25 sm:px-4"
           >
             <Icon d={ICONS.bag} className="size-[18px]" />
-            <span className="hidden sm:inline">Cart</span>
+            <span className="hidden sm:inline">{tr("Cart", "কার্ট")}</span>
             <span
               className={`grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] font-extrabold ${
                 cartCount > 0 ? "bg-saffron text-maroon" : "bg-white/15 text-white/80"
               }`}
             >
-              {cartCount}
+              {num(cartCount)}
             </span>
           </button>
           <button
@@ -355,7 +391,7 @@ export function Header({
             onClick={() => setIsNavOpen((o) => !o)}
             aria-expanded={isNavOpen}
             aria-controls="mobile-nav"
-            aria-label={isNavOpen ? "Close menu" : "Open menu"}
+            aria-label={isNavOpen ? tr("Close menu", "মেনু বন্ধ করুন") : tr("Open menu", "মেনু খুলুন")}
             className={`${iconBtn} md:hidden`}
           >
             <Icon d={isNavOpen ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"} />
@@ -367,18 +403,18 @@ export function Header({
       {isNavOpen && (
         <nav
           id="mobile-nav"
-          aria-label="Sections"
+          aria-label={tr("Sections", "সেকশন")}
           className="border-t border-line/70 bg-alabaster px-4 pb-3 pt-2 md:hidden"
         >
           <ul className="grid grid-cols-2 gap-2">
             {NAV.map((n) => (
-              <li key={n.label}>
+              <li key={n.href}>
                 <a
                   href={n.href}
                   onClick={() => setIsNavOpen(false)}
                   className="flex h-12 items-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-charcoal active:bg-cream"
                 >
-                  {n.label}
+                  {tr(n.en, n.bn)}
                 </a>
               </li>
             ))}
@@ -392,8 +428,12 @@ export function Header({
                 className="flex h-12 w-full items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-charcoal active:bg-cream"
               >
                 <Icon d={RECEIPT_ICON} className="size-4 text-brand" />
-                My orders · track your order
+                {tr("My orders · track your order", "আমার অর্ডার · অর্ডার ট্র্যাক করুন")}
               </button>
+            </li>
+            <li className="col-span-2 flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-1.5">
+              <span className="text-sm font-semibold text-charcoal">{tr("Language", "ভাষা")}</span>
+              <LanguageSwitch />
             </li>
           </ul>
         </nav>
@@ -401,10 +441,10 @@ export function Header({
 
       {/* Row 2: section nav + search */}
       <div className="mx-auto flex max-w-7xl flex-col gap-2 px-3 pb-3 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-        <nav aria-label="Sections" className="no-scrollbar -mx-1 hidden gap-1 overflow-x-auto md:flex">
+        <nav aria-label={tr("Sections", "সেকশন")} className="no-scrollbar -mx-1 hidden gap-1 overflow-x-auto md:flex">
           {NAV.map((n, i) => (
             <a
-              key={n.label}
+              key={n.href}
               href={n.href}
               className={`shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition ${
                 i === 0
@@ -412,7 +452,7 @@ export function Header({
                   : "text-charcoal hover:bg-cream hover:text-brand"
               }`}
             >
-              {n.label}
+              {tr(n.en, n.bn)}
             </a>
           ))}
         </nav>
@@ -427,7 +467,7 @@ export function Header({
             }}
             className="relative block w-full"
           >
-            <span className="sr-only">Search</span>
+            <span className="sr-only">{tr("Search", "খুঁজুন")}</span>
             {/* Left decorative search icon */}
             <Icon
               d={ICONS.search}
@@ -443,14 +483,14 @@ export function Header({
               }}
               onFocus={() => setIsSearchRecOpen(true)}
               onClick={() => setIsSearchRecOpen(true)}
-              placeholder="Search biriyani, tehari, borhani…"
+              placeholder={tr("Search biriyani, tehari, borhani…", "বিরিয়ানি, তেহারি, বোরহানি খুঁজুন…")}
               className="h-11 w-full rounded-full border border-line bg-white pl-10 pr-11 text-sm outline-none transition placeholder:text-slate/80 focus:border-brand focus:ring-4 focus:ring-brand/10"
             />
             {/* Small Search Icon Button on the right */}
             <button
               type="submit"
-              aria-label="Search"
-              title="Search"
+              aria-label={tr("Search", "খুঁজুন")}
+              title={tr("Search", "খুঁজুন")}
               className="absolute right-1 top-1/2 -translate-y-1/2 grid size-9 place-items-center rounded-full bg-brand text-white transition hover:bg-brand-hover active:scale-95 cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40"
             >
               <Icon d={ICONS.search} className="size-3.5" />

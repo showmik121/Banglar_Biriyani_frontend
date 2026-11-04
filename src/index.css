@@ -177,3 +177,13 @@
     scroll-behavior: auto;
   }
 }
+
+/* Bangla mode: a Bangla text font, and no letter-spacing (it breaks the joined Bangla letters).
+   Outside any layer so it wins over the tracking-* utilities. */
+html[lang="bn"] body {
+  font-family: var(--font-bangla);
+}
+html[lang="bn"] .text-eyebrow,
+html[lang="bn"] [class*="tracking-"] {
+  letter-spacing: 0;
+}

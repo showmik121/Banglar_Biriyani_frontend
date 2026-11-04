@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react"
+import { useLang } from "../context/LanguageContext"
 
 export type SearchableDish = {
   id: string | number
@@ -21,16 +22,10 @@ type Props = {
   containerRef?: React.RefObject<HTMLElement | null>
 }
 
-const POPULAR_SEARCH_PILLS = [
-  "Kacchi Biriyani",
-  "Beef Tehari",
-  "Chicken Polao",
-  "Borhani",
-  "Chicken Roast",
-  "Jali Kabab",
-  "Khichuri",
-  "Firni Cup",
-]
+const POPULAR_SEARCH_PILLS = {
+  en: ["Kacchi Biriyani", "Beef Tehari", "Chicken Polao", "Borhani", "Chicken Roast", "Jali Kabab", "Khichuri", "Firni Cup"],
+  bn: ["কাচ্চি", "তেহারি", "পোলাও", "বোরহানি", "রোস্ট", "জালি কাবাব", "খিচুড়ি", "ফিরনি"],
+}
 
 export function SearchRecommendationPopup({
   isOpen,
@@ -42,6 +37,7 @@ export function SearchRecommendationPopup({
   containerRef,
 }: Props) {
   const popupRef = useRef<HTMLDivElement>(null)
+  const { lang, tr, num, taka } = useLang()
 
   // Close on outside click
   useEffect(() => {
@@ -89,7 +85,7 @@ export function SearchRecommendationPopup({
       ref={popupRef}
       className="absolute left-0 right-0 top-full z-50 mt-2 max-h-[420px] overflow-hidden rounded-2xl border border-line bg-white shadow-2xl transition-all animate-in fade-in duration-150"
       role="dialog"
-      aria-label="Search Recommendations"
+      aria-label={tr("Search suggestions", "খোঁজার পরামর্শ")}
     >
       <div className="max-h-[410px] overflow-y-auto p-3 space-y-3">
         {/* If query has text, show "Search for exact query" action at top */}
@@ -115,10 +111,10 @@ export function SearchRecommendationPopup({
                 </svg>
               </span>
               <span>
-                Search menu for "<span className="underline font-bold">{query}</span>"
+                {tr("Search menu for", "মেনুতে খুঁজুন")} "<span className="underline font-bold">{query}</span>"
               </span>
             </div>
-            <span className="text-[11px] font-bold">Jump to results →</span>
+            <span className="text-[11px] font-bold">{tr("Jump to results →", "ফলাফল দেখুন →")}</span>
           </button>
         )}
 
@@ -126,10 +122,10 @@ export function SearchRecommendationPopup({
         {!cleanQuery && (
           <div>
             <span className="block text-[11px] font-bold uppercase tracking-wider text-slate mb-1.5 px-1">
-              🔥 Trending Dishes & Searches
+              {tr("🔥 Trending Dishes & Searches", "🔥 জনপ্রিয় খাবার ও খোঁজ")}
             </span>
             <div className="flex flex-wrap gap-1.5">
-              {POPULAR_SEARCH_PILLS.map((pill) => (
+              {POPULAR_SEARCH_PILLS[lang].map((pill) => (
                 <button
                   key={pill}
                   type="button"
@@ -151,10 +147,10 @@ export function SearchRecommendationPopup({
           <div className="flex items-center justify-between px-1 pb-1.5 pt-1">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate">
               {cleanQuery
-                ? `Dish Recommendations (${filteredDishes.length})`
-                : "Popular Recommendations"}
+                ? tr(`Dish Recommendations (${filteredDishes.length})`, `মিলে যাওয়া খাবার (${num(filteredDishes.length)})`)
+                : tr("Popular Recommendations", "জনপ্রিয় খাবার")}
             </span>
-            <span className="text-[11px] font-semibold text-brand">Banglar Biriyani</span>
+            <span className="text-[11px] font-semibold text-brand">{tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}</span>
           </div>
 
           {filteredDishes.length > 0 ? (
@@ -203,9 +199,9 @@ export function SearchRecommendationPopup({
 
                   {/* Price & Action */}
                   <div className="text-right shrink-0">
-                    <span className="text-xs font-bold text-brand">৳{dish.price}</span>
+                    <span className="text-xs font-bold text-brand">{taka(dish.price)}</span>
                     <span className="block text-[11px] text-slate group-hover:text-charcoal transition-colors">
-                      View →
+                      {tr("View →", "দেখুন →")}
                     </span>
                   </div>
                 </button>
@@ -214,7 +210,10 @@ export function SearchRecommendationPopup({
           ) : (
             <div className="p-4 text-center">
               <p className="text-xs text-slate">
-                No matching dishes found for "{query}". Try "Kacchi", "Tehari", or "Borhani".
+                {tr(
+                  `No matching dishes found for "${query}". Try "Kacchi", "Tehari", or "Borhani".`,
+                  `"${query}" এর সাথে কোনো খাবার মেলেনি। "কাচ্চি", "তেহারি" বা "বোরহানি" লিখে দেখুন।`,
+                )}
               </p>
             </div>
           )}

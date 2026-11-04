@@ -6,6 +6,8 @@ import { useAuth } from "../context/AuthContext"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
 import { STORE } from "../config/store"
+import { useLang } from "../context/LanguageContext"
+import { dishName } from "../i18n/dishes"
 import type { DayOfWeek, OrderDTO, OrderItemDTO } from "../types/menu"
 
 type Props = {
@@ -24,11 +26,11 @@ interface PlacedOrderState {
 }
 
 // Online payment shows only when the restaurant's number is set in src/config/store.ts
-type PaymentOption = { id: PaymentMethod; label: string; number: string }
+type PaymentOption = { id: PaymentMethod; label: string; labelBn: string; number: string }
 const ALL_PAYMENT_OPTIONS: PaymentOption[] = [
-  { id: "COD", label: "Cash on delivery", number: "" },
-  { id: "BKASH", label: "bKash", number: STORE.bkashNumber },
-  { id: "NAGAD", label: "Nagad", number: STORE.nagadNumber },
+  { id: "COD", label: "Cash on delivery", labelBn: "ক্যাশ অন ডেলিভারি", number: "" },
+  { id: "BKASH", label: "bKash", labelBn: "বিকাশ", number: STORE.bkashNumber },
+  { id: "NAGAD", label: "Nagad", labelBn: "নগদ", number: STORE.nagadNumber },
 ]
 const PAYMENT_OPTIONS = ALL_PAYMENT_OPTIONS.filter((p) => p.id === "COD" || p.number !== "")
 
@@ -37,7 +39,6 @@ const normalizePhone = (v: string) => {
   const digits = v.replace(/\D/g, "")
   return digits.startsWith("880") ? digits.slice(2) : digits
 }
-const taka = (n: number) => `৳${n.toLocaleString("en-IN")}`
 
 const inputClass = (invalid?: boolean) =>
   `mt-1.5 block w-full rounded-xl border bg-white px-3.5 text-base text-charcoal outline-none transition placeholder:text-slate/50 focus:ring-2 sm:text-sm ${
@@ -66,6 +67,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
   const { items, activeDay, subtotalBdt, clearCart, isCheckoutOpen, setIsCheckoutOpen } = useCart()
   const { selectedAddress, setFreeformAddress } = useAddress()
   const { user, openAuthModal, openMyOrders } = useAuth()
+  const { lang, tr, num, taka, digits } = useLang()
 
   const isOpen = propIsOpen ?? isCheckoutOpen
   const handleClose = propOnClose ?? (() => setIsCheckoutOpen(false))
@@ -149,12 +151,12 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
       const json = await res.json().catch(() => null)
       if (!res.ok) {
         setAppliedOffer(null)
-        setPromoError(json?.error?.message || "This code can't be used right now")
+        setPromoError(json?.error?.message || tr("This code can't be used right now", "এই কোড এখন ব্যবহার করা যাবে না"))
         return
       }
       setAppliedOffer(json.data)
     } catch {
-      setPromoError("Couldn't check the code. Please try again.")
+      setPromoError(tr("Couldn't check the code. Please try again.", "কোড যাচাই করা যায়নি। আবার চেষ্টা করুন।"))
     } finally {
       setPromoLoading(false)
     }
@@ -193,12 +195,15 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
 
   const validate = () => {
     const errors: Partial<Record<FieldKey, string>> = {}
-    if (customerName.trim().length < 2) errors.customerName = "Enter your name"
+    if (customerName.trim().length < 2) errors.customerName = tr("Enter your name", "আপনার নাম লিখুন")
     if (!/^01[3-9]\d{8}$/.test(normalizePhone(customerPhone)))
-      errors.customerPhone = "Enter an 11-digit mobile number starting with 01"
-    if (zones.length > 0 && !selectedZone) errors.deliveryZoneId = "Choose where we should deliver"
-    if (customerAddress.trim().length < 5) errors.customerAddress = "Add your room, house or landmark"
-    if (online && paymentTrxId.trim().length < 4) errors.paymentTrxId = "Enter the Transaction ID from your payment"
+      errors.customerPhone = tr(
+        "Enter an 11-digit mobile number starting with 01",
+        "01 দিয়ে শুরু ১১ সংখ্যার মোবাইল নম্বর লিখুন",
+      )
+    if (zones.length > 0 && !selectedZone) errors.deliveryZoneId = tr("Choose where we should deliver", "কোথায় ডেলিভারি দেব বেছে নিন")
+    if (customerAddress.trim().length < 5) errors.customerAddress = tr("Add your room, house or landmark", "রুম, বাসা বা কাছের চেনা জায়গা লিখুন")
+    if (online && paymentTrxId.trim().length < 4) errors.paymentTrxId = tr("Enter the Transaction ID from your payment", "পেমেন্টের ট্রানজেকশন আইডি লিখুন")
     return errors
   }
 
@@ -208,13 +213,13 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
     setGeneralError(null)
 
     if (items.length === 0) {
-      setGeneralError("Your cart is empty. Add something tasty first.")
+      setGeneralError(tr("Your cart is empty. Add something tasty first.", "আপনার কার্ট খালি। আগে মজার কিছু যোগ করুন।"))
       return
     }
     const errors = validate()
     setFieldErrors(errors)
     if (Object.keys(errors).length > 0) {
-      setGeneralError("Please check the highlighted fields.")
+      setGeneralError(tr("Please check the highlighted fields.", "লাল দাগ দেওয়া ঘরগুলো দেখে নিন।"))
       // Take the customer to the first problem
       const first = Object.keys(errors)[0]
       document.querySelector<HTMLElement>(`[data-field="${first}"]`)?.scrollIntoView?.({ block: "center", behavior: "smooth" })
@@ -252,11 +257,11 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
           if (details[k]?.[0]) mapped[k] = details[k]![0]
         }
         setFieldErrors(mapped)
-        setGeneralError(json.error.message || "Please check the highlighted fields.")
+        setGeneralError(json.error.message || tr("Please check the highlighted fields.", "লাল দাগ দেওয়া ঘরগুলো দেখে নিন।"))
         return
       }
       if (!res.ok) {
-        throw new Error(json.error?.message || "Couldn't place your order. Please try again.")
+        throw new Error(json.error?.message || tr("Couldn't place your order. Please try again.", "অর্ডার দেওয়া যায়নি। আবার চেষ্টা করুন।"))
       }
 
       const orderData: OrderDTO = json.data?.order || json.order
@@ -276,7 +281,11 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
         // not important
       }
     } catch (err) {
-      setGeneralError(err instanceof Error ? err.message : "Couldn't place your order. Please check your connection.")
+      setGeneralError(
+        err instanceof Error
+          ? err.message
+          : tr("Couldn't place your order. Please check your connection.", "অর্ডার দেওয়া যায়নি। ইন্টারনেট সংযোগ দেখুন।"),
+      )
     } finally {
       setSubmitting(false)
     }
@@ -316,16 +325,19 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
               <img src="/logo-mark.png" alt="" className="size-9 shrink-0 rounded-full bg-white ring-2 ring-saffron/70" />
               <div className="min-w-0 flex-1">
                 <h2 id="checkout-modal-title" className="text-lg font-bold leading-tight">
-                  Checkout
+                  {tr("Checkout", "চেকআউট")}
                 </h2>
                 <p className="text-xs text-white/75">
-                  {itemCount} {itemCount === 1 ? "item" : "items"} · free delivery
+                  {tr(
+                    `${itemCount} ${itemCount === 1 ? "item" : "items"} · free delivery`,
+                    `${num(itemCount)}টি আইটেম · ফ্রি ডেলিভারি`,
+                  )}
                 </p>
               </div>
               <button
                 type="button"
                 onClick={handleClose}
-                aria-label="Close checkout"
+                aria-label={tr("Close checkout", "চেকআউট বন্ধ করুন")}
                 className="-mr-2 grid size-10 shrink-0 place-items-center rounded-full text-white/80 hover:bg-white/10 hover:text-white"
               >
                 <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -342,24 +354,24 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
               )}
 
               {/* 1. Order */}
-              <Section title="Your order">
+              <Section title={tr("Your order", "আপনার অর্ডার")}>
                 <ul className="space-y-1.5 text-sm">
                   {items.map((i) => (
                     <li key={`${i.menuItemId}-${i.scheduledDay}`} className="flex justify-between gap-3 text-charcoal">
                       <span>
-                        {i.quantity}× {i.name}
+                        {num(i.quantity)}× {dishName(i.name, lang)}
                       </span>
                       <span className="shrink-0">{taka(i.priceBdt * i.quantity)}</span>
                     </li>
                   ))}
                 </ul>
                 <button type="button" onClick={handleClose} className="text-sm font-semibold text-brand hover:underline">
-                  Edit cart
+                  {tr("Edit cart", "কার্ট বদলান")}
                 </button>
               </Section>
 
               {/* 2. Contact */}
-              <Section title="Your details">
+              <Section title={tr("Your details", "আপনার তথ্য")}>
                 {user ? (
                   <p className="flex items-start gap-2 rounded-xl bg-cream px-3.5 py-2.5 text-sm text-charcoal">
                     <svg viewBox="0 0 24 24" className="mt-0.5 size-4 shrink-0 text-brand" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -369,26 +381,27 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     <span className="min-w-0">
                       {user.email ? (
                         <>
-                          Order updates will be emailed to <strong className="break-all">{user.email}</strong>
+                          {tr("Order updates will be emailed to ", "অর্ডারের আপডেট যাবে এই ইমেইলে: ")}
+                          <strong className="break-all">{user.email}</strong>
                         </>
                       ) : (
-                        <>Signed in as {user.fullName}</>
+                        <>{tr(`Signed in as ${user.fullName}`, `${user.fullName} হিসেবে সাইন ইন করা আছে`)}</>
                       )}
                     </span>
                   </p>
                 ) : (
                   <p className="text-sm text-slate">
-                    Have an account?{" "}
+                    {tr("Have an account? ", "অ্যাকাউন্ট আছে? ")}
                     <button type="button" onClick={() => openAuthModal("login")} className="font-semibold text-brand hover:underline">
-                      Sign in
-                    </button>{" "}
-                    to fill this in.
+                      {tr("Sign in", "সাইন ইন করুন")}
+                    </button>
+                    {tr(" to fill this in.", ", তথ্য নিজে থেকেই বসে যাবে।")}
                   </p>
                 )}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div data-field="customerName">
                     <label htmlFor="checkout-customer-name" className="block text-sm font-medium text-charcoal">
-                      Name
+                      {tr("Name", "নাম")}
                     </label>
                     <input
                       ref={nameInputRef}
@@ -407,7 +420,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                   </div>
                   <div data-field="customerPhone">
                     <label htmlFor="checkout-customer-phone" className="block text-sm font-medium text-charcoal">
-                      Mobile number
+                      {tr("Mobile number", "মোবাইল নম্বর")}
                     </label>
                     <input
                       id="checkout-customer-phone"
@@ -430,10 +443,10 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
               </Section>
 
               {/* 3. Delivery */}
-              <Section title="Delivery · free">
+              <Section title={tr("Delivery · free", "ডেলিভারি · ফ্রি")}>
                 {zones.length > 0 && (
                   <fieldset data-field="deliveryZoneId">
-                    <legend className="text-sm font-medium text-charcoal">Delivery point</legend>
+                    <legend className="text-sm font-medium text-charcoal">{tr("Delivery point", "ডেলিভারির জায়গা")}</legend>
                     <div className="mt-1.5 grid gap-2">
                       {zones.map((z) => {
                         const active = z.id === zoneId
@@ -458,7 +471,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                               <span className="block font-semibold text-charcoal">{z.name}</span>
                               {z.area && <span className="block text-slate">{z.area}</span>}
                             </span>
-                            <span className="shrink-0 text-slate">{z.etaMinutes} min</span>
+                            <span className="shrink-0 text-slate">{tr(`${z.etaMinutes} min`, `${digits(z.etaMinutes)} মিনিট`)}</span>
                           </label>
                         )
                       })}
@@ -468,13 +481,13 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 )}
                 <div data-field="customerAddress">
                   <label htmlFor="checkout-customer-address" className="block text-sm font-medium text-charcoal">
-                    Room, house or landmark
+                    {tr("Room, house or landmark", "রুম, বাসা বা চেনা জায়গা")}
                   </label>
                   <textarea
                     id="checkout-customer-address"
                     rows={2}
                     autoComplete="street-address"
-                    placeholder="e.g. Room 304, YKSG-1 Hall"
+                    placeholder={tr("e.g. Room 304, YKSG-1 Hall", "যেমন: রুম ৩০৪, YKSG-1 হল")}
                     value={customerAddress}
                     onChange={(e) => {
                       setCustomerAddress(e.target.value)
@@ -489,28 +502,28 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 {showNote ? (
                   <div>
                     <label htmlFor="checkout-notes" className="block text-sm font-medium text-charcoal">
-                      Note for the kitchen or rider
+                      {tr("Note for the kitchen or rider", "রান্নাঘর বা রাইডারের জন্য নোট")}
                     </label>
                     <input
                       id="checkout-notes"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder="e.g. less spicy, call at the gate"
+                      placeholder={tr("e.g. less spicy, call at the gate", "যেমন: ঝাল কম, গেটে এসে ফোন দিন")}
                       className={`${inputClass()} h-12`}
                       autoFocus
                     />
                   </div>
                 ) : (
                   <button type="button" onClick={() => setShowNote(true)} className="text-sm font-semibold text-brand hover:underline">
-                    + Add a note
+                    {tr("+ Add a note", "+ নোট যোগ করুন")}
                   </button>
                 )}
               </Section>
 
               {/* 4. Payment */}
-              <Section title="Payment">
+              <Section title={tr("Payment", "পেমেন্ট")}>
                 {PAYMENT_OPTIONS.length > 1 ? (
-                  <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Payment method">
+                  <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={tr("Payment method", "পেমেন্টের ধরন")}>
                     {PAYMENT_OPTIONS.map((p) => (
                       <label
                         key={p.id}
@@ -530,25 +543,34 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                             clearError("paymentTrxId")
                           }}
                         />
-                        {p.label}
+                        {tr(p.label, p.labelBn)}
                       </label>
                     ))}
                   </div>
                 ) : (
                   <p className="rounded-xl border border-line px-3.5 py-3 text-sm text-charcoal">
-                    <span className="font-semibold">Cash on delivery</span>
-                    <span className="text-slate"> · pay when your food arrives</span>
+                    <span className="font-semibold">{tr("Cash on delivery", "ক্যাশ অন ডেলিভারি")}</span>
+                    <span className="text-slate">{tr(" · pay when your food arrives", " · খাবার পৌঁছালে টাকা দিন")}</span>
                   </p>
                 )}
                 {online && (
                   <div data-field="paymentTrxId" className="space-y-3 rounded-xl bg-cream/60 p-3.5 text-sm">
                     <p className="text-charcoal">
-                      Send <strong>{taka(checkoutTotalBdt)}</strong> with {payment.label} "Send Money" to{" "}
-                      <strong className="font-mono">{payment.number}</strong>, then enter the Transaction ID.
+                      {lang === "bn" ? (
+                        <>
+                          {payment.labelBn}-এ <strong className="font-mono">{payment.number}</strong> নম্বরে{" "}
+                          <strong>{taka(checkoutTotalBdt)}</strong> "সেন্ড মানি" করুন, তারপর ট্রানজেকশন আইডি লিখুন।
+                        </>
+                      ) : (
+                        <>
+                          Send <strong>{taka(checkoutTotalBdt)}</strong> with {payment.label} "Send Money" to{" "}
+                          <strong className="font-mono">{payment.number}</strong>, then enter the Transaction ID.
+                        </>
+                      )}
                     </p>
                     <div>
                       <label htmlFor="checkout-payment-trxid" className="block text-sm font-medium text-charcoal">
-                        Transaction ID (TrxID)
+                        {tr("Transaction ID (TrxID)", "ট্রানজেকশন আইডি (TrxID)")}
                       </label>
                       <input
                         id="checkout-payment-trxid"
@@ -573,7 +595,7 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
               {appliedOffer ? (
                 <p className="flex items-center justify-between rounded-xl bg-emerald-50 px-3.5 py-3 text-sm text-emerald-800">
                   <span>
-                    <strong className="font-mono">{appliedOffer.code}</strong> applied · −{taka(discountBdt)}
+                    <strong className="font-mono">{appliedOffer.code}</strong> {tr("applied", "যোগ হয়েছে")} · −{taka(discountBdt)}
                   </span>
                   <button
                     type="button"
@@ -583,13 +605,13 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                     }}
                     className="font-semibold underline"
                   >
-                    Remove
+                    {tr("Remove", "সরান")}
                   </button>
                 </p>
               ) : showPromo ? (
                 <div>
                   <label htmlFor="promo-code" className="block text-sm font-medium text-charcoal">
-                    Promo code
+                    {tr("Promo code", "প্রোমো কোড")}
                   </label>
                   <div className="mt-1.5 flex gap-2">
                     <input
@@ -615,35 +637,35 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                       disabled={promoLoading || !promoInput.trim()}
                       className="h-12 rounded-xl bg-charcoal px-5 text-sm font-semibold text-white disabled:opacity-40"
                     >
-                      {promoLoading ? "…" : "Apply"}
+                      {promoLoading ? "…" : tr("Apply", "যোগ করুন")}
                     </button>
                   </div>
                   {promoError && <p className="mt-1.5 text-xs font-medium text-rose-600">{promoError}</p>}
                 </div>
               ) : (
                 <button type="button" onClick={() => setShowPromo(true)} className="text-sm font-semibold text-brand hover:underline">
-                  Have a promo code?
+                  {tr("Have a promo code?", "প্রোমো কোড আছে?")}
                 </button>
               )}
 
               {/* Totals */}
               <div className="space-y-1.5 border-t border-line pt-4 text-sm">
                 <div className="flex justify-between text-slate">
-                  <span>Subtotal</span>
+                  <span>{tr("Subtotal", "সাবটোটাল")}</span>
                   <span>{taka(subtotalBdt)}</span>
                 </div>
                 {discountBdt > 0 && (
                   <div className="flex justify-between text-emerald-700">
-                    <span>Discount ({appliedOffer?.code})</span>
+                    <span>{tr("Discount", "ছাড়")} ({appliedOffer?.code})</span>
                     <span>−{taka(discountBdt)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-slate">
-                  <span>Delivery</span>
-                  <span className="font-semibold text-emerald-700">Free</span>
+                  <span>{tr("Delivery", "ডেলিভারি")}</span>
+                  <span className="font-semibold text-emerald-700">{tr("Free", "ফ্রি")}</span>
                 </div>
                 <div className="flex justify-between pt-1 text-base font-bold text-charcoal">
-                  <span>Total</span>
+                  <span>{tr("Total", "মোট")}</span>
                   <span>{taka(checkoutTotalBdt)}</span>
                 </div>
               </div>
@@ -655,7 +677,9 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
                 disabled={submitting || items.length === 0}
                 className="flex h-12 w-full items-center justify-center rounded-xl bg-brand text-base font-bold text-white transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30 disabled:opacity-60"
               >
-                {submitting ? "Placing your order…" : `Place order · ${taka(checkoutTotalBdt)}`}
+                {submitting
+                  ? tr("Placing your order…", "অর্ডার দেওয়া হচ্ছে…")
+                  : tr(`Place order · ${taka(checkoutTotalBdt)}`, `অর্ডার দিন · ${taka(checkoutTotalBdt)}`)}
               </button>
             </div>
           </form>
@@ -665,10 +689,10 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
   )
 }
 
-const PAYMENT_LABEL: Record<string, string> = {
-  COD: "Cash on delivery · pay when it arrives",
-  BKASH: "bKash",
-  NAGAD: "Nagad",
+const PAYMENT_LABEL: Record<string, [string, string]> = {
+  COD: ["Cash on delivery · pay when it arrives", "ক্যাশ অন ডেলিভারি · খাবার পৌঁছালে টাকা দিন"],
+  BKASH: ["bKash", "বিকাশ"],
+  NAGAD: ["Nagad", "নগদ"],
 }
 
 function OrderPlaced({
@@ -689,6 +713,7 @@ function OrderPlaced({
   onSignup: () => void
 }) {
   const { order, items } = placed
+  const { lang, tr, num, taka, digits } = useLang()
   const [copied, setCopied] = useState(false)
   const copy = async () => {
     try {
@@ -700,12 +725,26 @@ function OrderPlaced({
     }
   }
   const steps = [
-    { title: "We confirm your order", text: "Usually within a few minutes." },
     {
-      title: "We cook and deliver it",
-      text: zone ? `Free delivery to ${zone.name}, about ${zone.etaMinutes} min.` : "Fresh from the kitchen, free delivery.",
+      title: tr("We confirm your order", "আমরা অর্ডার কনফার্ম করব"),
+      text: tr("Usually within a few minutes.", "সাধারণত কয়েক মিনিটের মধ্যে।"),
     },
-    { title: "Enjoy your meal", text: `We'll call ${order.customerPhone} if we need anything.` },
+    {
+      title: tr("We cook and deliver it", "রান্না করে পৌঁছে দেব"),
+      text: zone
+        ? tr(
+            `Free delivery to ${zone.name}, about ${zone.etaMinutes} min.`,
+            `${zone.name}-এ ফ্রি ডেলিভারি, প্রায় ${digits(zone.etaMinutes)} মিনিটে।`,
+          )
+        : tr("Fresh from the kitchen, free delivery.", "রান্নাঘর থেকে তাজা, ফ্রি ডেলিভারি।"),
+    },
+    {
+      title: tr("Enjoy your meal", "মজা করে খান"),
+      text: tr(
+        `We'll call ${order.customerPhone} if we need anything.`,
+        `কিছু দরকার হলে ${order.customerPhone} নম্বরে ফোন দেব।`,
+      ),
+    },
   ]
 
   return (
@@ -716,7 +755,7 @@ function OrderPlaced({
           ref={closeRef}
           type="button"
           onClick={onClose}
-          aria-label="Close"
+          aria-label={tr("Close", "বন্ধ করুন")}
           className="absolute right-3 top-3 grid size-10 place-items-center rounded-full text-white/80 hover:bg-white/10 hover:text-white"
         >
           <svg viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -729,19 +768,21 @@ function OrderPlaced({
           </svg>
         </div>
         <h2 id="order-confirmation-title" className="mt-3 text-2xl font-bold">
-          Order placed!
+          {tr("Order placed!", "অর্ডার হয়ে গেছে!")}
         </h2>
-        <p className="mt-0.5 text-sm text-white/80">অর্ডার সফলভাবে গ্রহণ করা হয়েছে</p>
+        <p className="mt-0.5 text-sm text-white/80">
+          {tr("Thank you for ordering from Banglar Biriyani", "বাংলার বিরিয়ানিতে অর্ডার করার জন্য ধন্যবাদ")}
+        </p>
         <div className="mt-4 inline-flex items-center gap-1 rounded-full bg-white/10 py-1 pl-4 pr-1 ring-1 ring-white/20">
           <span className="text-sm">
-            Order <strong id="confirmation-order-number" className="tracking-wide">{order.orderNumber}</strong>
+            {tr("Order", "অর্ডার")} <strong id="confirmation-order-number" className="tracking-wide">{order.orderNumber}</strong>
           </span>
           <button
             type="button"
             onClick={copy}
             className="h-8 rounded-full px-3 text-xs font-semibold text-saffron hover:bg-white/10"
           >
-            {copied ? "Copied" : "Copy"}
+            {copied ? tr("Copied", "কপি হয়েছে") : tr("Copy", "কপি")}
           </button>
         </div>
       </div>
@@ -755,14 +796,15 @@ function OrderPlaced({
               <path d="m3 7 9 6 9-6" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
             <span className="min-w-0">
-              We'll email updates to <strong className="break-all">{email}</strong>
+              {tr("We'll email updates to ", "আপডেট পাঠাব এই ইমেইলে: ")}
+              <strong className="break-all">{email}</strong>
             </span>
           </p>
         ) : (
           <p className="rounded-xl bg-cream px-3.5 py-2.5 text-sm text-charcoal">
-            Want updates by email next time?{" "}
+            {tr("Want updates by email next time? ", "পরের বার ইমেইলে আপডেট চান? ")}
             <button type="button" onClick={onSignup} className="font-semibold text-brand hover:underline">
-              Create an account
+              {tr("Create an account", "অ্যাকাউন্ট খুলুন")}
             </button>
           </p>
         )}
@@ -770,13 +812,13 @@ function OrderPlaced({
         {/* What happens next */}
         <section aria-labelledby="next-steps-title">
           <h3 id="next-steps-title" className="text-sm font-bold text-charcoal">
-            What happens next
+            {tr("What happens next", "এরপর যা হবে")}
           </h3>
           <ol className="mt-3 space-y-3">
             {steps.map((step, i) => (
               <li key={step.title} className="flex gap-3">
                 <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-light text-xs font-bold text-brand">
-                  {i + 1}
+                  {num(i + 1)}
                 </span>
                 <span className="min-w-0 text-sm">
                   <span className="block font-semibold text-charcoal">{step.title}</span>
@@ -790,13 +832,13 @@ function OrderPlaced({
         {/* Summary */}
         <section aria-labelledby="order-summary-title" className="rounded-xl border border-line">
           <h3 id="order-summary-title" className="border-b border-line px-4 py-3 text-sm font-bold text-charcoal">
-            Your order
+            {tr("Your order", "আপনার অর্ডার")}
           </h3>
           <ul className="space-y-1.5 px-4 pt-3 text-sm">
             {items.map((item) => (
               <li key={item.id} className="flex justify-between gap-3 text-charcoal">
                 <span>
-                  {item.quantity}× {item.itemNameSnapshot}
+                  {num(item.quantity)}× {dishName(item.itemNameSnapshot, lang)}
                 </span>
                 <span className="shrink-0">{taka(item.lineTotalBdt)}</span>
               </li>
@@ -805,22 +847,22 @@ function OrderPlaced({
           <div className="mx-4 mt-3 space-y-1 border-t border-line pt-3 text-sm">
             {(order.discountBdt ?? 0) > 0 && (
               <div className="flex justify-between text-emerald-700">
-                <span>Discount ({order.offerCode})</span>
+                <span>{tr("Discount", "ছাড়")} ({order.offerCode})</span>
                 <span>−{taka(order.discountBdt ?? 0)}</span>
               </div>
             )}
             <div className="flex justify-between text-slate">
-              <span>Delivery</span>
-              <span className="font-semibold text-emerald-700">Free</span>
+              <span>{tr("Delivery", "ডেলিভারি")}</span>
+              <span className="font-semibold text-emerald-700">{tr("Free", "ফ্রি")}</span>
             </div>
             <div className="flex justify-between pt-1 text-base font-bold text-charcoal">
-              <span>Total</span>
+              <span>{tr("Total", "মোট")}</span>
               <span>{taka(order.totalBdt)}</span>
             </div>
           </div>
           <dl className="mt-3 space-y-2 border-t border-line bg-alabaster px-4 py-3 text-sm">
             <div>
-              <dt className="text-slate">Deliver to</dt>
+              <dt className="text-slate">{tr("Deliver to", "ডেলিভারির ঠিকানা")}</dt>
               <dd className="text-charcoal">
                 {order.customerName} · {order.customerPhone}
                 <br />
@@ -829,10 +871,10 @@ function OrderPlaced({
               </dd>
             </div>
             <div>
-              <dt className="text-slate">Payment</dt>
+              <dt className="text-slate">{tr("Payment", "পেমেন্ট")}</dt>
               <dd className="text-charcoal">
-                {PAYMENT_LABEL[order.paymentMethod] ?? order.paymentMethod}
-                {order.paymentTrxId && <> · TrxID {order.paymentTrxId} (we'll check it)</>}
+                {PAYMENT_LABEL[order.paymentMethod] ? tr(...PAYMENT_LABEL[order.paymentMethod]) : order.paymentMethod}
+                {order.paymentTrxId && <> · TrxID {order.paymentTrxId} {tr("(we'll check it)", "(আমরা যাচাই করব)")}</>}
               </dd>
             </div>
           </dl>
@@ -845,14 +887,14 @@ function OrderPlaced({
           onClick={onClose}
           className="h-12 rounded-xl border border-line text-sm font-semibold text-charcoal transition hover:bg-cream focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/20"
         >
-          Back to menu
+          {tr("Back to menu", "মেনুতে ফিরুন")}
         </button>
         <button
           type="button"
           onClick={onTrack}
           className="h-12 rounded-xl bg-brand text-sm font-bold text-white transition hover:bg-brand-hover focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/30"
         >
-          Track my order
+          {tr("Track my order", "অর্ডার ট্র্যাক করুন")}
         </button>
       </div>
     </div>

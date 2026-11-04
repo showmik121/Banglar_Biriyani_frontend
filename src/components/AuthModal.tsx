@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 import { useAuth } from "../context/AuthContext"
 import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
+import { useLang } from "../context/LanguageContext"
 
 type Tab = "login" | "signup"
 type SignupField = "fullName" | "phone" | "email" | "password"
@@ -12,12 +13,20 @@ const normalizePhone = (v: string) => {
   return digits.startsWith("880") ? digits.slice(2) : digits
 }
 
-function validateSignup(name: string, phone: string, email: string, password: string): Partial<Record<SignupField, string>> {
+function validateSignup(
+  name: string,
+  phone: string,
+  email: string,
+  password: string,
+  tr: (en: string, bn: string) => string,
+): Partial<Record<SignupField, string>> {
   const errors: Partial<Record<SignupField, string>> = {}
-  if (name.trim().length < 2) errors.fullName = "Enter your name"
-  if (!/^01[3-9]\d{8}$/.test(normalizePhone(phone))) errors.phone = "Enter an 11-digit mobile number starting with 01"
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) errors.email = "Enter a valid email, e.g. name@gmail.com"
-  if (password.length < 8) errors.password = "Use at least 8 characters"
+  if (name.trim().length < 2) errors.fullName = tr("Enter your name", "আপনার নাম লিখুন")
+  if (!/^01[3-9]\d{8}$/.test(normalizePhone(phone)))
+    errors.phone = tr("Enter an 11-digit mobile number starting with 01", "01 দিয়ে শুরু ১১ সংখ্যার মোবাইল নম্বর লিখুন")
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()))
+    errors.email = tr("Enter a valid email, e.g. name@gmail.com", "সঠিক ইমেইল লিখুন, যেমন name@gmail.com")
+  if (password.length < 8) errors.password = tr("Use at least 8 characters", "কমপক্ষে ৮ অক্ষর দিন")
   return errors
 }
 
@@ -28,6 +37,7 @@ const inputClass = (invalid?: boolean) =>
 
 export function AuthModal() {
   const { isAuthModalOpen, authModalDefaultTab, closeAuthModal, login, signup } = useAuth()
+  const { tr } = useLang()
   const modalRef = useRef<HTMLDivElement>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
   useBodyScrollLock(isAuthModalOpen)
@@ -75,7 +85,7 @@ export function AuthModal() {
 
   if (!isAuthModalOpen) return null
 
-  const clientErrors = validateSignup(fullName, phone, email, password)
+  const clientErrors = validateSignup(fullName, phone, email, password, tr)
   // Show a field's problem after the customer leaves it (or presses the button)
   const fieldError = (f: SignupField) => serverErrors[f] || (touched[f] ? clientErrors[f] : undefined)
 
@@ -86,7 +96,8 @@ export function AuthModal() {
     setBusy(true)
     const result = await login(identifier.trim(), loginPassword)
     setBusy(false)
-    if (!result.ok) setFormError(result.error || "Wrong mobile number, email or password.")
+    if (!result.ok)
+      setFormError(result.error || tr("Wrong mobile number, email or password.", "মোবাইল নম্বর, ইমেইল বা পাসওয়ার্ড ভুল।"))
   }
 
   const submitSignup = async (e: FormEvent) => {
@@ -110,7 +121,8 @@ export function AuthModal() {
       const mapped: Partial<Record<SignupField, string>> = {}
       for (const f of ["fullName", "phone", "email", "password"] as SignupField[]) if (fe[f]?.[0]) mapped[f] = fe[f]![0]
       setServerErrors(mapped)
-      if (Object.keys(mapped).length === 0) setFormError(result.error || "Couldn't create your account. Please try again.")
+      if (Object.keys(mapped).length === 0)
+        setFormError(result.error || tr("Couldn't create your account. Please try again.", "অ্যাকাউন্ট খোলা যায়নি। আবার চেষ্টা করুন।"))
     }
   }
 
@@ -132,11 +144,11 @@ export function AuthModal() {
         {/* Brand header, same look as the admin panel */}
         <div className="flex shrink-0 items-center gap-2.5 bg-maroon px-5 py-3.5 text-white">
           <img src="/logo-mark.png" alt="" className="size-9 shrink-0 rounded-full bg-white ring-2 ring-saffron/70" />
-          <span className="min-w-0 flex-1 truncate font-bold">Banglar Biriyani</span>
+          <span className="min-w-0 flex-1 truncate font-bold">{tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}</span>
           <button
             type="button"
             onClick={closeAuthModal}
-            aria-label="Close"
+            aria-label={tr("Close", "বন্ধ করুন")}
             className="-mr-2 grid size-10 shrink-0 place-items-center rounded-full text-white/80 hover:bg-white/10 hover:text-white"
           >
             <svg className="size-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
@@ -147,7 +159,7 @@ export function AuthModal() {
 
         <div className="overflow-y-auto overscroll-contain px-6 pb-[calc(1.5rem+env(safe-area-inset-bottom))] pt-5 sm:pb-6">
           {/* Sign in / Create account switch */}
-          <div role="tablist" aria-label="Account" className="grid grid-cols-2 rounded-xl bg-cream p-1">
+          <div role="tablist" aria-label={tr("Account", "অ্যাকাউন্ট")} className="grid grid-cols-2 rounded-xl bg-cream p-1">
             {(["login", "signup"] as Tab[]).map((t) => (
               <button
                 key={t}
@@ -159,16 +171,18 @@ export function AuthModal() {
                   tab === t ? "bg-white text-brand shadow-sm" : "text-slate hover:text-charcoal"
                 }`}
               >
-                {t === "login" ? "Sign in" : "Create account"}
+                {t === "login" ? tr("Sign in", "সাইন ইন") : tr("Create account", "অ্যাকাউন্ট খুলুন")}
               </button>
             ))}
           </div>
 
           <h2 id="auth-modal-title" className="mt-5 text-xl font-bold text-charcoal">
-            {isSignup ? "Create your account" : "Welcome back"}
+            {isSignup ? tr("Create your account", "নতুন অ্যাকাউন্ট খুলুন") : tr("Welcome back", "আবার স্বাগতম")}
           </h2>
           <p className="mt-1 text-sm text-slate">
-            {isSignup ? "Takes a minute. Order faster and get updates by email." : "Sign in to order faster and see your orders."}
+            {isSignup
+              ? tr("Takes a minute. Order faster and get updates by email.", "এক মিনিটের কাজ। দ্রুত অর্ডার করুন, ইমেইলে আপডেট পান।")
+              : tr("Sign in to order faster and see your orders.", "দ্রুত অর্ডার করতে আর অর্ডার দেখতে সাইন ইন করুন।")}
           </p>
 
           {formError && (
@@ -179,7 +193,7 @@ export function AuthModal() {
 
           {isSignup ? (
             <form onSubmit={submitSignup} noValidate className="mt-5 space-y-4">
-              <Field id="signup-name" label="Your name" error={fieldError("fullName")}>
+              <Field id="signup-name" label={tr("Your name", "আপনার নাম")} error={fieldError("fullName")}>
                 <input
                   ref={firstInputRef}
                   id="signup-name"
@@ -197,7 +211,7 @@ export function AuthModal() {
                 />
               </Field>
 
-              <Field id="signup-phone" label="Mobile number" error={fieldError("phone")}>
+              <Field id="signup-phone" label={tr("Mobile number", "মোবাইল নম্বর")} error={fieldError("phone")}>
                 <input
                   id="signup-phone"
                   type="tel"
@@ -216,7 +230,12 @@ export function AuthModal() {
                 />
               </Field>
 
-              <Field id="signup-email" label="Email" error={fieldError("email")} hint="We'll email your order updates here">
+              <Field
+                id="signup-email"
+                label={tr("Email", "ইমেইল")}
+                error={fieldError("email")}
+                hint={tr("We'll email your order updates here", "অর্ডারের আপডেট এই ইমেইলে পাঠাব")}
+              >
                 <input
                   id="signup-email"
                   type="email"
@@ -235,7 +254,12 @@ export function AuthModal() {
                 />
               </Field>
 
-              <Field id="signup-password" label="Password" error={fieldError("password")} hint="At least 8 characters">
+              <Field
+                id="signup-password"
+                label={tr("Password", "পাসওয়ার্ড")}
+                error={fieldError("password")}
+                hint={tr("At least 8 characters", "কমপক্ষে ৮ অক্ষর")}
+              >
                 <PasswordInput
                   id="signup-password"
                   autoComplete="new-password"
@@ -251,25 +275,31 @@ export function AuthModal() {
                 />
               </Field>
 
-              <SubmitButton busy={busy} label="Create account" busyLabel="Creating account…" />
-              <p className="text-center text-xs text-slate">We use your number and email only for your orders.</p>
+              <SubmitButton
+                busy={busy}
+                label={tr("Create account", "অ্যাকাউন্ট খুলুন")}
+                busyLabel={tr("Creating account…", "অ্যাকাউন্ট খোলা হচ্ছে…")}
+              />
+              <p className="text-center text-xs text-slate">
+                {tr("We use your number and email only for your orders.", "আপনার নম্বর আর ইমেইল শুধু অর্ডারের কাজে ব্যবহার করি।")}
+              </p>
             </form>
           ) : (
             <form onSubmit={submitLogin} className="mt-5 space-y-4">
-              <Field id="login-identifier" label="Mobile number or email">
+              <Field id="login-identifier" label={tr("Mobile number or email", "মোবাইল নম্বর বা ইমেইল")}>
                 <input
                   ref={firstInputRef}
                   id="login-identifier"
                   type="text"
                   autoComplete="username"
-                  placeholder="01XXXXXXXXX or name@gmail.com"
+                  placeholder={tr("01XXXXXXXXX or name@gmail.com", "01XXXXXXXXX বা name@gmail.com")}
                   value={identifier}
                   onChange={(e) => setIdentifier(e.target.value)}
                   required
                   className={inputClass()}
                 />
               </Field>
-              <Field id="login-password" label="Password">
+              <Field id="login-password" label={tr("Password", "পাসওয়ার্ড")}>
                 <PasswordInput
                   id="login-password"
                   autoComplete="current-password"
@@ -280,15 +310,15 @@ export function AuthModal() {
                   required
                 />
               </Field>
-              <SubmitButton busy={busy} label="Sign in" busyLabel="Signing in…" />
+              <SubmitButton busy={busy} label={tr("Sign in", "সাইন ইন")} busyLabel={tr("Signing in…", "সাইন ইন হচ্ছে…")} />
               <p className="text-center text-sm text-slate">
-                New here?{" "}
+                {tr("New here? ", "নতুন? ")}
                 <button
                   type="button"
                   onClick={() => switchTo("signup")}
                   className="font-semibold text-brand underline-offset-2 hover:underline"
                 >
-                  Create an account
+                  {tr("Create an account", "অ্যাকাউন্ট খুলুন")}
                 </button>
               </p>
             </form>
@@ -350,6 +380,7 @@ function PasswordInput({
   invalid?: boolean
   required?: boolean
 }) {
+  const { tr } = useLang()
   return (
     <div className="relative">
       <input
@@ -367,10 +398,10 @@ function PasswordInput({
       <button
         type="button"
         onClick={onToggle}
-        aria-label={shown ? "Hide password" : "Show password"}
+        aria-label={shown ? tr("Hide password", "পাসওয়ার্ড লুকান") : tr("Show password", "পাসওয়ার্ড দেখান")}
         className="absolute right-1.5 top-[calc(50%+3px)] h-9 -translate-y-1/2 rounded-lg px-2.5 text-xs font-semibold text-slate hover:bg-cream hover:text-charcoal"
       >
-        {shown ? "Hide" : "Show"}
+        {shown ? tr("Hide", "লুকান") : tr("Show", "দেখান")}
       </button>
     </div>
   )
