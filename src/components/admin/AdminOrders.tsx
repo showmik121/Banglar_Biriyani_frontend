@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useLang } from "../../context/LanguageContext"
+import { NEW_ORDER_EVENT } from "./useOrderAlerts"
 import { adminFetch, btnDanger, btnPrimary, btnSecondary, dg, inputClass, taka, timeAgo } from "./adminApi"
 import { Empty, ListSkeleton, Notice, PageHeader } from "./adminUi"
 
@@ -167,7 +168,12 @@ export function AdminOrders() {
     const timer = window.setInterval(() => {
       if (document.visibilityState === "visible") load()
     }, 30000)
-    return () => window.clearInterval(timer)
+    // The layout spotted a new order: show it straight away
+    window.addEventListener(NEW_ORDER_EVENT, load)
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener(NEW_ORDER_EVENT, load)
+    }
   }, [load])
 
   const activeCount = rows.filter((r) => ACTIVE.includes(r.order.status)).length

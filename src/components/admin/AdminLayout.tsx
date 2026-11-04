@@ -2,6 +2,8 @@ import type { ReactNode } from "react"
 import { useAuth } from "../../context/AuthContext"
 import { useLang } from "../../context/LanguageContext"
 import { navigateTo, useCurrentPath } from "../../utils/navigation"
+import { dg, taka } from "./adminApi"
+import { useOrderAlerts } from "./useOrderAlerts"
 
 const TABS = [
   { en: "Orders", bn: "অর্ডার", path: "/admin/orders", icon: "M6 4h12l1 5H5l1-5ZM5 9v10h14V9M9 13h6" },
@@ -15,6 +17,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
   const { lang, setLang, tr } = useLang()
   const path = useCurrentPath()
+  const { enabled, enable, alert, dismiss } = useOrderAlerts()
   // /admin opens the Orders tab
   const active = TABS.find((t) => path.startsWith(t.path))?.path ?? TABS[0].path
 
@@ -103,6 +106,51 @@ export function AdminLayout({ children }: { children: ReactNode }) {
             ))}
           </ul>
         </nav>
+
+        {alert && (
+          <div role="alert" className="bg-brand text-white">
+            <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-2.5">
+              <span className="text-xl" aria-hidden>
+                🔔
+              </span>
+              <p className="min-w-0 flex-1 text-sm font-semibold leading-snug">
+                {alert.count === 1
+                  ? tr("New order!", "নতুন অর্ডার!")
+                  : tr(`${alert.count} new orders!`, `${dg(alert.count)}টি নতুন অর্ডার!`)}{" "}
+                <span className="font-normal text-white/90">
+                  {alert.name} · {taka(alert.total)}
+                </span>
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  dismiss()
+                  navigateTo("/admin/orders")
+                }}
+                className="h-10 shrink-0 rounded-lg bg-white px-4 text-sm font-bold text-brand"
+              >
+                {tr("View", "দেখুন")}
+              </button>
+              <button
+                type="button"
+                onClick={dismiss}
+                aria-label={tr("Dismiss", "বন্ধ করুন")}
+                className="grid size-10 shrink-0 place-items-center rounded-lg text-white/80 hover:bg-white/10"
+              >
+                ✕
+              </button>
+            </div>
+          </div>
+        )}
+        {!enabled && (
+          <button
+            type="button"
+            onClick={enable}
+            className="block w-full bg-saffron px-4 py-2.5 text-center text-sm font-bold text-maroon"
+          >
+            {tr("🔔 Turn on order sound & alerts", "🔔 অর্ডারের সাউন্ড ও অ্যালার্ট চালু করুন")}
+          </button>
+        )}
       </header>
 
       <main className="mx-auto max-w-5xl px-4 pb-28 pt-5 sm:pb-10 sm:pt-6">{children}</main>
