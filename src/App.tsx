@@ -118,26 +118,33 @@ function SectionTitle({
   eyebrow,
   bangla,
   light = false,
+  redBand = false,
 }: {
   title: string
   meta?: string
   eyebrow?: string
   bangla?: string
   light?: boolean
+  redBand?: boolean // phone only: red background panel
 }) {
+  const rb = redBand
   return (
-    <div className="mb-4 flex flex-col items-center text-center sm:mb-10">
+    <div
+      className={`mb-4 flex flex-col items-center text-center sm:mb-10 ${
+        rb ? "max-sm:rounded-2xl max-sm:bg-jali max-sm:px-4 max-sm:py-5 max-sm:shadow-md" : ""
+      }`}
+    >
       {eyebrow && (
-        <p className={`text-eyebrow ${light ? "text-saffron" : "text-brand"}`}>{eyebrow}</p>
+        <p className={`text-eyebrow ${light ? "text-saffron" : "text-brand"} ${rb ? "max-sm:!text-saffron" : ""}`}>{eyebrow}</p>
       )}
       {bangla && (
         <h2
-          className={`text-display mt-1 text-[1.5rem] sm:mt-3 sm:text-5xl ${light ? "text-white" : "text-charcoal"}`}
+          className={`text-display mt-1 text-[1.5rem] sm:mt-3 sm:text-5xl ${light ? "text-white" : "text-charcoal"} ${rb ? "max-sm:!text-white" : ""}`}
         >
           {bangla}
         </h2>
       )}
-      <p className={`mt-1 text-sm font-semibold sm:mt-2 sm:text-base ${light ? "text-white/75" : "text-slate"}`}>
+      <p className={`mt-1 text-sm font-semibold sm:mt-2 sm:text-base ${light ? "text-white/75" : "text-slate"} ${rb ? "max-sm:!text-white/85" : ""}`}>
         {title}
       </p>
       <svg
@@ -153,10 +160,10 @@ function SectionTitle({
           strokeLinecap="round"
         />
       </svg>
-      <div className={`ornament mt-3 sm:hidden ${light ? "!text-saffron" : ""}`} aria-hidden>
+      <div className={`ornament mt-3 sm:hidden ${light || rb ? "!text-saffron" : ""}`} aria-hidden>
         <span />
       </div>
-      {meta && <p className="mt-3 text-xs font-semibold text-slate">{meta}</p>}
+      {meta && <p className={`mt-3 text-xs font-semibold text-slate ${rb ? "max-sm:!text-white/85" : ""}`}>{meta}</p>}
     </div>
   )
 }
@@ -706,6 +713,7 @@ export default function App() {
           <SectionTitle
             eyebrow={tr("Our Menu", "আমাদের মেনু")}
             bangla="আমাদের শাহি মেনু"
+            redBand
             title={tr("Straight from the nawab's handi", "সরাসরি নবাবি হাঁড়ি থেকে")}
             meta={
               loading
