@@ -23,7 +23,7 @@ afterEach(() => vi.unstubAllGlobals())
 
 function mockApi() {
   const calls: { url: string; init?: RequestInit }[] = []
-  const schedule = Object.fromEntries(days.map((d) => [d, [row(1, "BREAKFAST"), row(2, "LUNCH")]]))
+  const schedule = Object.fromEntries(days.map((d) => [d, [row(1, "LUNCH")]]))
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string, init?: RequestInit) => {
@@ -45,7 +45,7 @@ function mockApi() {
 }
 
 describe("Admin daily meals", () => {
-  test("shows breakfast, lunch and dinner and saves each dish with its meal", async () => {
+  test("shows lunch and dinner and saves each dish with its meal", async () => {
     const calls = mockApi()
     render(<AdminMeals />)
     const dinner = (await screen.findByRole("heading", { name: "Dinner" })).closest("section")!
@@ -59,20 +59,19 @@ describe("Admin daily meals", () => {
     await waitFor(() => expect(calls.some((c) => c.init?.method === "PUT")).toBe(true))
     const body = JSON.parse(String(calls.find((c) => c.init?.method === "PUT")!.init!.body))
     expect(body.assignments.map((a: { mealTime: string; menuItemId: number }) => `${a.mealTime}:${a.menuItemId}`)).toEqual([
-      "BREAKFAST:1",
-      "LUNCH:2",
+      "LUNCH:1",
       "DINNER:3",
       "DINNER:2",
     ])
     // The first dish of each meal is its special
-    expect(body.assignments.map((a: { isFeatured: boolean }) => a.isFeatured)).toEqual([true, true, true, false])
+    expect(body.assignments.map((a: { isFeatured: boolean }) => a.isFeatured)).toEqual([true, true, false])
   })
 
   test("removing a dish enables Undo", async () => {
     mockApi()
     render(<AdminMeals />)
     const lunch = (await screen.findByRole("heading", { name: "Lunch" })).closest("section")!
-    fireEvent.click(within(lunch).getByRole("button", { name: /Remove Kacchi/ }))
+    fireEvent.click(within(lunch).getByRole("button", { name: /Remove Khichuri/ }))
     expect(screen.getByRole("button", { name: "Undo changes" })).toBeEnabled()
   })
 })

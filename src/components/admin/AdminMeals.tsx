@@ -3,7 +3,7 @@ import { adminFetch, btnPrimary, btnSecondary, taka } from "./adminApi"
 import { Empty, ListSkeleton, Notice, PageHeader } from "./adminUi"
 
 /** Must match MAX_ITEMS_PER_MEAL on the server */
-export const MAX_ITEMS_PER_MEAL = 6
+export const MAX_ITEMS_PER_MEAL = 12
 
 const DAYS = ["SATURDAY", "SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"] as const
 type Day = (typeof DAYS)[number]
@@ -16,9 +16,9 @@ const DAY_NAME: Record<Day, string> = {
   THURSDAY: "Thursday",
   FRIDAY: "Friday",
 }
-const MEALS = ["BREAKFAST", "LUNCH", "DINNER"] as const
+const MEALS = ["LUNCH", "DINNER"] as const
 type Meal = (typeof MEALS)[number]
-const MEAL_NAME: Record<Meal, string> = { BREAKFAST: "Breakfast", LUNCH: "Lunch", DINNER: "Dinner" }
+const MEAL_NAME: Record<Meal, string> = { LUNCH: "Lunch", DINNER: "Dinner" }
 
 const todayKey = (): Day => {
   const js = ["SUNDAY", "MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"] as const
@@ -128,7 +128,7 @@ export function AdminMeals() {
     <div>
       <PageHeader title="Daily meals" />
       <p className="-mt-3 mb-5 text-sm text-slate">
-        Set breakfast, lunch and dinner for each day (up to {MAX_ITEMS_PER_MEAL} dishes each). They show in "7-day
+        Set lunch and dinner for each day (up to {MAX_ITEMS_PER_MEAL} dishes each). They show in "7-day
         special meals" on the website. The first dish of each meal is its special.
       </p>
       {notice && <Notice kind="ok">{notice}</Notice>}

@@ -108,12 +108,6 @@ const HERO_IMAGES = [
   img("photo-1589302168068-964664d93dc0", 2000, 1100),
   img("photo-1563379091339-03b21ab4a4f8", 2000, 1100),
 ]
-const MEAL_IMAGES = [
-  img("photo-1589778655375-3e622a9fc91c", 2000, 1000),
-  img("photo-1585937421612-70a008356fbe", 2000, 1000),
-  img("photo-1546833999-b9f581a1996d", 2000, 1000),
-  img("photo-1626777552726-4a6b54c97e46", 2000, 1000),
-]
 
 function SectionTitle({
   title,
@@ -754,22 +748,6 @@ export default function App() {
         </div>
       </section>
 
-      <Hero
-        compact
-        as="h2"
-        images={MEAL_IMAGES}
-        alt={tr("A Bengali thali with rice, curries and sides", "ভাত, তরকারি ও সাইড ডিশসহ বাঙালি থালি")}
-        badge={tr("Daily meals", "দৈনিক খাবার")}
-        title={tr("Home-style", "ঘরোয়া স্বাদের")}
-        highlight={tr("meals", "খাবার")}
-        subtitle={tr("Breakfast, lunch and dinner", "সকালের নাস্তা, দুপুর আর রাতের খাবার")}
-        body={tr(
-          "A different menu for every meal, every day of the week, just like your favourite bhater hotel. Pick a day and a meal, then order ahead.",
-          "ভাতের হোটেলের মতো সপ্তাহের প্রতিদিন তিন বেলার আলাদা মেনু। দিন আর বেলা বেছে নিয়ে আগেই অর্ডার করুন।",
-        )}
-        primary={{ label: tr("See meals", "মিল দেখুন"), href: "#meal" }}
-      />
-
       {/* 7-day meals with a sticky day picker */}
       <section id="meal" className="scroll-mt-[var(--header-h,120px)]">
         <div className="sticky top-[var(--header-h,120px)] z-30 border-b border-line bg-alabaster/95 py-3 backdrop-blur">
@@ -790,8 +768,8 @@ export default function App() {
             </p>
           </div>
 
-          {/* Breakfast / Lunch / Dinner */}
-          <div role="tablist" aria-label={tr("Meal time", "বেলা")} className="mb-6 grid grid-cols-3 gap-1 rounded-2xl bg-cream p-1 sm:inline-grid sm:min-w-[420px]">
+          {/* Lunch / Dinner */}
+          <div role="tablist" aria-label={tr("Meal time", "বেলা")} className="mb-6 grid grid-cols-2 gap-1 rounded-2xl bg-cream p-1 sm:inline-grid sm:min-w-[320px]">
             {MEAL_TIMES.map((m) => {
               const count = filteredMeals.filter((p) => (p.mealTime || "LUNCH") === m).length
               const active = m === mealTime
