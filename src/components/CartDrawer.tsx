@@ -250,7 +250,7 @@ export function CartDrawer({
                     <div className="mt-0.5 flex items-center gap-2">
                       <span className="text-sm font-bold text-brand">{taka(item.priceBdt)}</span>
                       {item.mealTime && (
-                        <span className="rounded-full bg-cream px-2 py-0.5 text-[11px] font-semibold text-charcoal">
+                        <span className="rounded-full bg-cream px-2 py-0.5 text-xs font-semibold text-charcoal">
                           {mealTimeLabel(item.mealTime, lang)}
                         </span>
                       )}
@@ -318,11 +318,11 @@ export function CartDrawer({
                 <div className="mb-2 flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
                     <span className="text-xs font-bold text-charcoal">{tr("Complete Your Biriyani", "বিরিয়ানির সাথে নিন")}</span>
-                    <span className="rounded-full bg-brand px-1.5 py-0.2 text-[11px] font-bold uppercase tracking-wider text-white">
+                    <span className="rounded-full bg-brand px-1.5 py-0.2 text-xs font-bold uppercase tracking-wider text-white">
                       {tr("Add-ons", "সাথে")}
                     </span>
                   </div>
-                  <span className="text-[11px] font-medium text-slate">{tr("Pairs best", "দারুণ মানায়")}</span>
+                  <span className="text-xs font-medium text-slate">{tr("Pairs best", "দারুণ মানায়")}</span>
                 </div>
 
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">

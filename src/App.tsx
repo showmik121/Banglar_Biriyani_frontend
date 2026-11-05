@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react"
+import { Suspense, lazy, useEffect, useMemo, useState } from "react"
 import { Header } from "./components/Header"
 import { Hero } from "./components/Hero"
 import { TornEdge } from "./components/TornEdge"
@@ -11,7 +11,8 @@ import { AddressModal } from "./components/AddressModal"
 import { AuthModal } from "./components/AuthModal"
 import { MyOrdersDrawer } from "./components/MyOrdersDrawer"
 import { AdminPanelModal } from "./components/AdminPanelModal"
-import { AdminPortal } from "./components/admin/AdminPortal"
+// The admin panel is only needed by the owner: load it on demand so customers download less
+const AdminPortal = lazy(() => import("./components/admin/AdminPortal").then((m) => ({ default: m.AdminPortal })))
 import { useCurrentPath } from "./utils/navigation"
 import { type SearchableDish } from "./components/SearchRecommendationPopup"
 import { useCart } from "./context/CartContext"
@@ -496,9 +497,9 @@ export default function App() {
   const currentPath = useCurrentPath()
   const { lang, tr, num, taka } = useLang()
   const isAdmin = currentPath.startsWith("/admin")
-  // The admin panel is English only
+  // The admin panel sets its own language (Bangla by default)
   useEffect(() => {
-    document.documentElement.lang = isAdmin ? "en" : lang
+    if (!isAdmin) document.documentElement.lang = lang
   }, [isAdmin, lang])
   const { zones: storeZones, offers: storeOffers } = useStoreData()
   const {
@@ -665,11 +666,27 @@ export default function App() {
   }
 
   if (currentPath.startsWith("/admin")) {
-    return <AdminPortal />
+    return (
+      <Suspense
+        fallback={
+          <div className="grid min-h-screen place-items-center bg-alabaster" role="status">
+            <div className="size-8 animate-spin rounded-full border-2 border-line border-t-brand" />
+          </div>
+        }
+      >
+        <AdminPortal />
+      </Suspense>
+    )
   }
 
   return (
     <div className="flex min-h-screen flex-col">
+      <a
+        href="#menu"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[100] focus:rounded-lg focus:bg-brand focus:px-4 focus:py-2.5 focus:text-sm focus:font-bold focus:text-white"
+      >
+        {tr("Skip to the menu", "মেনুতে যান")}
+      </a>
       <Header
         cartCount={totalItems}
         query={query}
@@ -813,7 +830,7 @@ export default function App() {
                   }`}
                 >
                   {mealTimeShort(m, lang)}
-                  <span className={`text-[11px] font-semibold ${active ? "text-brand/80" : "text-slate"}`}>
+                  <span className={`text-xs font-semibold ${active ? "text-brand/80" : "text-slate"}`}>
                     {tr(`${count} items`, `${num(count)}টি`)}
                   </span>
                 </button>

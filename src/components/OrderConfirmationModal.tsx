@@ -74,7 +74,7 @@ export function OrderConfirmationModal({ order, onClose, onViewOrders }: Props) 
                     <span className="font-semibold text-charcoal">
                       {item.quantity}x {item.name}
                     </span>
-                    <span className="block text-[10px] text-slate font-mono">
+                    <span className="block text-xs text-slate font-mono">
                       ৳{item.price} each
                     </span>
                   </div>

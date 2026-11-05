@@ -77,7 +77,7 @@ export function DayPillBar({ active: propActive, onChange: propOnChange }: Props
               {dayLabel(d, lang)}
               {isToday && (
                 <span
-                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                  className={`rounded-full px-1.5 py-0.5 text-xs font-bold uppercase tracking-wider ${
                     isActive ? "bg-saffron text-maroon" : "bg-gold-light text-gold"
                   }`}
                 >

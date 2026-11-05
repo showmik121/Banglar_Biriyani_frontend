@@ -150,7 +150,7 @@ export function Header({
             <span className="text-display text-lg text-maroon sm:text-xl">
               {tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}
             </span>
-            <span className="font-bn mt-1 text-[11px] text-gold sm:text-xs">
+            <span className="font-bn mt-1 text-xs text-gold sm:text-xs">
               {tr("বাংলার বিরিয়ানি", "Banglar Biriyani")}
             </span>
           </span>
@@ -243,9 +243,9 @@ export function Header({
                 >
                   <div className="border-b border-line px-3 py-2.5">
                     <p className="text-xs font-bold text-charcoal truncate">{user.fullName}</p>
-                    <div className="mt-0.5 flex items-center justify-between text-[11px] text-slate">
+                    <div className="mt-0.5 flex items-center justify-between text-xs text-slate">
                       <span className="truncate">{user.phone}</span>
-                      <span className="rounded-full bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand">
+                      <span className="rounded-full bg-brand/10 px-1.5 py-0.5 text-xs font-bold text-brand">
                         {user.role}
                       </span>
                     </div>
@@ -376,7 +376,7 @@ export function Header({
           >
             <Icon d={ICONS.bag} className="size-[22px]" />
             {cartCount > 0 && (
-              <span className="absolute right-0.5 top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-brand px-1 text-[10px] font-extrabold text-white ring-2 ring-alabaster">
+              <span className="absolute right-0.5 top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-brand px-1 text-xs font-extrabold text-white ring-2 ring-alabaster">
                 {num(cartCount)}
               </span>
             )}

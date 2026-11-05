@@ -56,6 +56,8 @@ test("a new customer signs up, orders from the menu, and the admin sees the orde
   const adminCtx = await browser.newContext({ locale: "en-US", timezoneId: "Asia/Dhaka" })
   await backend.attach(adminCtx)
   const admin = await adminCtx.newPage()
+  // The admin panel opens in Bangla; this test reads it in English
+  await admin.addInitScript(() => localStorage.setItem("bb_admin_lang", "en"))
   await admin.goto("/admin")
   await admin.getByLabel("Email or phone", { exact: true }).fill(ADMIN.email)
   await admin.getByLabel("Password", { exact: true }).fill(ADMIN.password)
@@ -85,13 +87,14 @@ test("a customer cannot open the admin orders", async ({ browser }) => {
   const page = await ctx.newPage()
   await page.goto("/admin")
   // Not signed in: only the sign-in form shows, no orders
-  await expect(page.getByRole("heading", { name: "Banglar Biriyani Admin" })).toBeVisible()
-  await expect(page.getByText("Search orders")).toHaveCount(0)
+  // The admin panel opens in Bangla by default
+  await expect(page.getByRole("heading", { name: "বাংলার বিরিয়ানি অ্যাডমিন" })).toBeVisible()
+  await expect(page.getByText("অর্ডার খুঁজুন")).toHaveCount(0)
 
   // Wrong password is refused
-  await page.getByLabel("Email or phone", { exact: true }).fill(ADMIN.email)
-  await page.getByLabel("Password", { exact: true }).fill("wrong-password")
-  await page.getByRole("button", { name: /sign in/i }).click()
+  await page.getByLabel("ইমেইল অথবা ফোন", { exact: true }).fill(ADMIN.email)
+  await page.getByLabel("পাসওয়ার্ড", { exact: true }).fill("wrong-password")
+  await page.getByRole("button", { name: "সাইন ইন", exact: true }).click()
   await expect(page.getByRole("alert")).toContainText("Wrong email, phone or password.")
   await ctx.close()
 })

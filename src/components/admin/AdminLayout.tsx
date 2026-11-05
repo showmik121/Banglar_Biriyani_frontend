@@ -54,7 +54,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           >
             <img src="/logo-mark.png" alt="" className="size-8 shrink-0 rounded-full bg-white ring-2 ring-saffron/70" />
             <span className="truncate font-bold">{tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}</span>
-            <span className="shrink-0 rounded-full bg-saffron px-2 py-0.5 text-[11px] font-bold tracking-wide text-maroon">
+            <span className="shrink-0 rounded-full bg-saffron px-2 py-0.5 text-xs font-bold tracking-wide text-maroon">
               {tr("ADMIN", "অ্যাডমিন")}
             </span>
           </a>
@@ -168,7 +168,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
                 {tabLink(
                   t,
                   isActive,
-                  `flex h-16 flex-col items-center justify-center gap-0.5 text-[11px] font-semibold transition ${
+                  `flex h-16 flex-col items-center justify-center gap-0.5 text-xs font-semibold transition ${
                     isActive ? "text-brand" : "text-slate"
                   }`,
                   true,

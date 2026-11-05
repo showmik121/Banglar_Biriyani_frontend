@@ -141,7 +141,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
               <button
                 type="button"
                 onClick={() => handleQueryChange("")}
-                className="absolute right-2.5 text-slate/60 hover:text-charcoal p-1"
+                className="absolute right-2.5 text-slate hover:text-charcoal p-2"
                 aria-label={tr("Clear search", "খোঁজা মুছুন")}
               >
                 <Icon d={ICONS.close} className="size-3.5" />
@@ -168,7 +168,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                 </span>
                 <p className="truncate text-sm font-medium text-charcoal">"{query}"</p>
               </div>
-              <span className="rounded-full bg-brand px-2.5 py-1 text-[11px] font-bold text-white">
+              <span className="rounded-full bg-brand px-2.5 py-1 text-xs font-bold text-white">
                 {tr("Deliver Here", "এখানে দিন")}
               </span>
             </button>
@@ -177,7 +177,7 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
           {/* Saved Addresses Section (if available & query is empty) */}
           {!query && addresses.length > 0 && (
             <div>
-              <div className="px-2 pb-1.5 pt-1 text-[11px] font-bold uppercase tracking-wider text-slate">
+              <div className="px-2 pb-1.5 pt-1 text-xs font-bold uppercase tracking-wider text-slate">
                 {tr("Your Saved Locations", "আপনার সেভ করা ঠিকানা")}
               </div>
               <div className="space-y-1">
@@ -211,9 +211,9 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold text-charcoal">{addressLabel(addr.label, lang)}</span>
-                          <span className="text-[10px] text-slate font-medium">{addr.area}</span>
+                          <span className="text-xs text-slate font-medium">{addr.area}</span>
                           {isSelected && (
-                            <span className="text-[10px] font-bold text-brand">• {tr("Active", "চালু")}</span>
+                            <span className="text-xs font-bold text-brand">• {tr("Active", "চালু")}</span>
                           )}
                         </div>
                         <p className="truncate text-xs text-slate">{addr.details}</p>
@@ -228,12 +228,12 @@ export function AddressRecommendationPopup({ isOpen, onClose, onOpenDetailedModa
           {/* Recommendations List */}
           <div>
             <div className="flex items-center justify-between px-2 pb-1.5 pt-1">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate">
+              <span className="text-xs font-bold uppercase tracking-wider text-slate">
                 {query
                   ? tr(`Recommended Matches (${results.length})`, `মিলে যাওয়া জায়গা (${num(results.length)})`)
                   : tr("Popular Delivery Hotspots", "জনপ্রিয় ডেলিভারির জায়গা")}
               </span>
-              <span className="flex items-center gap-1 text-[10px] font-semibold text-brand">
+              <span className="flex items-center gap-1 text-xs font-semibold text-brand">
                 <Icon d={ICONS.sparkles} className="size-3" />
                 {tr("Near DIU", "ডিআইইউর কাছে")}
               </span>

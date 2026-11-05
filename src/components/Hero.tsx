@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { imageSrcSet } from "../utils/imageSizes"
 import { useLang } from "../context/LanguageContext"
 
 type Props = {
@@ -72,7 +73,7 @@ export function Hero({
 
       <div className="mx-auto grid max-w-7xl items-center gap-5 px-5 pb-5 pt-3 max-sm:grid-cols-1 max-sm:gap-0 sm:px-6 sm:py-10 lg:grid-cols-[1.1fr_1fr] lg:gap-10 lg:px-8 lg:py-14">
         <div className="order-2 flex flex-col items-start text-left max-sm:z-10 max-sm:self-end max-sm:p-4 max-sm:pb-5 max-sm:[grid-area:1/1] sm:items-center sm:text-center lg:order-1 lg:items-start lg:text-left">
-          <span className="inline-flex w-fit items-center gap-2 text-[10px] font-bold uppercase tracking-[0.16em] text-saffron sm:text-brand sm:rounded-full sm:bg-brand/10 sm:px-3.5 sm:py-1.5 sm:text-xs sm:normal-case sm:tracking-normal">
+          <span className="inline-flex w-fit items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-saffron sm:text-brand sm:rounded-full sm:bg-brand/10 sm:px-3.5 sm:py-1.5 sm:text-xs sm:normal-case sm:tracking-normal">
             <span className="hidden size-1.5 rounded-full bg-brand sm:block" aria-hidden />
             {badge}
           </span>
@@ -107,7 +108,7 @@ export function Hero({
             ].map(([top, bottom]) => (
               <li key={top} className="px-2">
                 <p className="text-display text-base text-charcoal sm:text-xl sm:text-brand">{top}</p>
-                <p className="text-[11px] font-semibold text-slate sm:text-xs">{bottom}</p>
+                <p className="text-xs font-semibold text-slate sm:text-xs">{bottom}</p>
               </li>
             ))}
           </ul>
@@ -134,6 +135,11 @@ export function Hero({
                     alt={i === active ? alt : ""}
                     aria-hidden={i !== active}
                     loading={i === 0 ? "eager" : "lazy"}
+                    fetchPriority={i === 0 ? "high" : "auto"}
+                    srcSet={imageSrcSet(src, [480, 800])}
+                    sizes="(max-width: 640px) 100vw, 50vw"
+                    width={1200}
+                    height={900}
                     decoding="async"
                     className="size-full shrink-0 object-cover"
                   />
@@ -148,7 +154,7 @@ export function Hero({
               </span>
               <span className="text-left leading-tight">
                 <span className="block text-xs font-bold text-charcoal">{tr("Served hot", "গরম গরম")}</span>
-                <span className="hidden text-[10px] text-slate sm:block">{tr("dum cooked", "দমে রান্না")}</span>
+                <span className="hidden text-xs text-slate sm:block">{tr("dum cooked", "দমে রান্না")}</span>
               </span>
             </div>
             <div className="absolute bottom-3 left-3 hidden items-center gap-2 rounded-full bg-white/95 py-1.5 pl-1.5 pr-3 shadow-md sm:left-auto sm:flex sm:-right-8 sm:bottom-[14%] sm:rounded-2xl sm:px-3 sm:py-2 sm:shadow-xl sm:ring-1 sm:ring-line">
@@ -157,7 +163,7 @@ export function Hero({
               </span>
               <span className="text-left leading-tight">
                 <span className="block text-xs font-bold text-charcoal">{tr("Free delivery", "ফ্রি ডেলিভারি")}</span>
-                <span className="hidden text-[10px] text-slate sm:block">{tr("to your door", "দরজা পর্যন্ত")}</span>
+                <span className="hidden text-xs text-slate sm:block">{tr("to your door", "দরজা পর্যন্ত")}</span>
               </span>
             </div>
           </div>

@@ -171,7 +171,7 @@ export function AdminMeals() {
                 {tr(DAY_SHORT[d][0], DAY_SHORT[d][1])}
                 {d === todayKey() && <span className={active ? "text-saffron" : "text-brand"}> · {tr("today", "আজ")}</span>}
               </span>
-              <span className={`text-[11px] font-medium ${active ? "text-white/80" : "text-slate"}`}>
+              <span className={`text-xs font-medium ${active ? "text-white/80" : "text-slate"}`}>
                 {counts.map((c) => dg(c)).join(" · ")}
                 {unsaved ? ` · ${tr("not saved", "সেভ হয়নি")}` : ""}
               </span>

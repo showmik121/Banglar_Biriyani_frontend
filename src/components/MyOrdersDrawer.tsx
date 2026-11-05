@@ -304,7 +304,7 @@ function ActiveOrderCard({ group: { order, items } }: { group: OrderGroup }) {
           return (
             <li key={s.status} aria-current={i === step ? "step" : undefined}>
               <span className={`block h-1.5 rounded-full ${done ? "bg-brand" : "bg-line"}`} />
-              <span className={`mt-1.5 block text-[11px] leading-tight ${done ? "font-semibold text-charcoal" : "text-slate"}`}>
+              <span className={`mt-1.5 block text-xs leading-tight ${done ? "font-semibold text-charcoal" : "text-slate"}`}>
                 {tr(...s.label)}
               </span>
             </li>

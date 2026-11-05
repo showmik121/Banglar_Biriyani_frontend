@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { imageSrcSet } from "../utils/imageSizes"
 import { useCart } from "../context/CartContext"
 import { useLang } from "../context/LanguageContext"
 import { dishDescription, dishName, portionName } from "../i18n/dishes"
@@ -66,6 +67,11 @@ export function ProductCard({
             src={product.image}
             alt={name}
             loading="lazy"
+            decoding="async"
+            srcSet={imageSrcSet(product.image, [200, 400])}
+            sizes="(max-width: 639px) 96px, (max-width: 1023px) 50vw, 400px"
+            width={800}
+            height={600}
             className={`size-full object-cover transition duration-500 group-hover:scale-105 ${isSoldOut ? "grayscale" : ""}`}
           />
         ) : (
@@ -74,7 +80,7 @@ export function ProductCard({
           </div>
         )}
         {product.bestseller && (
-          <span className="absolute left-1.5 top-1.5 rounded-full bg-saffron px-2 py-0.5 text-[10px] font-bold text-charcoal sm:left-3 sm:top-3 sm:px-3 sm:py-1 sm:text-xs">
+          <span className="absolute left-1.5 top-1.5 rounded-full bg-saffron px-2 py-0.5 text-xs font-bold text-charcoal sm:left-3 sm:top-3 sm:px-3 sm:py-1 sm:text-xs">
             {tr("Bestseller", "বেস্টসেলার")}
           </span>
         )}

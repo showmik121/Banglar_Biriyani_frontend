@@ -286,7 +286,7 @@ export function AdminPanelModal() {
                       <div key={d.day} className="flex justify-between py-2">
                         <span className="font-medium text-slate">{d.day}</span>
                         <div className="flex items-center gap-3">
-                          <span className="text-[11px] text-slate">{d.orderCount} orders</span>
+                          <span className="text-xs text-slate">{d.orderCount} orders</span>
                           <span className="font-bold text-brand">৳{d.revenueBdt}</span>
                         </div>
                       </div>
@@ -341,16 +341,16 @@ export function AdminPanelModal() {
                           </td>
                           <td className="p-3">
                             <p className="font-semibold text-charcoal">{order.customerName}</p>
-                            <p className="text-[11px] text-slate">{order.customerPhone}</p>
+                            <p className="text-xs text-slate">{order.customerPhone}</p>
                           </td>
                           <td className="p-3">
-                            <span className="rounded bg-brand/10 px-1.5 py-0.5 text-[10px] font-bold text-brand">
+                            <span className="rounded bg-brand/10 px-1.5 py-0.5 text-xs font-bold text-brand">
                               {order.scheduledDay}
                             </span>
                           </td>
                           <td className="p-3 font-bold text-brand">৳{order.totalBdt}</td>
                           <td className="p-3">
-                            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">
+                            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-bold text-amber-700">
                               {order.status}
                             </span>
                           </td>
@@ -394,14 +394,14 @@ export function AdminPanelModal() {
                       <td className="p-3 font-mono">#{u.id}</td>
                       <td className="p-3">
                         <p className="font-semibold text-charcoal">{u.fullName}</p>
-                        <p className="text-[11px] text-slate">{u.email}</p>
+                        <p className="text-xs text-slate">{u.email}</p>
                       </td>
                       <td className="p-3">{u.phone}</td>
                       <td className="p-3 font-bold">{u.orderCount}</td>
                       <td className="p-3 font-bold text-brand">৳{u.totalSpendBdt}</td>
                       <td className="p-3">
                         {u.id === user?.id ? (
-                          <span className="rounded bg-rose-100 px-2 py-0.5 text-[10px] font-bold text-rose-800">
+                          <span className="rounded bg-rose-100 px-2 py-0.5 text-xs font-bold text-rose-800">
                             Current Admin (Protected)
                           </span>
                         ) : (

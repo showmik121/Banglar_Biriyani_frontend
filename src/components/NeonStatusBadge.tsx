@@ -49,11 +49,11 @@ export function NeonStatusBadge({ onOpenOrders }: Props) {
             <span className="flex items-center gap-2 text-emerald-400">
               <span className="font-semibold">Connected</span>
               <span className="hidden sm:inline text-white/50">•</span>
-              <span className="hidden sm:inline text-white/80 font-mono text-[11px]">
+              <span className="hidden sm:inline text-white/80 font-mono text-xs">
                 {health?.endpoint}
               </span>
               {health?.latencyMs !== undefined && (
-                <span className="rounded bg-emerald-950/80 px-1.5 py-0.5 font-mono text-[10px] text-emerald-300 border border-emerald-800/60">
+                <span className="rounded bg-emerald-950/80 px-1.5 py-0.5 font-mono text-xs text-emerald-300 border border-emerald-800/60">
                   {health.latencyMs}ms
                 </span>
               )}
@@ -69,7 +69,7 @@ export function NeonStatusBadge({ onOpenOrders }: Props) {
           <button
             type="button"
             onClick={check}
-            className="hidden sm:inline-flex items-center gap-1 text-[11px] text-white/70 hover:text-white transition"
+            className="hidden sm:inline-flex items-center gap-1 text-xs text-white/70 hover:text-white transition"
             title="Refresh database ping"
           >
             <svg
@@ -90,7 +90,7 @@ export function NeonStatusBadge({ onOpenOrders }: Props) {
           <button
             type="button"
             onClick={onOpenOrders}
-            className="flex items-center gap-1.5 rounded-full bg-saffron/20 border border-saffron/40 px-2.5 py-0.5 text-[11px] font-semibold text-saffron transition hover:bg-saffron hover:text-charcoal"
+            className="flex items-center gap-1.5 rounded-full bg-saffron/20 border border-saffron/40 px-2.5 py-0.5 text-xs font-semibold text-saffron transition hover:bg-saffron hover:text-charcoal"
           >
             <svg
               className="size-3"

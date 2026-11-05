@@ -1,4 +1,5 @@
-import { LanguageProvider } from "../../context/LanguageContext"
+import { LanguageProvider, useLang } from "../../context/LanguageContext"
+import { useEffect } from "react"
 import { useCurrentPath } from "../../utils/navigation"
 import { AdminGuard } from "../AdminGuard"
 import { AdminLayout } from "./AdminLayout"
@@ -8,6 +9,15 @@ import { AdminMeals } from "./AdminMeals"
 import { AdminOffers } from "./AdminOffers"
 import { AdminDeliveryZones } from "./AdminDeliveryZones"
 import { ADMIN_LANG_KEY } from "./adminApi"
+
+/** Keeps <html lang> in step with the admin language (Bangla font and screen readers). */
+function HtmlLang() {
+  const { lang } = useLang()
+  useEffect(() => {
+    document.documentElement.lang = lang
+  }, [lang])
+  return null
+}
 
 export function AdminPortal() {
   const path = useCurrentPath()
@@ -27,6 +37,7 @@ export function AdminPortal() {
 
   return (
     <LanguageProvider storageKey={ADMIN_LANG_KEY} defaultLang="bn">
+      <HtmlLang />
       <AdminGuard>
         <AdminLayout>{view}</AdminLayout>
       </AdminGuard>

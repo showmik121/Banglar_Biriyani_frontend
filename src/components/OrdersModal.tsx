@@ -155,7 +155,7 @@ export function OrdersModal({ isOpen, onClose }: Props) {
                           {ord.status}
                         </span>
                         {ord.deliverySlot && (
-                          <span className="rounded-full bg-charcoal text-white px-2 py-0.5 text-[10px] font-semibold">
+                          <span className="rounded-full bg-charcoal text-white px-2 py-0.5 text-xs font-semibold">
                             {ord.deliverySlot}
                           </span>
                         )}
@@ -167,21 +167,21 @@ export function OrdersModal({ isOpen, onClose }: Props) {
 
                     <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
                       <div>
-                        <span className="block font-semibold text-slate uppercase text-[10px] tracking-wider">
+                        <span className="block font-semibold text-slate uppercase text-xs tracking-wider">
                           Customer
                         </span>
                         <p className="font-medium text-charcoal text-sm">{ord.customerName}</p>
                         <p className="text-slate font-mono">{ord.customerPhone}</p>
                         <p className="text-slate mt-0.5 line-clamp-2">{ord.customerAddress}</p>
                         {ord.paymentMethod && (
-                          <p className="mt-1 text-[11px] font-semibold text-brand">
+                          <p className="mt-1 text-xs font-semibold text-brand">
                             Payment: {ord.paymentMethod}
                           </p>
                         )}
                       </div>
 
                       <div>
-                        <span className="block font-semibold text-slate uppercase text-[10px] tracking-wider">
+                        <span className="block font-semibold text-slate uppercase text-xs tracking-wider">
                           Items Ordered
                         </span>
                         <ul className="mt-1 space-y-1">
@@ -197,7 +197,7 @@ export function OrdersModal({ isOpen, onClose }: Props) {
                           ))}
                         </ul>
                         {ord.notes && (
-                          <p className="mt-2 text-[11px] text-amber-800 bg-amber-50 rounded px-2 py-1 border border-amber-200">
+                          <p className="mt-2 text-xs text-amber-800 bg-amber-50 rounded px-2 py-1 border border-amber-200">
                             <strong>Note:</strong> {ord.notes}
                           </p>
                         )}
@@ -205,7 +205,7 @@ export function OrdersModal({ isOpen, onClose }: Props) {
 
                       <div className="flex flex-col justify-between items-end md:border-l md:border-line/60 md:pl-4">
                         <div className="text-right">
-                          <span className="block font-semibold text-slate uppercase text-[10px] tracking-wider">
+                          <span className="block font-semibold text-slate uppercase text-xs tracking-wider">
                             Total Amount
                           </span>
                           <span className="text-display text-2xl text-brand">
@@ -214,7 +214,7 @@ export function OrdersModal({ isOpen, onClose }: Props) {
                         </div>
 
                         <div className="mt-2 flex items-center gap-1.5">
-                          <label className="text-[11px] font-medium text-slate">Status:</label>
+                          <label className="text-xs font-medium text-slate">Status:</label>
                           <select
                             value={ord.status}
                             disabled={updatingId === ord.id}

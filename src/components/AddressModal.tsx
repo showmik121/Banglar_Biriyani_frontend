@@ -202,7 +202,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                 <label className="text-xs font-bold uppercase tracking-wider text-charcoal">
                   {tr("Write Your Address *", "আপনার ঠিকানা লিখুন *")}
                 </label>
-                <span className="text-[11px] text-slate">{tr("Free text", "যেভাবে খুশি")}</span>
+                <span className="text-xs text-slate">{tr("Free text", "যেভাবে খুশি")}</span>
               </div>
 
               <div className="relative">
@@ -224,7 +224,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                   <button
                     type="button"
                     onClick={() => setAddressInput("")}
-                    className="absolute right-3 top-3 text-slate/50 hover:text-charcoal p-1"
+                    className="absolute right-3 top-3 text-slate hover:text-charcoal p-2"
                     title={tr("Clear address", "ঠিকানা মুছুন")}
                   >
                     <Icon d={ICONS.close} className="size-3.5" />
@@ -236,10 +236,10 @@ export function AddressModal({ isOpen, onClose }: Props) {
               {liveRecommendations.length > 0 && (
                 <div className="mt-2 rounded-xl border border-brand/30 bg-brand-light p-2.5 space-y-1.5 shadow-xs">
                   <div className="flex items-center justify-between px-1">
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-brand">
+                    <span className="text-xs font-bold uppercase tracking-wider text-brand">
                       {tr(`✨ Suggested places for "${addressInput}":`, `✨ "${addressInput}" এর জন্য পরামর্শ:`)}
                     </span>
-                    <span className="text-[10px] text-slate">{tr("Tap to fill in", "চাপলে বসে যাবে")}</span>
+                    <span className="text-xs text-slate">{tr("Tap to fill in", "চাপলে বসে যাবে")}</span>
                   </div>
                   <div className="space-y-1">
                     {liveRecommendations.map((rec) => (
@@ -251,11 +251,11 @@ export function AddressModal({ isOpen, onClose }: Props) {
                       >
                         <div className="min-w-0 flex-1">
                           <span className="font-bold text-charcoal">{rec.name}</span>
-                          <span className="block truncate text-[11px] text-slate">
+                          <span className="block truncate text-xs text-slate">
                             {rec.details}
                           </span>
                         </div>
-                        <span className="ml-2 rounded-full bg-brand/10 px-2 py-0.5 text-[10px] font-bold text-brand shrink-0">
+                        <span className="ml-2 rounded-full bg-brand/10 px-2 py-0.5 text-xs font-bold text-brand shrink-0">
                           {tr("Use This", "এটা নিন")}
                         </span>
                       </button>
@@ -269,7 +269,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
 
             {/* Quick-Click Area Chips to append with 1 tap */}
             <div>
-              <span className="block text-[11px] font-semibold text-slate mb-1.5">
+              <span className="block text-xs font-semibold text-slate mb-1.5">
                 {tr("Quick-add delivery areas near DIU (tap to add):", "ডিআইইউর কাছের এলাকা এক চাপে যোগ করুন:")}
               </span>
               <div className="flex flex-wrap gap-1.5">
@@ -322,7 +322,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
               {showDetailedFields && (
                 <div className="mt-3 space-y-3 rounded-xl border border-line/70 bg-alabaster/50 p-3.5">
                   <div>
-                    <label className="block text-[11px] font-semibold text-charcoal mb-1">
+                    <label className="block text-xs font-semibold text-charcoal mb-1">
                       {tr("Contact Phone", "যোগাযোগের ফোন")}
                     </label>
                     <input
@@ -334,7 +334,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] font-semibold text-charcoal mb-1">
+                    <label className="block text-xs font-semibold text-charcoal mb-1">
                       {tr("Delivery Note / Instructions", "ডেলিভারির নোট / নির্দেশনা")}
                     </label>
                     <input
@@ -365,7 +365,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                 <span className="text-xs font-bold uppercase tracking-wider text-slate">
                   {tr(`Saved Locations (${addresses.length})`, `সেভ করা ঠিকানা (${num(addresses.length)})`)}
                 </span>
-                <span className="text-[11px] text-slate">{tr("Tap to choose", "চাপ দিয়ে বেছে নিন")}</span>
+                <span className="text-xs text-slate">{tr("Tap to choose", "চাপ দিয়ে বেছে নিন")}</span>
               </div>
 
               <div className="space-y-2.5">
@@ -394,11 +394,11 @@ export function AddressModal({ isOpen, onClose }: Props) {
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
                           <span className="text-sm font-bold text-charcoal">{tagLabel(addr.label)}</span>
-                          <span className="rounded-full bg-slate/10 px-2 py-0.5 text-[10px] font-medium text-slate">
+                          <span className="rounded-full bg-slate/10 px-2 py-0.5 text-xs font-medium text-slate">
                             {addr.area}
                           </span>
                           {isSelected && (
-                            <span className="rounded-full bg-brand px-2 py-0.2 text-[10px] font-bold text-white">
+                            <span className="rounded-full bg-brand px-2 py-0.2 text-xs font-bold text-white">
                               {tr("Active", "চালু")}
                             </span>
                           )}
@@ -409,7 +409,7 @@ export function AddressModal({ isOpen, onClose }: Props) {
                         </p>
 
                         {addr.instructions && (
-                          <p className="mt-0.5 text-[11px] text-slate italic">
+                          <p className="mt-0.5 text-xs text-slate italic">
                             {tr("Note:", "নোট:")} {addr.instructions}
                           </p>
                         )}

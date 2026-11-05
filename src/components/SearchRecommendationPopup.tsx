@@ -114,14 +114,14 @@ export function SearchRecommendationPopup({
                 {tr("Search menu for", "মেনুতে খুঁজুন")} "<span className="underline font-bold">{query}</span>"
               </span>
             </div>
-            <span className="text-[11px] font-bold">{tr("Jump to results →", "ফলাফল দেখুন →")}</span>
+            <span className="text-xs font-bold">{tr("Jump to results →", "ফলাফল দেখুন →")}</span>
           </button>
         )}
 
         {/* Quick search pills when query is empty */}
         {!cleanQuery && (
           <div>
-            <span className="block text-[11px] font-bold uppercase tracking-wider text-slate mb-1.5 px-1">
+            <span className="block text-xs font-bold uppercase tracking-wider text-slate mb-1.5 px-1">
               {tr("🔥 Trending Dishes & Searches", "🔥 জনপ্রিয় খাবার ও খোঁজ")}
             </span>
             <div className="flex flex-wrap gap-1.5">
@@ -145,12 +145,12 @@ export function SearchRecommendationPopup({
         {/* Recommended Dishes List */}
         <div>
           <div className="flex items-center justify-between px-1 pb-1.5 pt-1">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate">
+            <span className="text-xs font-bold uppercase tracking-wider text-slate">
               {cleanQuery
                 ? tr(`Dish Recommendations (${filteredDishes.length})`, `মিলে যাওয়া খাবার (${num(filteredDishes.length)})`)
                 : tr("Popular Recommendations", "জনপ্রিয় খাবার")}
             </span>
-            <span className="text-[11px] font-semibold text-brand">{tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}</span>
+            <span className="text-xs font-semibold text-brand">{tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}</span>
           </div>
 
           {filteredDishes.length > 0 ? (
@@ -193,14 +193,14 @@ export function SearchRecommendationPopup({
                       )}
                     </div>
                     {dish.description && (
-                      <p className="truncate text-[11px] text-slate">{dish.description}</p>
+                      <p className="truncate text-xs text-slate">{dish.description}</p>
                     )}
                   </div>
 
                   {/* Price & Action */}
                   <div className="text-right shrink-0">
                     <span className="text-xs font-bold text-brand">{taka(dish.price)}</span>
-                    <span className="block text-[11px] text-slate group-hover:text-charcoal transition-colors">
+                    <span className="block text-xs text-slate group-hover:text-charcoal transition-colors">
                       {tr("View →", "দেখুন →")}
                     </span>
                   </div>
