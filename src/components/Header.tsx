@@ -146,30 +146,15 @@ export function Header({
           <span className="grid size-10 place-items-center rounded-full bg-white p-0.5 shadow-card ring-2 ring-gold/40 transition group-hover:ring-gold sm:size-12">
             <img src="/logo-mark.png" alt="" className="size-full rounded-full object-contain" />
           </span>
-          <span className="hidden flex-col leading-none sm:flex">
-            <span className="text-display text-lg text-maroon sm:text-xl">
+          <span className="flex min-w-0 flex-col leading-none">
+            <span className="text-display whitespace-nowrap text-[17px] text-maroon min-[400px]:text-lg sm:text-xl">
               {tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}
             </span>
-            <span className="font-bn mt-1 text-xs text-gold sm:text-xs">
+            <span className="font-bn mt-1 hidden text-xs text-gold sm:block">
               {tr("বাংলার বিরিয়ানি", "Banglar Biriyani")}
             </span>
           </span>
         </a>
-
-        {/* Mobile Address Button */}
-        <button
-          type="button"
-          onClick={() => setIsAddressModalOpen(true)}
-          aria-label={tr("Change delivery address", "ডেলিভারির ঠিকানা বদলান")}
-          className="flex h-10 min-w-0 items-center gap-1.5 rounded-full bg-cream px-3 text-xs text-charcoal transition hover:bg-gold-light md:hidden"
-          title={tr("Change delivery address", "ডেলিভারির ঠিকানা বদলান")}
-        >
-          <Icon d={ICONS.pin} className="size-3.5 text-brand" />
-          <span className="hidden max-w-[88px] truncate font-medium min-[360px]:inline min-[380px]:max-w-[120px]">
-            {selectedAddress ? selectedAddress.area : tr("Address", "ঠিকানা")}
-          </span>
-          <Icon d={ICONS.chevron} className="size-3 text-slate" />
-        </button>
 
         {/* Desktop Address Button Container with Floating Recommendation Popup */}
         <div className="relative mx-auto hidden md:block">
