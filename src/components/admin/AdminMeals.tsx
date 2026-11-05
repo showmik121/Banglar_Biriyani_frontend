@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
+import { useAuth } from "../../context/AuthContext"
 import { useLang } from "../../context/LanguageContext"
 import { adminFetch, btnPrimary, btnSecondary, dg, taka } from "./adminApi"
 import { Empty, ListSkeleton, Notice, PageHeader } from "./adminUi"
+import { DishFormDialog, type DishCategory, type DishData } from "./DishFormDialog"
+import { MealHoursCard } from "./MealHoursCard"
 
 /** Must match MAX_ITEMS_PER_MEAL on the server */
 export const MAX_ITEMS_PER_MEAL = 12
@@ -36,12 +39,7 @@ const todayKey = (): Day => {
   return js[new Date().getDay()]
 }
 
-interface Dish {
-  id: number
-  name: string
-  basePriceBdt: number
-  imageUrl: string
-  isAvailable: boolean
+interface Dish extends DishData {
   categoryName: string
 }
 /** One dish in one meal; price, quota and "special" settings are kept as they were */
@@ -63,9 +61,13 @@ const same = (a: Slot[], b: Slot[]) => JSON.stringify(a) === JSON.stringify(b)
 
 export function AdminMeals() {
   const { tr } = useLang()
+  const { user } = useAuth()
+  const isAdmin = user?.role === "ADMIN"
   const dayName = (d: Day) => tr(DAY_NAME[d][0], DAY_NAME[d][1])
   const mealName = (m: Meal) => tr(MEAL_NAME[m][0], MEAL_NAME[m][1])
   const [catalog, setCatalog] = useState<Dish[]>([])
+  const [categories, setCategories] = useState<DishCategory[]>([])
+  const [dialog, setDialog] = useState<{ dish: Dish | null; meal: Meal } | null>(null)
   const [saved, setSaved] = useState<Week>(emptyWeek)
   const [draft, setDraft] = useState<Week>(emptyWeek)
   const [day, setDay] = useState<Day>(todayKey)
@@ -76,7 +78,7 @@ export function AdminMeals() {
 
   const load = useCallback(async () => {
     try {
-      const data = await adminFetch<{ days: Record<Day, ScheduleRow[]>; menuCatalog: Dish[] }>("/api/admin/schedule")
+      const data = await adminFetch<{ days: Record<Day, ScheduleRow[]>; menuCatalog: Dish[]; categories?: DishCategory[] }>("/api/admin/schedule")
       const week = emptyWeek()
       for (const d of DAYS) {
         week[d] = (data.days[d] || []).map(({ menuItemId, specialPriceBdt, dailyQuota, isFeatured, mealTime }) => ({
@@ -88,6 +90,7 @@ export function AdminMeals() {
         }))
       }
       setCatalog(data.menuCatalog)
+      setCategories(data.categories ?? [])
       setSaved(week)
       setDraft(week)
       setError(null)
@@ -101,6 +104,13 @@ export function AdminMeals() {
   useEffect(() => {
     load()
   }, [load])
+
+  /** Reload only the dish list, so unsaved changes to the day's meals are kept */
+  const refreshCatalog = useCallback(async () => {
+    const data = await adminFetch<{ menuCatalog: Dish[]; categories?: DishCategory[] }>("/api/admin/schedule")
+    setCatalog(data.menuCatalog)
+    setCategories(data.categories ?? [])
+  }, [])
 
   const dishById = useMemo(() => new Map(catalog.map((d) => [d.id, d])), [catalog])
   const slots = draft[day]
@@ -118,6 +128,41 @@ export function AdminMeals() {
     if (i <= 0) return
     ;[list[i - 1], list[i]] = [list[i], list[i - 1]]
     replaceMeal(m, list)
+  }
+
+  const dishSaved = async (id: number, name: string, isNew: boolean) => {
+    const meal = dialog?.meal ?? "LUNCH"
+    setDialog(null)
+    try {
+      await refreshCatalog()
+    } catch (e) {
+      setError((e as Error).message)
+    }
+    window.dispatchEvent(new Event("banglar-biriyani:menu-updated"))
+    if (isNew) {
+      if (mealSlots(meal).length < MAX_ITEMS_PER_MEAL) add(meal, id)
+      setNotice(
+        tr(
+          `${name} created and added to ${MEAL_NAME[meal][0].toLowerCase()}. Press Save to publish it.`,
+          `${name} তৈরি হয়েছে এবং ${MEAL_NAME[meal][1]}-এ যোগ হয়েছে। চালু করতে সেভ চাপুন।`,
+        ),
+      )
+    } else {
+      setNotice(tr(`${name} updated`, `${name} আপডেট হয়েছে`))
+    }
+  }
+  const dishDeleted = async (id: number, name: string) => {
+    setDialog(null)
+    const strip = (w: Week) => Object.fromEntries(DAYS.map((d) => [d, w[d].filter((s) => s.menuItemId !== id)])) as unknown as Week
+    setSaved(strip)
+    setDraft(strip)
+    try {
+      await refreshCatalog()
+    } catch (e) {
+      setError((e as Error).message)
+    }
+    window.dispatchEvent(new Event("banglar-biriyani:menu-updated"))
+    setNotice(tr(`${name} removed`, `${name} মুছে ফেলা হয়েছে`))
   }
 
   const save = async () => {
@@ -149,6 +194,8 @@ export function AdminMeals() {
       </p>
       {notice && <Notice kind="ok">{notice}</Notice>}
       {error && <Notice kind="error">{error}</Notice>}
+
+      <MealHoursCard isAdmin={isAdmin} />
 
       {/* Day picker */}
       <div role="tablist" aria-label={tr("Day", "দিন")} className="no-scrollbar -mx-4 mb-5 flex gap-2 overflow-x-auto px-4 pb-1">
@@ -223,6 +270,18 @@ export function AdminMeals() {
                             {dish && !dish.isAvailable && <span className="ml-2 text-red-600">{tr("Hidden from menu", "মেনু থেকে লুকানো")}</span>}
                           </p>
                         </div>
+                        {dish && (
+                          <button
+                            type="button"
+                            onClick={() => setDialog({ dish, meal: m })}
+                            aria-label={tr(`Edit ${name}`, `${name} এডিট করুন`)}
+                            className="grid size-9 shrink-0 place-items-center rounded-lg text-slate hover:bg-cream"
+                          >
+                            <svg viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden>
+                              <path d="M4 20h4L19 9l-4-4L4 16v4Z" strokeLinejoin="round" />
+                            </svg>
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => moveUp(m, i)}
@@ -272,6 +331,13 @@ export function AdminMeals() {
                       </select>
                     </li>
                   )}
+                  {list.length < MAX_ITEMS_PER_MEAL && isAdmin && (
+                    <li className="px-4 pb-3">
+                      <button type="button" onClick={() => setDialog({ dish: null, meal: m })} className={`${btnSecondary} h-11 w-full sm:h-10`}>
+                        {tr(`+ Create a new ${MEAL_NAME[m][0].toLowerCase()} dish (with photo)`, `+ নতুন খাবার বানান (ছবিসহ)`)}
+                      </button>
+                    </li>
+                  )}
                 </ol>
               </section>
             )
@@ -295,6 +361,18 @@ export function AdminMeals() {
             </button>
           </div>
         </div>
+      )}
+
+      {dialog && (
+        <DishFormDialog
+          dish={dialog.dish}
+          categories={categories}
+          isAdmin={isAdmin}
+          isEveryday={false}
+          onClose={() => setDialog(null)}
+          onSaved={dishSaved}
+          onDeleted={dishDeleted}
+        />
       )}
     </div>
   )

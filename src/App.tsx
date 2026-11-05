@@ -19,7 +19,7 @@ import { useCart } from "./context/CartContext"
 import { useAddress } from "./context/AddressContext"
 import { useLang } from "./context/LanguageContext"
 import { DayPillBar, dayLabel, getTodayDay } from "./components/DayPillBar"
-import { MEAL_TIMES, dhakaClock, mealHoursLabel, mealIsOpen, mealTimeLabel, mealTimeNow, mealTimeShort, type MealTime } from "./i18n/mealTimes"
+import { MEAL_TIMES, dhakaClock, mealHoursLabel, mealIsOpen, mealTimeLabel, mealTimeNow, mealTimeShort, setMealHours, type MealTime } from "./i18n/mealTimes"
 import { categoryName, dishDescription, dishName } from "./i18n/dishes"
 
 const img = (id: string, w = 800, h = 600) =>
@@ -278,7 +278,18 @@ type PublicOffer = {
 function useStoreData() {
   const [zones, setZones] = useState<ZoneView[]>(FALLBACK_ZONES)
   const [offers, setOffers] = useState<PublicOffer[]>([])
+  // Only used to redraw once the owner's lunch and dinner hours have arrived
+  const [, setHoursLoaded] = useState(false)
   useEffect(() => {
+    fetch("/api/meal-hours")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (json?.data) {
+          setMealHours(json.data)
+          setHoursLoaded(true)
+        }
+      })
+      .catch(() => {})
     fetch("/api/delivery-zones")
       .then((r) => (r.ok ? r.json() : null))
       .then((json) => {

@@ -2,7 +2,7 @@ import { describe, test, expect, vi } from "vitest"
 import { fireEvent, render, screen } from "@testing-library/react"
 import { CartProvider } from "../src/context/CartContext"
 import { ProductCard, type Product } from "../src/components/ProductCard"
-import { dhakaClock, mealHoursLabel, mealIsOpen } from "../src/i18n/mealTimes"
+import { dhakaClock, hourLabel, mealHoursLabel, mealIsOpen, mealTimeNow, setMealHours } from "../src/i18n/mealTimes"
 
 const dish: Product = { id: "1", name: "Chicken Roast", description: "Roast", price: 200 }
 
@@ -38,5 +38,21 @@ describe("meal hours", () => {
     expect(button).toBeDisabled()
     fireEvent.click(button)
     expect(onAdd).not.toHaveBeenCalled()
+  })
+
+  test("hours set by the owner are used, and bad data is ignored", () => {
+    try {
+      setMealHours({ LUNCH: { startHour: 11, endHour: 15 }, DINNER: { startHour: 19, endHour: 23 } })
+      expect(mealIsOpen("LUNCH", 11)).toBe(true)
+      expect(mealIsOpen("DINNER", 22.5)).toBe(true)
+      expect(mealHoursLabel("DINNER", "en")).toBe("7:00 pm to 11:00 pm")
+      setMealHours({ LUNCH: { startHour: 9, endHour: 3 } })
+      expect(mealIsOpen("LUNCH", 11)).toBe(true)
+    } finally {
+      setMealHours({ LUNCH: { startHour: 12, endHour: 16 }, DINNER: { startHour: 18, endHour: 22 } })
+    }
+    expect(mealIsOpen("LUNCH", 11)).toBe(false)
+    expect(mealTimeNow).toBeTypeOf("function")
+    expect(hourLabel(24, "en")).toBe("12:00 am")
   })
 })
