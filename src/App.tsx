@@ -805,34 +805,33 @@ export default function App() {
       </section>
 
       {/* 7-day meals with a sticky day picker */}
-      <section id="meal" className="relative scroll-mt-[var(--header-h,120px)] max-md:order-2">
-        {/* traditional thali picture behind the day picker and heading */}
-        <div
-          aria-hidden
-          className="pointer-events-none absolute inset-x-0 top-0 h-[250px] border-t border-gold/30 bg-cover bg-[position:85%_center] sm:h-[280px] sm:bg-center"
-          style={{ backgroundImage: "url(/bg-thali.svg)" }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-alabaster/90 via-alabaster/55 to-transparent sm:via-alabaster/30" />
-          <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-b from-transparent to-alabaster" />
-        </div>
-        <div className="sticky top-[var(--header-h,120px)] z-30 border-b border-gold/25 bg-alabaster/60 py-3 backdrop-blur">
+      <section id="meal" className="scroll-mt-[var(--header-h,120px)] max-md:order-2">
+        <div className="sticky top-[var(--header-h,120px)] z-30 border-b border-white/15 bg-[#7d0e15]/95 py-3 backdrop-blur">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <DayPillBar />
           </div>
         </div>
-        <div className="relative mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-10 lg:px-8 lg:py-14">
-          <div className="mb-3 flex flex-wrap items-end justify-between gap-x-4 gap-y-0.5 sm:mb-5">
-            <h2 className="text-display text-2xl sm:text-4xl">{tr("7-day special meals", "৭ দিনের স্পেশাল মিল")}</h2>
-            <p className="text-sm text-slate">
-              {loading
-                ? tr("Loading...", "লোড হচ্ছে...")
-                : `${dayLabel(String(activeDay), lang)} • ${mealTimeLabel(mealTime, lang)} • ${tr(
-                    `${mealsNow.length} items`,
-                    `${num(mealsNow.length)}টি আইটেম`,
-                  )}`}
-            </p>
+        {/* red banner with a real biryani photo behind the heading */}
+        <div
+          className="relative isolate bg-[#8f1119] bg-cover bg-[position:80%_center] sm:bg-center"
+          style={{ backgroundImage: "url(https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=1600&q=70)" }}
+        >
+          <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-r from-[#8f1119] via-[#b3151d]/90 to-[#D7232B]/70" />
+          <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
+            <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-0.5">
+              <h2 className="text-display text-2xl text-white sm:text-4xl">{tr("7-day special meals", "৭ দিনের স্পেশাল মিল")}</h2>
+              <p className="text-sm text-white/85">
+                {loading
+                  ? tr("Loading...", "লোড হচ্ছে...")
+                  : `${dayLabel(String(activeDay), lang)} • ${mealTimeLabel(mealTime, lang)} • ${tr(
+                      `${mealsNow.length} items`,
+                      `${num(mealsNow.length)}টি আইটেম`,
+                    )}`}
+              </p>
+            </div>
           </div>
-
+        </div>
+        <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
           {/* Lunch / Dinner */}
           <div role="tablist" aria-label={tr("Meal time", "বেলা")} className="mb-4 grid grid-cols-2 gap-1 rounded-2xl border border-gold/35 bg-cream p-1 sm:mb-6 sm:border-0 sm:inline-grid sm:min-w-[320px]">
             {MEAL_TIMES.map((m) => {

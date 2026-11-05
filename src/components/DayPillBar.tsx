@@ -70,7 +70,7 @@ export function DayPillBar({ active: propActive, onChange: propOnChange }: Props
               onClick={() => onChange(d)}
               className={`relative inline-flex h-10 shrink-0 snap-start items-center gap-1.5 rounded-full border px-4 text-sm font-semibold transition focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/25 cursor-pointer sm:border-transparent ${
                 isActive
-                  ? "border-brand bg-brand text-white shadow-[0_8px_18px_-10px_rgba(140,10,18,0.9)]"
+                  ? "border-white bg-brand text-white ring-2 ring-white/70 shadow-[0_8px_18px_-10px_rgba(140,10,18,0.9)]"
                   : "border-gold/35 bg-white text-charcoal hover:text-brand sm:border-line sm:bg-transparent sm:hover:bg-cream"
               }`}
             >
