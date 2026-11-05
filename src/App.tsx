@@ -806,19 +806,24 @@ export default function App() {
 
       {/* 7-day meals with a sticky day picker */}
       <section id="meal" className="scroll-mt-[var(--header-h,120px)] max-md:order-2">
-        <div className="sticky top-[var(--header-h,120px)] z-30 border-b border-white/15 bg-[#7d0e15]/95 py-3 backdrop-blur">
+        {/* red torn-paper band, same look as the promise strip */}
+        <div className="relative">
+          <TornEdge side="top" className="text-brand" />
+        </div>
+        <div className="sticky top-[var(--header-h,120px)] z-30 bg-jali py-3 text-white shadow-[0_6px_14px_-10px_rgba(60,0,4,0.7)]">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <DayPillBar />
           </div>
         </div>
-        {/* red banner with a real biryani photo behind the heading */}
-        <div
-          className="relative isolate bg-[#8f1119] bg-cover bg-[position:80%_center] sm:bg-center"
-          style={{ backgroundImage: "url(https://images.unsplash.com/photo-1589302168068-964664d93dc0?auto=format&fit=crop&w=1600&q=70)" }}
-        >
-          <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-r from-[#8f1119] via-[#b3151d]/90 to-[#D7232B]/70" />
-          <div className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:px-8">
-            <div className="flex flex-wrap items-end justify-between gap-x-4 gap-y-0.5">
+        <div className="bg-jali relative text-white">
+          <div className="mx-auto flex w-full max-w-7xl items-center gap-3 px-4 pb-6 pt-2 sm:gap-5 sm:px-6 sm:pb-10 sm:pt-4 lg:px-8">
+            <img
+              src={PHOTOS.promise.dum}
+              alt=""
+              loading="lazy"
+              className="size-14 shrink-0 rounded-full object-cover ring-2 ring-white/90 sm:size-20 sm:ring-4 sm:shadow-[0_12px_24px_-10px_rgba(60,0,4,0.8)]"
+            />
+            <div className="min-w-0">
               <h2 className="text-display text-2xl text-white sm:text-4xl">{tr("7-day special meals", "৭ দিনের স্পেশাল মিল")}</h2>
               <p className="text-sm text-white/85">
                 {loading
@@ -830,8 +835,9 @@ export default function App() {
               </p>
             </div>
           </div>
+          <TornEdge side="bottom" className="text-brand" />
         </div>
-        <div className="mx-auto w-full max-w-7xl px-4 py-5 sm:px-6 sm:py-8 lg:px-8 lg:py-10">
+        <div className="mx-auto w-full max-w-7xl px-4 pb-5 pt-8 sm:px-6 sm:pb-8 sm:pt-12 lg:px-8 lg:pb-10">
           {/* Lunch / Dinner */}
           <div role="tablist" aria-label={tr("Meal time", "বেলা")} className="mb-4 grid grid-cols-2 gap-1 rounded-2xl border border-gold/35 bg-cream p-1 sm:mb-6 sm:border-0 sm:inline-grid sm:min-w-[320px]">
             {MEAL_TIMES.map((m) => {
