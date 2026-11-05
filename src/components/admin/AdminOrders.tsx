@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useLang } from "../../context/LanguageContext"
 import { NEW_ORDER_EVENT } from "./useOrderAlerts"
+import { useRefreshOnReturn } from "./useRefreshOnReturn"
 import { adminFetch, btnDanger, btnPrimary, btnSecondary, dg, inputClass, taka, timeAgo } from "./adminApi"
 import { Empty, ListSkeleton, Notice, PageHeader } from "./adminUi"
 
@@ -140,6 +141,7 @@ export function AdminOrders() {
   const [query, setQuery] = useState("")
   const [busyId, setBusyId] = useState<number | null>(null)
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null)
+  const [refreshing, setRefreshing] = useState(false)
 
   const load = useCallback(async () => {
     try {
@@ -175,6 +177,15 @@ export function AdminOrders() {
       window.removeEventListener(NEW_ORDER_EVENT, load)
     }
   }, [load])
+
+  useRefreshOnReturn(load)
+
+  const refresh = async () => {
+    setRefreshing(true)
+    await load()
+    // keep the spinner for a moment so the tap is clearly noticed
+    window.setTimeout(() => setRefreshing(false), 400)
+  }
 
   const activeCount = rows.filter((r) => ACTIVE.includes(r.order.status)).length
 
@@ -221,8 +232,20 @@ export function AdminOrders() {
       <PageHeader
         title={tr("Orders", "অর্ডার")}
         action={
-          <button type="button" onClick={load} className={btnSecondary}>
-            {tr("Refresh", "রিফ্রেশ")}
+          <button type="button" onClick={refresh} disabled={refreshing} className={`${btnSecondary} gap-2`}>
+            <svg
+              viewBox="0 0 24 24"
+              className={`size-4 ${refreshing ? "animate-spin" : ""}`}
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M20 12a8 8 0 1 1-2.3-5.7M20 4v5h-5" />
+            </svg>
+            {refreshing ? tr("Refreshing…", "রিফ্রেশ হচ্ছে…") : tr("Refresh", "রিফ্রেশ")}
           </button>
         }
       />

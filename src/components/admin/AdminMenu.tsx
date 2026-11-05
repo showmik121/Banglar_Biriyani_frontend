@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from "react
 import { useAuth } from "../../context/AuthContext"
 import { useLang } from "../../context/LanguageContext"
 import { ApiError, adminFetch, btnDanger, btnPrimary, btnSecondary, inputClass, labelClass, taka } from "./adminApi"
+import { useRefreshOnReturn } from "./useRefreshOnReturn"
 import { Empty, FieldError, FormDialog, ListSkeleton, Notice, PageHeader, Toggle } from "./adminUi"
 
 interface Dish {
@@ -61,6 +62,7 @@ export function AdminMenu() {
   useEffect(() => {
     load()
   }, [load])
+  useRefreshOnReturn(load)
 
   const groups = useMemo(
     () =>

@@ -28,6 +28,8 @@ export class ApiError extends Error {
 export async function adminFetch<T>(url: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(url, {
     credentials: "include",
+    // Always ask the server: a refresh must never show an old copy from the browser cache
+    cache: "no-store",
     ...init,
     headers: { "content-type": "application/json", ...(init.headers || {}) },
   })

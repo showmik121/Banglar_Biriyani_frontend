@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState, type FormEvent } from "react"
 import { useAuth } from "../../context/AuthContext"
 import { useLang } from "../../context/LanguageContext"
 import { ApiError, adminFetch, adminIsBangla, btnDanger, btnPrimary, btnSecondary, dg, inputClass, labelClass, taka } from "./adminApi"
+import { useRefreshOnReturn } from "./useRefreshOnReturn"
 import { Empty, FieldError, FormDialog, ListSkeleton, Notice, PageHeader, Toggle } from "./adminUi"
 
 export interface OfferRecord {
@@ -89,6 +90,7 @@ export function AdminOffers() {
   useEffect(() => {
     load()
   }, [load])
+  useRefreshOnReturn(load)
 
   const open = (o: OfferRecord | "new") => {
     setEditing(o)
