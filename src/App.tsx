@@ -780,16 +780,16 @@ export default function App() {
             </div>
           )}
           {!q && filteredMenu.length > 4 && (
-            <div className="mt-8 flex justify-center">
+            <div className="mt-4 mb-8 flex justify-center sm:mt-6">
               <button
                 type="button"
                 onClick={() => setShowAll((v) => !v)}
                 aria-expanded={showAll}
-                className="inline-flex h-12 items-center gap-2 rounded-full border-2 border-charcoal bg-white px-7 text-sm font-bold text-charcoal transition hover:bg-charcoal hover:text-white"
+                className="inline-flex h-9 items-center gap-1.5 rounded-full border-2 border-charcoal bg-white px-5 text-[13px] font-bold text-charcoal transition hover:bg-charcoal hover:text-white"
               >
                 {showAll ? tr("Show less", "কম দেখুন") : tr("See more", "আরও দেখুন")}
                 <svg
-                  className={`size-4 transition ${showAll ? "rotate-180" : ""}`}
+                  className={`size-3.5 transition ${showAll ? "rotate-180" : ""}`}
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
