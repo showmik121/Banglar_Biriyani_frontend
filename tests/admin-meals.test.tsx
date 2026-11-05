@@ -111,16 +111,23 @@ describe("Admin daily meals", () => {
   test("the owner can change lunch and dinner hours", async () => {
     const calls = mockApi()
     render(<AdminMeals />)
+    const lunchSec = (await screen.findByRole("heading", { name: "Order hours" })).closest("section")!
+    fireEvent.click(within(lunchSec).getByRole("button", { name: "Edit" }))
     fireEvent.change(await screen.findByLabelText("Lunch ends"), { target: { value: "15" } })
     fireEvent.click(screen.getByRole("button", { name: "Save hours" }))
     await waitFor(() => expect(calls.some((c) => c.url.includes("meal-hours") && c.init?.method === "PUT")).toBe(true))
     const body = JSON.parse(String(calls.find((c) => c.init?.method === "PUT" && c.url.includes("meal-hours"))!.init!.body))
     expect(body).toEqual({ LUNCH: { startHour: 12, endHour: 15 }, DINNER: { startHour: 18, endHour: 22 } })
+    // after saving the form closes and an Edit button is shown again
+    expect(await screen.findByText("Order hours saved")).toBeInTheDocument()
+    expect(screen.queryByRole("button", { name: "Save hours" })).toBeNull()
+    expect(within(lunchSec).getByRole("button", { name: "Edit" })).toBeInTheDocument()
   })
 
   test("refuses an end time that is not after the start", async () => {
     mockApi()
     render(<AdminMeals />)
+    fireEvent.click(within((await screen.findByRole("heading", { name: "Order hours" })).closest("section")!).getByRole("button", { name: "Edit" }))
     fireEvent.change(await screen.findByLabelText("Dinner ends"), { target: { value: "18" } })
     expect(screen.getByRole("alert")).toHaveTextContent("end time must be after")
     expect(screen.getByRole("button", { name: "Save hours" })).toBeDisabled()

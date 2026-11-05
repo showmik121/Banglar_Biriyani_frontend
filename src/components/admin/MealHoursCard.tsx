@@ -22,6 +22,7 @@ export function MealHoursCard({ isAdmin }: { isAdmin: boolean }) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [ok, setOk] = useState<string | null>(null)
+  const [editing, setEditing] = useState(false)
 
   useEffect(() => {
     let live = true
@@ -52,6 +53,12 @@ export function MealHoursCard({ isAdmin }: { isAdmin: boolean }) {
   const bad = MEALS.find((m) => hours[m].endHour <= hours[m].startHour)
   const changed = JSON.stringify(hours) !== JSON.stringify(saved)
 
+  const cancel = () => {
+    if (saved) setHours(saved)
+    setError(null)
+    setEditing(false)
+  }
+
   const save = async () => {
     if (bad) return
     setSaving(true)
@@ -61,12 +68,49 @@ export function MealHoursCard({ isAdmin }: { isAdmin: boolean }) {
       setHours(next)
       setSaved(next)
       setOk(tr("Order hours saved", "অর্ডারের সময় সেভ হয়েছে"))
+      setEditing(false)
       window.dispatchEvent(new Event("banglar-biriyani:menu-updated"))
     } catch (e) {
       setError((e as Error).message)
     } finally {
       setSaving(false)
     }
+  }
+
+  if (!editing) {
+    return (
+      <section aria-labelledby="meal-hours-h" className="mb-5 rounded-xl border border-line bg-white p-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 id="meal-hours-h" className="font-semibold text-charcoal">
+              {tr("Order hours", "অর্ডারের সময়")}
+            </h2>
+            <ul className="mt-1.5 space-y-0.5 text-sm text-slate">
+              {MEALS.map((m) => (
+                <li key={m}>
+                  <span className="font-medium text-charcoal">{tr(NAME[m][0], NAME[m][1])}:</span>{" "}
+                  {hourLabel(hours[m].startHour, lang)} – {hourLabel(hours[m].endHour, lang)}
+                </li>
+              ))}
+            </ul>
+          </div>
+          {isAdmin && (
+            <button
+              type="button"
+              onClick={() => {
+                setOk(null)
+                setEditing(true)
+              }}
+              className="h-11 shrink-0 rounded-lg border border-line px-4 text-sm font-medium text-brand hover:bg-cream sm:h-10"
+            >
+              {tr("Edit", "এডিট")}
+            </button>
+          )}
+        </div>
+        {error && <div className="mt-3"><Notice kind="error">{error}</Notice></div>}
+        {ok && <div className="mt-3"><Notice kind="ok">{ok}</Notice></div>}
+      </section>
+    )
   }
 
   return (
@@ -129,13 +173,14 @@ export function MealHoursCard({ isAdmin }: { isAdmin: boolean }) {
       )}
       {error && <div className="mt-3"><Notice kind="error">{error}</Notice></div>}
       {ok && <div className="mt-3"><Notice kind="ok">{ok}</Notice></div>}
-      {isAdmin ? (
-        <button type="button" onClick={save} disabled={!changed || !!bad || saving} className={`${btnPrimary} mt-3 h-11 w-full sm:h-10 sm:w-auto`}>
+      <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+        <button type="button" onClick={save} disabled={!changed || !!bad || saving} className={`${btnPrimary} h-11 w-full sm:h-10 sm:w-auto`}>
           {saving ? tr("Saving…", "সেভ হচ্ছে…") : tr("Save hours", "সময় সেভ করুন")}
         </button>
-      ) : (
-        <p className="mt-3 text-xs text-slate">{tr("Only the admin can change these.", "শুধু অ্যাডমিন এটি বদলাতে পারেন।")}</p>
-      )}
+        <button type="button" onClick={cancel} disabled={saving} className="h-11 w-full rounded-lg border border-line px-4 text-sm font-medium text-charcoal hover:bg-cream sm:h-10 sm:w-auto">
+          {tr("Cancel", "বাতিল")}
+        </button>
+      </div>
     </section>
   )
 }
