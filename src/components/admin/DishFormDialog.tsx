@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from "react"
+import { useRef, useState, type FormEvent } from "react"
 import { useLang } from "../../context/LanguageContext"
-import { ApiError, adminFetch, btnDanger, inputClass, labelClass } from "./adminApi"
+import { ApiError, adminFetch, btnDanger, btnSecondary, inputClass, labelClass } from "./adminApi"
+import { shrinkPhoto } from "./shrinkPhoto"
 import { FieldError, FormDialog, Toggle } from "./adminUi"
 
 export interface DishData {
@@ -50,10 +51,28 @@ export function DishFormDialog({
     isAvailable: dish?.isAvailable ?? true,
   })
   const [saving, setSaving] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
   const [formError, setFormError] = useState<string | null>(null)
   const [fieldErrors, setFieldErrors] = useState<Record<string, string[] | undefined>>({})
   const set = <K extends keyof typeof form>(k: K, v: (typeof form)[K]) => setForm((f) => ({ ...f, [k]: v }))
   const fe = (k: string) => fieldErrors[k]?.[0]
+
+  const pickPhoto = async (file?: File) => {
+    if (!file) return
+    setUploading(true)
+    setFormError(null)
+    try {
+      const dataUrl = await shrinkPhoto(file)
+      const res = await adminFetch<{ url: string }>("/api/admin/images", { method: "POST", body: JSON.stringify({ dataUrl }) })
+      set("imageUrl", res.url)
+    } catch (err) {
+      setFormError((err as Error).message)
+    } finally {
+      setUploading(false)
+      if (fileRef.current) fileRef.current.value = ""
+    }
+  }
 
   const save = async (e: FormEvent) => {
     e.preventDefault()
@@ -115,7 +134,7 @@ export function DishFormDialog({
       title={isNew ? tr("Add dish", "খাবার যোগ করুন") : tr(`Edit ${dish.name}`, `${dish.name} এডিট`)}
       onClose={onClose}
       onSubmit={save}
-      saving={saving}
+      saving={saving || uploading}
       submitLabel={isNew ? tr("Add dish", "খাবার যোগ করুন") : tr("Save changes", "পরিবর্তন সেভ করুন")}
       error={formError}
       footerExtra={
@@ -132,18 +151,37 @@ export function DishFormDialog({
         <div className="size-20 shrink-0 overflow-hidden rounded-lg bg-cream">
           {form.imageUrl && <img src={form.imageUrl} alt={tr("Photo preview", "ছবির প্রিভিউ")} className="size-full object-cover" />}
         </div>
-        <label className="min-w-0 flex-1">
-          <span className={labelClass}>{tr("Photo link", "ছবির লিংক")}</span>
+        <div className="min-w-0 flex-1">
+          <span className={labelClass}>{tr("Photo", "ছবি")}</span>
           <input
-            className={inputClass}
-            type="url"
-            value={form.imageUrl}
-            onChange={(e) => set("imageUrl", e.target.value)}
-            placeholder="https://…"
-            required
+            ref={fileRef}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            aria-label={tr("Choose a photo from this device", "এই ডিভাইস থেকে ছবি বাছুন")}
+            onChange={(e) => pickPhoto(e.target.files?.[0])}
           />
+          <button type="button" onClick={() => fileRef.current?.click()} disabled={uploading} className={`${btnSecondary} h-11 w-full sm:h-10`}>
+            {uploading
+              ? tr("Uploading…", "আপলোড হচ্ছে…")
+              : form.imageUrl
+                ? tr("Change photo", "ছবি বদলান")
+                : tr("Choose photo from device", "ডিভাইস থেকে ছবি বাছুন")}
+          </button>
+          <label className="mt-2 block">
+            <span className="mb-1 block text-xs text-slate">{tr("or paste a photo link", "অথবা ছবির লিংক দিন")}</span>
+            <input
+              className={inputClass}
+              type="text"
+              inputMode="url"
+              value={form.imageUrl}
+              onChange={(e) => set("imageUrl", e.target.value)}
+              placeholder="https://…"
+              required
+            />
+          </label>
           <FieldError message={fe("imageUrl")} />
-        </label>
+        </div>
       </div>
       <label>
         <span className={labelClass}>{tr("Name", "নাম")}</span>

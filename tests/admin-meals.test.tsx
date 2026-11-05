@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest"
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react"
 import { AdminMeals } from "../src/components/admin/AdminMeals"
 
+vi.mock("../src/components/admin/shrinkPhoto", () => ({ shrinkPhoto: async () => "data:image/jpeg;base64,AAAA" }))
 vi.mock("../src/context/AuthContext", () => ({ useAuth: () => ({ user: { role: "ADMIN" } }) }))
 
 const dish = (id: number, name: string) => ({
@@ -38,6 +39,7 @@ function mockApi() {
           JSON.stringify({ data: { LUNCH: { startHour: 12, endHour: 16 }, DINNER: { startHour: 18, endHour: 22 } } }),
           { status: 200 },
         )
+      if (url === "/api/admin/images") return new Response(JSON.stringify({ data: { url: "/api/images/7" } }), { status: 201 })
       if (url === "/api/admin/menu" && init?.method === "POST")
         return new Response(JSON.stringify({ data: { menuItem: { id: 9 } } }), { status: 201 })
       if (init?.method === "PUT") return new Response(JSON.stringify({ data: { assignments: [] } }), { status: 200 })
@@ -92,7 +94,7 @@ describe("Admin daily meals", () => {
     render(<AdminMeals />)
     const dinner = (await screen.findByRole("heading", { name: "Dinner" })).closest("section")!
     fireEvent.click(within(dinner).getByRole("button", { name: /Create a new dinner dish/ }))
-    fireEvent.change(await screen.findByLabelText("Photo link"), { target: { value: "https://x.test/a.jpg" } })
+    fireEvent.change(await screen.findByLabelText("or paste a photo link"), { target: { value: "https://x.test/a.jpg" } })
     fireEvent.change(screen.getByLabelText("Name"), { target: { value: "Beef Tehari" } })
     fireEvent.change(screen.getByLabelText("Price (৳)"), { target: { value: "250" } })
     fireEvent.change(screen.getByLabelText("Description"), { target: { value: "Spicy tehari" } })
@@ -122,5 +124,17 @@ describe("Admin daily meals", () => {
     fireEvent.change(await screen.findByLabelText("Dinner ends"), { target: { value: "18" } })
     expect(screen.getByRole("alert")).toHaveTextContent("end time must be after")
     expect(screen.getByRole("button", { name: "Save hours" })).toBeDisabled()
+  })
+
+  test("a photo picked from the device is uploaded and used as the dish photo", async () => {
+    const calls = mockApi()
+    render(<AdminMeals />)
+    const lunch = (await screen.findByRole("heading", { name: "Lunch" })).closest("section")!
+    fireEvent.click(within(lunch).getByRole("button", { name: /Create a new lunch dish/ }))
+    const file = new File(["x"], "dish.jpg", { type: "image/jpeg" })
+    fireEvent.change(await screen.findByLabelText("Choose a photo from this device"), { target: { files: [file] } })
+    await waitFor(() => expect(screen.getByLabelText("or paste a photo link")).toHaveValue("/api/images/7"))
+    const up = calls.find((c) => c.url === "/api/admin/images")!
+    expect(JSON.parse(String(up.init!.body))).toEqual({ dataUrl: "data:image/jpeg;base64,AAAA" })
   })
 })
