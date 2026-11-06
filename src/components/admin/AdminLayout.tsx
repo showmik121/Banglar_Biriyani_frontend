@@ -1,9 +1,8 @@
 import { useEffect, type ReactNode } from "react"
-import { useAuth } from "../../context/AuthContext"
 import { useLang } from "../../context/LanguageContext"
 import { navigateTo, useCurrentPath } from "../../utils/navigation"
 import { dg, taka } from "./adminApi"
-import { PushAlertsCard } from "./PushAlertsCard"
+import { AdminNavMenu } from "./AdminNavMenu"
 import { useOrderAlerts } from "./useOrderAlerts"
 
 const TABS = [
@@ -15,8 +14,7 @@ const TABS = [
 ]
 
 export function AdminLayout({ children }: { children: ReactNode }) {
-  const { user, logout } = useAuth()
-  const { lang, setLang, tr } = useLang()
+  const { tr } = useLang()
   const path = useCurrentPath()
   const { enabled, enable, alert, dismiss } = useOrderAlerts()
   // /admin opens the Orders tab
@@ -68,35 +66,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
               {tr("ADMIN", "অ্যাডমিন")}
             </span>
           </a>
-          <div className="ml-auto flex shrink-0 items-center gap-1">
-            <a
-              href="/"
-              onClick={(e) => {
-                e.preventDefault()
-                navigateTo("/")
-              }}
-              className="hidden h-9 items-center rounded-lg px-3 text-sm text-white/80 hover:bg-white/10 hover:text-white sm:inline-flex"
-            >
-              {tr("View site", "সাইট দেখুন")}
-            </a>
-            <span className="hidden max-w-48 truncate px-2 text-sm text-white/70 md:inline" title={user?.email ?? undefined}>
-              {user?.email ?? user?.phone}
-            </span>
-            <button
-              type="button"
-              onClick={() => setLang(lang === "bn" ? "en" : "bn")}
-              aria-label={tr("Switch language", "ভাষা বদলান")}
-              className="inline-flex h-10 min-w-10 items-center justify-center rounded-lg border border-white/25 px-2 text-sm font-semibold text-white hover:bg-white/10"
-            >
-              {lang === "bn" ? "EN" : "বাং"}
-            </button>
-            <button
-              type="button"
-              onClick={() => logout().then(() => navigateTo("/admin"))}
-              className="inline-flex h-10 items-center rounded-lg px-3 text-sm font-semibold text-white hover:bg-white/10"
-            >
-              {tr("Sign out", "সাইন আউট")}
-            </button>
+          <div className="ml-auto flex shrink-0 items-center">
+            <AdminNavMenu soundOn={enabled} enableSound={enable} />
           </div>
         </div>
         {/* Tabs at the top on larger screens */}
@@ -164,7 +135,6 @@ export function AdminLayout({ children }: { children: ReactNode }) {
       </header>
 
       <main className="mx-auto max-w-5xl px-4 pb-28 pt-5 sm:pb-10 sm:pt-6">
-        {active === TABS[0].path && <PushAlertsCard />}
         {children}
       </main>
 
