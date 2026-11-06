@@ -1,8 +1,9 @@
-import type { ReactNode } from "react"
+import { useEffect, type ReactNode } from "react"
 import { useAuth } from "../../context/AuthContext"
 import { useLang } from "../../context/LanguageContext"
 import { navigateTo, useCurrentPath } from "../../utils/navigation"
 import { dg, taka } from "./adminApi"
+import { PushAlertsCard } from "./PushAlertsCard"
 import { useOrderAlerts } from "./useOrderAlerts"
 
 const TABS = [
@@ -20,6 +21,15 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const { enabled, enable, alert, dismiss } = useOrderAlerts()
   // /admin opens the Orders tab
   const active = TABS.find((t) => path.startsWith(t.path))?.path ?? TABS[0].path
+
+  // "Add to Home Screen" on an admin page installs the Admin app (customers never see this)
+  useEffect(() => {
+    const link = document.createElement("link")
+    link.rel = "manifest"
+    link.href = "/admin.webmanifest"
+    document.head.appendChild(link)
+    return () => link.remove()
+  }, [])
 
   const tabLink = (t: (typeof TABS)[number], isActive: boolean, className: string, withIcon: boolean) => (
     <a
@@ -153,7 +163,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         )}
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 pb-28 pt-5 sm:pb-10 sm:pt-6">{children}</main>
+      <main className="mx-auto max-w-5xl px-4 pb-28 pt-5 sm:pb-10 sm:pt-6">
+        {active === TABS[0].path && <PushAlertsCard />}
+        {children}
+      </main>
 
       {/* Phone: fixed bottom tab bar, easy to reach with a thumb */}
       <nav

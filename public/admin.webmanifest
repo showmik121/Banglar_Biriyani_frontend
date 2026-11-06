@@ -1,0 +1,13 @@
+{
+  "name": "Banglar Biriyani Admin",
+  "short_name": "BB Admin",
+  "start_url": "/admin/orders",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fffaf7",
+  "theme_color": "#8c0a12",
+  "icons": [
+    { "src": "/logo.png", "sizes": "640x600", "type": "image/png", "purpose": "any" },
+    { "src": "/logo-mark.png", "sizes": "256x250", "type": "image/png", "purpose": "any" }
+  ]
+}
