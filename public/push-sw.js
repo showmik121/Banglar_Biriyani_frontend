@@ -1,9 +1,30 @@
-// Shows a "new order" notification on the owner's phone, even when the admin page is closed.
-// The server sends an empty ping; no order details travel through the push service.
+// Shows phone notifications even when the site is closed:
+//  - owner/staff: an empty ping from the server means "new order" (no details travel through the push service)
+//  - customers: an encrypted message {title, body, url, tag} about their own order's status
 self.addEventListener("install", () => self.skipWaiting())
 self.addEventListener("activate", (event) => event.waitUntil(self.clients.claim()))
 
 self.addEventListener("push", (event) => {
+  let message = null
+  try {
+    message = event.data ? event.data.json() : null
+  } catch (e) {
+    message = null
+  }
+  if (message && typeof message.title === "string") {
+    event.waitUntil(
+      self.registration.showNotification(message.title, {
+        body: typeof message.body === "string" ? message.body : "",
+        icon: "/logo-mark.png",
+        badge: "/logo-mark.png",
+        tag: typeof message.tag === "string" ? message.tag : "bb-order",
+        renotify: true,
+        vibrate: [200, 100, 200],
+        data: { url: typeof message.url === "string" && message.url.startsWith("/") ? message.url : "/" },
+      }),
+    )
+    return
+  }
   event.waitUntil(
     self.registration.showNotification("🔔 নতুন অর্ডার এসেছে · New order", {
       body: "অর্ডার দেখতে ট্যাপ করুন · Tap to see it",
@@ -24,8 +45,11 @@ self.addEventListener("notificationclick", (event) => {
   event.waitUntil(
     self.clients.matchAll({ type: "window", includeUncontrolled: true }).then((list) => {
       for (const client of list) {
-        if (new URL(client.url).pathname.startsWith("/admin") && "focus" in client) {
-          return client.focus().then((c) => (c && "navigate" in c ? c.navigate(target) : undefined))
+        const sameArea = target.startsWith("/admin")
+          ? new URL(client.url).pathname.startsWith("/admin")
+          : !new URL(client.url).pathname.startsWith("/admin")
+        if (sameArea && "focus" in client) {
+          return client.focus().then((c) => (c && target.startsWith("/admin") && "navigate" in c ? c.navigate(target) : undefined))
         }
       }
       return self.clients.openWindow(target)

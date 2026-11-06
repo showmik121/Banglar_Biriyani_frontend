@@ -5,6 +5,13 @@ import { useFocusTrap } from "../hooks/useFocusTrap"
 import { forgetTrackedOrder, getTrackedOrders, saveTrackedOrder } from "../lib/trackedOrders"
 import { useLang, type Lang } from "../context/LanguageContext"
 import { dishName } from "../i18n/dishes"
+import {
+  disableOrderAlerts,
+  enableOrderAlerts,
+  getOrderAlertState,
+  syncOrderAlerts,
+  type OrderAlertState,
+} from "../lib/orderPush"
 
 type Status = "PENDING" | "CONFIRMED" | "PREPARING" | "OUT_FOR_DELIVERY" | "DELIVERED" | "CANCELLED"
 
@@ -219,6 +226,8 @@ export function MyOrdersDrawer() {
             </div>
           ) : null}
 
+          {active.length > 0 && <OrderAlertsCard orders={active.map((g) => g.order)} />}
+
           {active.length > 0 && (
             <section aria-labelledby="active-orders" className="space-y-3">
               <h3 id="active-orders" className="text-sm font-bold text-charcoal">
@@ -283,6 +292,89 @@ export function MyOrdersDrawer() {
         </div>
       </div>
     </div>
+  )
+}
+
+/** "Tell me on my phone when my order changes" for the orders that are still on their way. */
+function OrderAlertsCard({ orders }: { orders: { orderNumber: string; customerPhone: string }[] }) {
+  const { lang, tr } = useLang()
+  const [state, setState] = useState<OrderAlertState>(() => getOrderAlertState())
+  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const list = useMemo(() => orders.map((o) => ({ orderNumber: o.orderNumber, phone: o.customerPhone })), [orders])
+  const key = list.map((o) => o.orderNumber).join(",")
+
+  // New orders are covered automatically while notifications are on
+  useEffect(() => {
+    if (state === "on") void syncOrderAlerts(list, lang)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state, key, lang])
+
+  if (state === "unsupported") return null
+
+  const turnOn = async () => {
+    setBusy(true)
+    setError(null)
+    try {
+      await enableOrderAlerts(list, lang)
+      setState("on")
+    } catch (e) {
+      const reason = (e as Error).message
+      if (reason === "blocked") setState("blocked")
+      else
+        setError(
+          reason === "not-set-up"
+            ? tr("Notifications are not available right now.", "নোটিফিকেশন এখন চালু নেই।")
+            : tr("Could not turn notifications on. Please try again.", "নোটিফিকেশন চালু করা যায়নি। আবার চেষ্টা করুন।"),
+        )
+    } finally {
+      setBusy(false)
+    }
+  }
+  const turnOff = async () => {
+    setBusy(true)
+    await disableOrderAlerts()
+    setState("off")
+    setBusy(false)
+  }
+
+  return (
+    <section aria-label={tr("Order notifications", "অর্ডারের নোটিফিকেশন")} className="rounded-2xl bg-white p-4 ring-1 ring-line">
+      <p className="text-sm font-bold text-charcoal">
+        {state === "on"
+          ? tr("Phone notifications are on", "ফোনে নোটিফিকেশন চালু আছে")
+          : tr("Get updates on your phone", "ফোনে আপডেট পান")}
+      </p>
+      <p className="mt-0.5 text-xs text-slate">
+        {state === "blocked"
+          ? tr(
+              "Notifications are blocked in your browser settings. Allow them for this site to get updates.",
+              "ব্রাউজারের সেটিংসে নোটিফিকেশন বন্ধ করা আছে। আপডেট পেতে এই সাইটের জন্য চালু করুন।",
+            )
+          : state === "on"
+            ? tr("We'll tell you when the restaurant confirms, cooks and sends your order.", "অর্ডার কনফার্ম, রান্না ও ডেলিভারির পথে গেলে জানিয়ে দেব।")
+            : tr("Even when this page is closed, we'll tell you when your order changes.", "এই পেজ বন্ধ থাকলেও অর্ডারের অবস্থা বদলালে জানিয়ে দেব।")}
+      </p>
+      {error && (
+        <p role="alert" className="mt-2 text-xs text-rose-700">
+          {error}
+        </p>
+      )}
+      {state !== "blocked" && (
+        <button
+          type="button"
+          disabled={busy}
+          onClick={state === "on" ? turnOff : turnOn}
+          className={
+            state === "on"
+              ? "mt-3 rounded-full px-4 py-2 text-sm font-semibold text-slate ring-1 ring-line hover:bg-cream disabled:opacity-60"
+              : "mt-3 rounded-full bg-brand px-4 py-2 text-sm font-bold text-white hover:bg-brand-hover disabled:opacity-60"
+          }
+        >
+          {state === "on" ? tr("Turn off", "বন্ধ করুন") : tr("Notify me", "আমাকে জানান")}
+        </button>
+      )}
+    </section>
   )
 }
 
