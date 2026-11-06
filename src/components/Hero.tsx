@@ -102,7 +102,7 @@ export function Hero({
 
           <ul className="mt-5 hidden w-full max-w-md sm:mt-7 sm:grid grid-cols-3 divide-x divide-line py-1 text-center max-sm:border-t max-sm:border-line max-sm:pt-4 sm:rounded-2xl sm:border sm:border-line sm:bg-white/80 sm:py-3 sm:shadow-sm lg:max-w-lg">
             {[
-              [tr("7 days", "৭ দিন"), tr("7 menus", "৭ রকম মেনু")],
+              [tr("7 days", "৭ দিন"), tr("special meals", "স্পেশাল মিল")],
               [tr("Free", "ফ্রি"), tr("delivery", "ডেলিভারি")],
               [tr("Fresh", "তাজা"), tr("every day", "প্রতিদিন")],
             ].map(([top, bottom]) => (
