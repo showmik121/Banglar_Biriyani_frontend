@@ -105,7 +105,7 @@ export function Header({
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
   const [isNavOpen, setIsNavOpen] = useState(false)
   const cartCount = propCartCount ?? totalItems
-  const { lang, setLang, tr, num } = useLang()
+  const { lang, tr, num } = useLang()
 
   // Close user dropdown when clicking outside
   useEffect(() => {
@@ -209,14 +209,6 @@ export function Header({
                     isUserMenuOpen ? "rotate-180" : ""
                   }`}
                 />
-              </button>
-              <button
-                type="button"
-                onClick={() => setIsUserMenuOpen((prev) => !prev)}
-                aria-label={tr(`Account menu for ${user.fullName}`, `${user.fullName}-এর অ্যাকাউন্ট মেনু`)}
-                className={`${iconBtn} text-brand lg:hidden`}
-              >
-                <Icon d={ICONS.user} />
               </button>
 
               {/* User Dropdown Menu */}
@@ -332,27 +324,9 @@ export function Header({
                 {tr("Sign In", "সাইন ইন")}
                 <Icon d={ICONS.chevron} className="size-4 text-brand" />
               </button>
-              <button
-                type="button"
-                onClick={() => openAuthModal("login")}
-                aria-label={tr("Sign In", "সাইন ইন")}
-                className={`${iconBtn} lg:hidden`}
-              >
-                <Icon d={ICONS.user} />
-              </button>
             </>
           )}
           <LanguageSwitch className="mx-1 hidden lg:flex" />
-          {/* Phones and tablets: one tap switches to the other language */}
-          <button
-            type="button"
-            onClick={() => setLang(lang === "en" ? "bn" : "en")}
-            lang={lang === "en" ? "bn" : "en"}
-            aria-label={lang === "en" ? "বাংলায় দেখুন" : "Switch to English"}
-            className="grid h-10 min-w-10 shrink-0 place-items-center rounded-full px-2 text-xs font-bold text-charcoal transition hover:bg-cream hover:text-brand lg:hidden"
-          >
-            {lang === "en" ? "বাং" : "EN"}
-          </button>
           <button
             type="button"
             onClick={handleOpenCart}
@@ -372,7 +346,7 @@ export function Header({
             aria-expanded={isNavOpen}
             aria-controls="mobile-nav"
             aria-label={isNavOpen ? tr("Close menu", "মেনু বন্ধ করুন") : tr("Open menu", "মেনু খুলুন")}
-            className={`${iconBtn} md:hidden`}
+            className={`${iconBtn} lg:hidden`}
           >
             <Icon d={isNavOpen ? "M6 6l12 12M18 6 6 18" : "M4 7h16M4 12h16M4 17h16"} />
           </button>
@@ -384,11 +358,22 @@ export function Header({
         <nav
           id="mobile-nav"
           aria-label={tr("Sections", "সেকশন")}
-          className="border-t border-line/70 bg-alabaster px-4 pb-3 pt-2 md:hidden"
+          className="border-t border-line/70 bg-alabaster px-4 pb-3 pt-2 lg:hidden"
         >
           <ul className="grid grid-cols-2 gap-2">
+            {user && (
+              <li className="col-span-2 flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-2.5">
+                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-light text-brand">
+                  <Icon d={ICONS.user} className="size-4" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-bold text-charcoal">{user.fullName}</span>
+                  <span className="block truncate text-xs text-slate">{user.phone}</span>
+                </span>
+              </li>
+            )}
             {NAV.map((n) => (
-              <li key={n.href}>
+              <li key={n.href} className="md:hidden">
                 <a
                   href={n.href}
                   onClick={() => setIsNavOpen(false)}
@@ -411,10 +396,55 @@ export function Header({
                 {tr("My orders · track your order", "আমার অর্ডার · অর্ডার ট্র্যাক করুন")}
               </button>
             </li>
+            {!user && (
+              <li className="col-span-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsNavOpen(false)
+                    openAuthModal("login")
+                  }}
+                  className="flex h-12 w-full items-center gap-2 rounded-xl bg-brand px-4 text-sm font-bold text-white active:bg-brand-hover"
+                >
+                  <Icon d={ICONS.user} className="size-4" />
+                  {tr("Sign In", "সাইন ইন")}
+                </button>
+              </li>
+            )}
+            {(user?.role === "ADMIN" || user?.role === "STAFF") && (
+              <li className="col-span-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsNavOpen(false)
+                    navigateTo("/admin")
+                  }}
+                  className="flex h-12 w-full items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-brand active:bg-cream"
+                >
+                  <Icon d="M3 3h18v18H3zM9 3v18" className="size-4" />
+                  {tr("Admin Panel", "অ্যাডমিন প্যানেল")}
+                </button>
+              </li>
+            )}
             <li className="col-span-2 flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-1.5">
               <span className="text-sm font-semibold text-charcoal">{tr("Language", "ভাষা")}</span>
               <LanguageSwitch />
             </li>
+            {user && (
+              <li className="col-span-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsNavOpen(false)
+                    logout()
+                  }}
+                  className="flex h-12 w-full items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-rose-600 active:bg-rose-50"
+                >
+                  <Icon d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" className="size-4" />
+                  {tr("Sign Out", "সাইন আউট")}
+                </button>
+              </li>
+            )}
           </ul>
         </nav>
       )}
