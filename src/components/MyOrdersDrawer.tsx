@@ -34,13 +34,23 @@ interface OrderGroup {
 
 type Pair = [en: string, bn: string]
 
-const STEPS: { status: Status; label: Pair }[] = [
-  { status: "PENDING", label: ["Placed", "অর্ডার হয়েছে"] },
-  { status: "CONFIRMED", label: ["Confirmed", "কনফার্ম"] },
-  { status: "PREPARING", label: ["Cooking", "রান্না হচ্ছে"] },
-  { status: "OUT_FOR_DELIVERY", label: ["On the way", "পথে আছে"] },
-  { status: "DELIVERED", label: ["Delivered", "পৌঁছে গেছে"] },
+const STEPS: { status: Status; label: Pair; emoji: string }[] = [
+  { status: "PENDING", label: ["Placed", "অর্ডার হয়েছে"], emoji: "🧾" },
+  { status: "CONFIRMED", label: ["Confirmed", "কনফার্ম"], emoji: "✅" },
+  { status: "PREPARING", label: ["Cooking", "রান্না হচ্ছে"], emoji: "👨‍🍳" },
+  { status: "OUT_FOR_DELIVERY", label: ["On the way", "পথে আছে"], emoji: "🛵" },
+  { status: "DELIVERED", label: ["Delivered", "পৌঁছে গেছে"], emoji: "🎉" },
 ]
+
+/** A short, friendly nudge shown under the status. */
+const CHEER: Record<Status, Pair> = {
+  PENDING: ["Hang tight, we've got it!", "একটু অপেক্ষা করুন, আমরা দেখছি!"],
+  CONFIRMED: ["The kitchen is on it!", "রান্নাঘর তৈরি!"],
+  PREPARING: ["Smells amazing already", "সুঘ্রাণ ছড়াচ্ছে এখনই"],
+  OUT_FOR_DELIVERY: ["Almost there! Get your plate ready", "প্রায় পৌঁছে গেছে! প্লেট রেডি রাখুন"],
+  DELIVERED: ["Bon appétit!", "খাওয়া শুরু করুন!"],
+  CANCELLED: ["", ""],
+}
 
 const MESSAGE: Record<Status, { title: Pair; detail: Pair }> = {
   PENDING: {
@@ -380,34 +390,94 @@ function OrderAlertsCard({ orders }: { orders: { orderNumber: string; customerPh
 
 function ActiveOrderCard({ group: { order, items } }: { group: OrderGroup }) {
   const { lang, tr, taka, num } = useLang()
-  const step = STEPS.findIndex((s) => s.status === order.status)
+  const step = Math.max(0, STEPS.findIndex((s) => s.status === order.status))
+  const last = STEPS.length - 1
   const msg = MESSAGE[order.status]
+  const next = STEPS[step + 1]
   return (
-    <article className="rounded-2xl bg-white p-4 shadow-xs ring-1 ring-line">
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="text-base font-bold text-brand">{tr(...msg.title)}</p>
-        <span className="font-mono text-xs text-slate">{order.orderNumber}</span>
+    <article className="overflow-hidden rounded-2xl bg-white shadow-xs ring-1 ring-line">
+      {/* Banner: big emoji, the status, and a friendly line */}
+      <div className="flex items-center gap-3 bg-linear-to-r from-brand-light via-gold-light to-brand-light p-4">
+        <span
+          aria-hidden="true"
+          className="bb-hop flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-white text-3xl shadow-xs ring-1 ring-line"
+        >
+          {STEPS[step].emoji}
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-base font-bold leading-tight text-brand">{tr(...msg.title)}</p>
+          <p className="mt-0.5 text-sm text-charcoal">{tr(...CHEER[order.status])}</p>
+        </div>
+        <span className="shrink-0 rounded-full bg-white/80 px-2 py-1 font-mono text-[11px] text-slate ring-1 ring-line">
+          #{order.orderNumber.slice(-7)}
+        </span>
       </div>
-      <p className="mt-0.5 text-sm text-slate">{tr(...msg.detail)}</p>
 
-      <ol className="mt-4 grid grid-cols-5 gap-1" aria-label={tr("Order progress", "অর্ডারের অগ্রগতি")}>
-        {STEPS.map((s, i) => {
-          const done = i <= step
-          return (
-            <li key={s.status} aria-current={i === step ? "step" : undefined}>
-              <span className={`block h-1.5 rounded-full ${done ? "bg-brand" : "bg-line"}`} />
-              <span className={`mt-1.5 block text-xs leading-tight ${done ? "font-semibold text-charcoal" : "text-slate"}`}>
-                {tr(...s.label)}
-              </span>
-            </li>
-          )
-        })}
-      </ol>
+      <div className="p-4">
+        <p className="text-sm text-slate">{tr(...msg.detail)}</p>
 
-      <div className="mt-4 space-y-1 border-t border-line pt-3 text-sm">
+        {/* Game-style progress road */}
+        <div className="relative mt-5">
+          <div className="absolute inset-x-[10%] top-5 h-1.5 -translate-y-1/2 rounded-full bg-line">
+            <div
+              className="h-full rounded-full bg-linear-to-r from-brand to-saffron transition-[width] duration-700 ease-out"
+              style={{ width: `${(step / last) * 100}%` }}
+            />
+          </div>
+          <ol className="relative grid grid-cols-5 gap-1" aria-label={tr("Order progress", "অর্ডারের অগ্রগতি")}>
+            {STEPS.map((s, i) => {
+              const done = i < step
+              const current = i === step
+              return (
+                <li key={s.status} aria-current={current ? "step" : undefined} className="flex flex-col items-center">
+                  <span
+                    aria-hidden="true"
+                    className={`relative flex h-10 w-10 items-center justify-center rounded-full text-lg ${
+                      current
+                        ? "bb-pulse-ring scale-110 bg-brand text-white shadow-md"
+                        : done
+                          ? "bg-gold-light ring-2 ring-saffron"
+                          : "bg-cream opacity-60 grayscale ring-1 ring-line"
+                    }`}
+                  >
+                    {s.emoji}
+                    {done && (
+                      <span className="absolute -right-1 -bottom-1 flex h-4 w-4 items-center justify-center rounded-full bg-brand text-[9px] font-bold text-white ring-2 ring-white">
+                        ✓
+                      </span>
+                    )}
+                  </span>
+                  <span
+                    className={`mt-2 block text-center text-xs leading-tight ${
+                      current ? "font-bold text-brand" : done ? "font-semibold text-charcoal" : "text-slate"
+                    }`}
+                  >
+                    {tr(...s.label)}
+                  </span>
+                </li>
+              )
+            })}
+          </ol>
+        </div>
+
+        {/* Level counter and what comes next */}
+        <div className="mt-4 flex flex-wrap items-center gap-2 text-xs">
+          <span className="rounded-full bg-brand px-2.5 py-1 font-bold text-white">
+            {tr(`Step ${step + 1} of ${STEPS.length}`, `ধাপ ${num(step + 1)}/${num(STEPS.length)}`)}
+          </span>
+          {next && (
+            <span className="rounded-full bg-cream px-2.5 py-1 font-semibold text-charcoal ring-1 ring-line">
+              {tr("Next up", "এরপর")}: {next.emoji} {tr(...next.label)}
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="space-y-1 border-t border-line bg-alabaster px-4 pt-3 pb-4 text-sm">
         {items.map((i) => (
           <div key={i.id} className="flex justify-between gap-3 text-charcoal">
             <span>
+              <span aria-hidden="true">🍛 </span>
               {num(i.quantity)}× {dishName(i.itemNameSnapshot, lang)}
             </span>
             <span>{taka(i.lineTotalBdt)}</span>

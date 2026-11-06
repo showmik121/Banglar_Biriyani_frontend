@@ -154,6 +154,30 @@
   }
 }
 
+@keyframes bb-hop {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+@keyframes bb-pulse-ring {
+  0% {
+    box-shadow: 0 0 0 0 rgb(215 35 43 / 0.45);
+  }
+  100% {
+    box-shadow: 0 0 0 12px rgb(215 35 43 / 0);
+  }
+}
+.bb-hop {
+  animation: bb-hop 1.8s ease-in-out infinite;
+}
+.bb-pulse-ring {
+  animation: bb-pulse-ring 1.6s ease-out infinite;
+}
+
 @layer utilities {
   .animate-float-slow {
     animation: float-slow 6s ease-in-out infinite;
@@ -169,7 +193,9 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-float-slow,
   .animate-rise-in,
-  .animate-steam {
+  .animate-steam,
+  .bb-hop,
+  .bb-pulse-ring {
     animation: none;
   }
   html {
