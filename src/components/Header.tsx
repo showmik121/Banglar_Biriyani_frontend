@@ -82,6 +82,15 @@ function LanguageSwitch({ className = "" }: { className?: string }) {
   )
 }
 
+const menuRow =
+  "flex min-h-14 w-full items-center gap-3 px-4 py-2 text-left text-sm font-semibold text-charcoal transition active:bg-cream"
+
+const NAV_ICONS: Record<string, string> = {
+  "#menu": "M4 6h16M4 12h16M4 18h10",
+  "#meal": "M7 3v8M5 3v5a2 2 0 0 0 4 0V3M7 11v10M17 3c-2 2-3 5-3 8h3v10",
+  "#location": ICONS.pin,
+}
+
 const iconBtn =
   "grid size-10 shrink-0 place-items-center rounded-full text-charcoal transition hover:bg-cream hover:text-brand focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/25"
 
@@ -358,94 +367,110 @@ export function Header({
         <nav
           id="mobile-nav"
           aria-label={tr("Sections", "সেকশন")}
-          className="border-t border-line/70 bg-alabaster px-4 pb-3 pt-2 lg:hidden"
+          className="max-h-[calc(100dvh-8rem)] space-y-3 overflow-y-auto border-t border-line/70 bg-alabaster px-4 pb-4 pt-3 lg:hidden"
         >
-          <ul className="grid grid-cols-2 gap-2">
-            {user && (
-              <li className="col-span-2 flex items-center gap-3 rounded-xl border border-line bg-white px-4 py-2.5">
-                <span className="grid size-9 shrink-0 place-items-center rounded-full bg-brand-light text-brand">
-                  <Icon d={ICONS.user} className="size-4" />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-sm font-bold text-charcoal">{user.fullName}</span>
-                  <span className="block truncate text-xs text-slate">{user.phone}</span>
-                </span>
-              </li>
-            )}
-            {NAV.map((n) => (
-              <li key={n.href} className="md:hidden">
-                <a
-                  href={n.href}
-                  onClick={() => setIsNavOpen(false)}
-                  className="flex h-12 items-center rounded-xl border border-line bg-white px-4 text-sm font-semibold text-charcoal active:bg-cream"
-                >
-                  {tr(n.en, n.bn)}
-                </a>
-              </li>
-            ))}
-            <li className="col-span-2">
-              <button
-                type="button"
-                onClick={() => {
-                  setIsNavOpen(false)
-                  openMyOrders()
-                }}
-                className="flex h-12 w-full items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-charcoal active:bg-cream"
-              >
-                <Icon d={RECEIPT_ICON} className="size-4 text-brand" />
-                {tr("My orders · track your order", "আমার অর্ডার · অর্ডার ট্র্যাক করুন")}
-              </button>
-            </li>
-            {!user && (
-              <li className="col-span-2">
+          {user ? (
+            <div className="flex items-center gap-3 rounded-2xl bg-linear-to-r from-brand-light to-gold-light p-3.5 ring-1 ring-line">
+              <span className="grid size-11 shrink-0 place-items-center rounded-full bg-white text-brand shadow-sm">
+                <Icon d={ICONS.user} className="size-5" />
+              </span>
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-base font-bold text-charcoal">{user.fullName}</span>
+                <span className="block truncate text-sm text-slate">{user.phone}</span>
+              </span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => {
+                setIsNavOpen(false)
+                openAuthModal("login")
+              }}
+              className="flex h-12 w-full items-center justify-center gap-2 rounded-2xl bg-brand text-sm font-bold text-white shadow-sm active:bg-brand-hover"
+            >
+              <Icon d={ICONS.user} className="size-4" />
+              {tr("Sign in or create account", "সাইন ইন বা অ্যাকাউন্ট খুলুন")}
+            </button>
+          )}
+
+          <div>
+            <p className="px-1 pb-1.5 text-xs font-semibold uppercase tracking-wide text-slate">{tr("Explore", "ঘুরে দেখুন")}</p>
+            <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
+              {NAV.map((n) => (
+                <li key={n.href} className="md:hidden">
+                  <a href={n.href} onClick={() => setIsNavOpen(false)} className={menuRow}>
+                    <span className="text-brand">
+                      <Icon d={NAV_ICONS[n.href]} className="size-5" />
+                    </span>
+                    <span className="flex-1">{tr(n.en, n.bn)}</span>
+                    <Icon d="m9 6 6 6-6 6" className="size-4 text-slate/60" />
+                  </a>
+                </li>
+              ))}
+              <li>
                 <button
                   type="button"
                   onClick={() => {
                     setIsNavOpen(false)
-                    openAuthModal("login")
+                    openMyOrders()
                   }}
-                  className="flex h-12 w-full items-center gap-2 rounded-xl bg-brand px-4 text-sm font-bold text-white active:bg-brand-hover"
+                  className={menuRow}
                 >
-                  <Icon d={ICONS.user} className="size-4" />
-                  {tr("Sign In", "সাইন ইন")}
+                  <span className="text-brand">
+                    <Icon d={RECEIPT_ICON} className="size-5" />
+                  </span>
+                  <span className="flex-1">{tr("My orders · track your order", "আমার অর্ডার · অর্ডার ট্র্যাক করুন")}</span>
+                  <Icon d="m9 6 6 6-6 6" className="size-4 text-slate/60" />
                 </button>
               </li>
-            )}
-            {(user?.role === "ADMIN" || user?.role === "STAFF") && (
-              <li className="col-span-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setIsNavOpen(false)
-                    navigateTo("/admin")
-                  }}
-                  className="flex h-12 w-full items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-brand active:bg-cream"
-                >
-                  <Icon d="M3 3h18v18H3zM9 3v18" className="size-4" />
-                  {tr("Admin Panel", "অ্যাডমিন প্যানেল")}
-                </button>
-              </li>
-            )}
-            <li className="col-span-2 flex items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-1.5">
-              <span className="text-sm font-semibold text-charcoal">{tr("Language", "ভাষা")}</span>
-              <LanguageSwitch />
-            </li>
-            {user && (
-              <li className="col-span-2">
+              {(user?.role === "ADMIN" || user?.role === "STAFF") && (
+                <li>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsNavOpen(false)
+                      navigateTo("/admin")
+                    }}
+                    className={menuRow}
+                  >
+                    <span className="text-brand">
+                      <Icon d="M3 3h18v18H3zM9 3v18" className="size-5" />
+                    </span>
+                    <span className="flex-1">{tr("Admin Panel", "অ্যাডমিন প্যানেল")}</span>
+                    <Icon d="m9 6 6 6-6 6" className="size-4 text-slate/60" />
+                  </button>
+                </li>
+              )}
+            </ul>
+          </div>
+
+          <div>
+            <p className="px-1 pb-1.5 text-xs font-semibold uppercase tracking-wide text-slate">{tr("Settings", "সেটিংস")}</p>
+            <div className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-white">
+              <div className="flex min-h-14 items-center justify-between gap-3 px-4 py-2">
+                <span className="flex items-center gap-3 text-sm font-semibold text-charcoal">
+                  <span className="text-brand">
+                    <Icon d={ICONS.globe} className="size-5" />
+                  </span>
+                  {tr("Language", "ভাষা")}
+                </span>
+                <LanguageSwitch />
+              </div>
+              {user && (
                 <button
                   type="button"
                   onClick={() => {
                     setIsNavOpen(false)
                     logout()
                   }}
-                  className="flex h-12 w-full items-center gap-2 rounded-xl border border-line bg-white px-4 text-sm font-semibold text-rose-600 active:bg-rose-50"
+                  className={`${menuRow} text-rose-600 active:bg-rose-50`}
                 >
-                  <Icon d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" className="size-4" />
-                  {tr("Sign Out", "সাইন আউট")}
+                  <Icon d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" className="size-5" />
+                  <span className="flex-1">{tr("Sign Out", "সাইন আউট")}</span>
                 </button>
-              </li>
-            )}
-          </ul>
+              )}
+            </div>
+          </div>
         </nav>
       )}
 
