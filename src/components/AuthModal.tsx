@@ -4,6 +4,7 @@ import { useBodyScrollLock } from "../hooks/useBodyScrollLock"
 import { useFocusTrap } from "../hooks/useFocusTrap"
 import { useLang } from "../context/LanguageContext"
 import { normalizePhone } from "../utils/phone"
+import { GoogleSignInButton } from "./GoogleSignInButton"
 
 type Tab = "login" | "signup"
 type SignupField = "fullName" | "phone" | "email" | "password"
@@ -31,7 +32,7 @@ const inputClass = (invalid?: boolean) =>
   }`
 
 export function AuthModal() {
-  const { isAuthModalOpen, authModalDefaultTab, closeAuthModal, login, signup } = useAuth()
+  const { isAuthModalOpen, authModalDefaultTab, closeAuthModal, login, loginWithGoogle, signup } = useAuth()
   const { tr } = useLang()
   const modalRef = useRef<HTMLDivElement>(null)
   const firstInputRef = useRef<HTMLInputElement>(null)
@@ -93,6 +94,16 @@ export function AuthModal() {
     setBusy(false)
     if (!result.ok)
       setFormError(result.error || tr("Wrong mobile number, email or password.", "মোবাইল নম্বর, ইমেইল বা পাসওয়ার্ড ভুল।"))
+  }
+
+  const submitGoogle = async (credential: string) => {
+    if (busy) return
+    setFormError(null)
+    setBusy(true)
+    const result = await loginWithGoogle(credential)
+    setBusy(false)
+    if (!result.ok)
+      setFormError(result.error || tr("Couldn't sign you in with Google. Please try again.", "Google দিয়ে সাইন ইন করা যায়নি। আবার চেষ্টা করুন।"))
   }
 
   const submitSignup = async (e: FormEvent) => {
@@ -318,6 +329,8 @@ export function AuthModal() {
               </p>
             </form>
           )}
+
+          <GoogleSignInButton onCredential={submitGoogle} />
         </div>
       </div>
     </div>

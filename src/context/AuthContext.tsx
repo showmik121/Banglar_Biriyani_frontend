@@ -11,7 +11,7 @@ export interface AuthUser {
   id: number
   fullName: string
   email: string | null
-  phone: string
+  phone: string | null // empty for people who signed in with Google until they give it at checkout
   role: "CUSTOMER" | "STAFF" | "ADMIN"
   defaultAddress: string | null
   isActive: boolean
@@ -49,6 +49,7 @@ interface AuthContextType {
   signup: (
     data: SignupInput,
   ) => Promise<{ ok: boolean; error?: string; fieldErrors?: Record<string, string[] | undefined> }>
+  loginWithGoogle: (credential: string) => Promise<{ ok: boolean; error?: string }>
   logout: () => Promise<void>
   updateProfile: (data: UpdateProfileInput) => Promise<{ ok: boolean; error?: string }>
   refreshUser: () => Promise<void>
@@ -195,6 +196,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [closeAuthModal],
   )
 
+  const loginWithGoogle = useCallback(
+    async (credential: string) => {
+      try {
+        const res = await fetch("/api/auth/google", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ credential }),
+        })
+        const body = await res.json().catch(() => null)
+        if (!res.ok) {
+          return { ok: false, error: body?.error?.message || "Could not sign you in with Google. Please try again." }
+        }
+        if (body?.data?.user) {
+          setUser(body.data.user)
+          closeAuthModal()
+          return { ok: true }
+        }
+        return { ok: false, error: "Unexpected response from authentication service" }
+      } catch (err) {
+        return { ok: false, error: err instanceof Error ? err.message : "Network error during sign in" }
+      }
+    },
+    [closeAuthModal],
+  )
+
   const logout = useCallback(async () => {
     try {
       await fetch("/api/auth/logout", {
@@ -259,6 +286,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         openAdminModal,
         closeAdminModal,
         login,
+        loginWithGoogle,
         signup,
         logout,
         updateProfile,

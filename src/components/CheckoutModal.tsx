@@ -80,7 +80,8 @@ export function CheckoutModal({ isOpen: propIsOpen, onClose: propOnClose }: Prop
   useEffect(() => {
     if (!isOpen) return
     if (user?.fullName) setCustomerName((v) => v || user.fullName)
-    if (user?.phone) setCustomerPhone((v) => v || user.phone)
+    const savedPhone = user?.phone
+    if (savedPhone) setCustomerPhone((v) => v || savedPhone)
     else if (selectedAddress?.contactPhone) setCustomerPhone((v) => v || selectedAddress.contactPhone || "")
     const address = selectedAddress?.details || user?.defaultAddress
     if (address) setCustomerAddress((v) => v || address)
