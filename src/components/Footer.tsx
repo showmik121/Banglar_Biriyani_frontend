@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { TornEdge } from "./TornEdge"
 import { PHOTOS } from "../data/photos"
 import { useLang } from "../context/LanguageContext"
@@ -55,6 +56,23 @@ function SocialLinks({ items, className = "" }: { items: Ico[]; className?: stri
         </li>
       ))}
     </ul>
+  )
+}
+
+function Fold({ title, icon, children }: { title: string; icon: string[]; children: ReactNode }) {
+  return (
+    <details className="group">
+      <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-white [&::-webkit-details-marker]:hidden">
+        <span className="flex items-center gap-2.5">
+          <Icon paths={icon} className="size-4 text-saffron" />
+          {title}
+        </span>
+        <svg viewBox="0 0 24 24" className="size-4 text-white/60 transition group-open:rotate-180" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+          <path d="m6 9 6 6 6-6" />
+        </svg>
+      </summary>
+      <div className="px-4 pb-4 text-xs sm:text-sm">{children}</div>
+    </details>
   )
 }
 
@@ -132,20 +150,53 @@ export function Footer() {
             <SocialLinks items={SOCIALS} className="mt-6 hidden md:flex" />
           </div>
 
-          {/* Quick actions (phones) */}
-          <div className="col-span-2 grid grid-cols-2 gap-2 md:hidden">
-            <a href="tel:+8809612000000" className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 font-semibold text-white transition active:bg-white/20">
-              <Icon paths={P.phone} className="size-4 text-saffron" />
-              {tr("Call us", "কল করুন")}
-            </a>
-            <a href="mailto:hello@banglarbiriyani.com" className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 font-semibold text-white transition active:bg-white/20">
-              <Icon paths={P.mail} className="size-4 text-saffron" />
-              {tr("Email us", "ইমেইল করুন")}
-            </a>
+          {/* Phones: collapsible sections */}
+          <div className="col-span-2 divide-y divide-white/15 overflow-hidden rounded-2xl border border-white/15 bg-white/5 md:hidden">
+            <Fold title={tr("Explore", "ঘুরে দেখুন")} icon={P.pin}>
+              <ul className="grid grid-cols-2 gap-x-4">
+                {LINKS.map((l) => (
+                  <li key={l.href}>
+                    <a href={l.href} className="block py-2 text-white/85 active:text-saffron">
+                      {tr(l.en, l.bn)}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </Fold>
+            <Fold title={tr("Contact", "যোগাযোগ")} icon={P.phone}>
+              <ul className="space-y-3 text-white/85">
+                <li className="flex gap-2.5">
+                  <Icon paths={P.pin} className="mt-0.5 size-4 shrink-0 text-saffron" />
+                  <span>{tr("Near Daffodil Smart City, Birulia, Savar, Dhaka-1216", "ড্যাফোডিল স্মার্ট সিটির পাশে, বিরুলিয়া, সাভার, ঢাকা-১২১৬")}</span>
+                </li>
+                <li>
+                  <a href="tel:+8809612000000" className="flex items-center gap-2.5">
+                    <Icon paths={P.phone} className="size-4 shrink-0 text-saffron" />
+                    +880 9612-000000
+                  </a>
+                </li>
+                <li>
+                  <a href="mailto:hello@banglarbiriyani.com" className="flex items-center gap-2.5 break-all">
+                    <Icon paths={P.mail} className="size-4 shrink-0 text-saffron" />
+                    hello@banglarbiriyani.com
+                  </a>
+                </li>
+              </ul>
+            </Fold>
+            <Fold title={tr("Opening hours", "খোলার সময়")} icon={P.clock}>
+              <ul className="space-y-2.5">
+                {HOURS.map((h) => (
+                  <li key={h.day[0]} className="flex items-start justify-between gap-3">
+                    <span className="font-semibold text-white">{tr(h.day[0], h.day[1])}</span>
+                    <span className="text-right text-white/75">{tr(h.time[0], h.time[1])}</span>
+                  </li>
+                ))}
+              </ul>
+            </Fold>
           </div>
 
           {/* Explore */}
-          <nav aria-label={tr("Explore", "ঘুরে দেখুন")} className="col-span-2 md:col-span-2">
+          <nav aria-label={tr("Explore", "ঘুরে দেখুন")} className="hidden md:col-span-2 md:block">
             <p className={heading}>{tr("Explore", "ঘুরে দেখুন")}</p>
             <ul className="mt-1 grid grid-cols-2 gap-x-6 md:mt-4 md:block md:space-y-0.5">
               {LINKS.map((l) => (
@@ -163,7 +214,7 @@ export function Footer() {
           </nav>
 
           {/* Contact */}
-          <div className="md:col-span-3">
+          <div className="hidden md:col-span-3 md:block">
             <p className={heading}>{tr("Contact", "যোগাযোগ")}</p>
             <ul className="mt-2 space-y-3 text-white/85 md:mt-4">
               <li className="flex gap-2.5">
@@ -191,7 +242,7 @@ export function Footer() {
           </div>
 
           {/* Hours */}
-          <div className="md:col-span-3">
+          <div className="hidden md:col-span-3 md:block">
             <p className={heading}>{tr("Opening hours", "খোলার সময়")}</p>
             <div className="mt-2 rounded-2xl border border-white/15 bg-white/5 p-3.5 md:mt-4 md:p-4">
               <p className="flex items-center gap-2 text-xs font-bold text-saffron">
