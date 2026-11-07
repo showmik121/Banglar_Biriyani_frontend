@@ -147,6 +147,37 @@ export function Footer() {
           <p>{tr(`© ${year} Banglar Biriyani. All rights reserved.`, `© ${num(year).replace(/,/g, "")} বাংলার বিরিয়ানি। সর্বস্বত্ব সংরক্ষিত।`)}</p>
           <p className="font-bn">ভালোবাসা দিয়ে রান্না, সাভার থেকে</p>
         </div>
+        <div className="border-t border-white/10">
+          <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8">
+            <div className="flex items-center gap-3">
+              <span className="grid h-12 w-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-[#f9f6f1] p-0.5">
+                <img src="/eloris-labs.png" alt="Eloris Labs" width={240} height={282} loading="lazy" className="size-full object-contain" />
+              </span>
+              <p className="text-xs leading-tight text-white/70">
+                {tr("Developed by", "ডেভেলপ করেছে")}
+                <span className="text-display block text-sm text-white">Eloris Labs</span>
+              </p>
+            </div>
+            <ul className="flex flex-wrap gap-2 text-xs font-semibold">
+              {[
+                ["WhatsApp", "https://wa.me/8801828255113", "+880 1828-255113"],
+                ["Email", "mailto:elorislabs444@gmail.com", "elorislabs444@gmail.com"],
+                ["Facebook", "https://www.facebook.com/share/19p2Yd2HA6/", "Facebook"],
+              ].map(([key, href, label]) => (
+                <li key={key}>
+                  <a
+                    href={href}
+                    target={href.startsWith("http") ? "_blank" : undefined}
+                    rel="noopener noreferrer"
+                    className="inline-flex h-9 items-center rounded-full border border-white/15 px-3.5 text-white/85 transition hover:border-saffron hover:text-saffron"
+                  >
+                    {label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
       </div>
     </footer>
   )
