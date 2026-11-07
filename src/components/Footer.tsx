@@ -39,6 +39,25 @@ function Icon({ paths, fill, className = "size-[18px]" }: { paths: string[]; fil
   )
 }
 
+function SocialLinks({ items, className = "" }: { items: Ico[]; className?: string }) {
+  return (
+    <ul className={`gap-2 ${className}`}>
+      {items.map((x) => (
+        <li key={x.label}>
+          <a
+            href={x.href}
+            aria-label={x.label}
+            title={x.label}
+            className="inline-flex size-9 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/90 transition hover:border-saffron hover:bg-saffron hover:text-charcoal md:size-10"
+          >
+            <Icon paths={x.paths} fill={x.fill} />
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 /** The restaurant's own social pages (replace "#" with the real links). */
 const SOCIALS: Ico[] = [
   { label: "Facebook", href: "#", fill: true, paths: P.facebook },
@@ -56,7 +75,7 @@ const CREDIT_LINKS: Ico[] = [
 ]
 
 const heading = "text-eyebrow text-saffron"
-const link = "inline-flex items-center gap-1.5 py-1.5 text-white/85 transition hover:translate-x-0.5 hover:text-saffron"
+const link = "flex items-center justify-between gap-1.5 py-2.5 text-white/85 transition hover:text-saffron md:inline-flex md:justify-start md:py-1.5 md:hover:translate-x-0.5"
 
 export function Footer() {
   const year = new Date().getFullYear()
@@ -92,14 +111,17 @@ export function Footer() {
         <div className="grid grid-cols-2 gap-x-4 gap-y-6 pb-8 pt-2 text-xs sm:text-sm md:grid-cols-12 md:gap-x-10 md:gap-y-0 md:pb-14 md:pt-6">
           {/* Brand */}
           <div className="col-span-2 md:col-span-4">
-            <div className="flex items-center gap-3">
-              <span className="grid size-12 place-items-center rounded-full bg-alabaster p-1 ring-4 ring-white/30 md:size-16">
-                <img src="/logo-mark.png" alt="" className="size-full rounded-full object-contain" />
-              </span>
-              <div>
-                <p className="text-display text-xl md:text-2xl">{tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}</p>
-                <p className="font-bn text-sm text-saffron">{tr("বাংলার বিরিয়ানি", "Banglar Biriyani")}</p>
+            <div className="flex items-center justify-between gap-3 md:block">
+              <div className="flex min-w-0 items-center gap-3">
+                <span className="grid size-11 shrink-0 place-items-center rounded-full bg-alabaster p-1 ring-4 ring-white/30 md:size-16">
+                  <img src="/logo-mark.png" alt="" className="size-full rounded-full object-contain" />
+                </span>
+                <div className="min-w-0">
+                  <p className="text-display text-lg leading-tight md:text-2xl">{tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}</p>
+                  <p className="font-bn text-xs text-saffron md:text-sm">{tr("বাংলার বিরিয়ানি", "Banglar Biriyani")}</p>
+                </div>
               </div>
+              <SocialLinks items={SOCIALS} className="flex shrink-0 md:hidden" />
             </div>
             <p className="mt-3 max-w-sm leading-relaxed text-white/80 md:mt-5">
               {tr(
@@ -107,31 +129,33 @@ export function Footer() {
                 "মুখ বন্ধ হাঁড়িতে ধীরে রান্না পুরান ঢাকার বিরিয়ানি, ড্যাফোডিল স্মার্ট সিটি, সাভারের আশেপাশে গরম গরম ডেলিভারি।",
               )}
             </p>
-            <ul className="mt-4 flex gap-2 md:mt-6">
-              {SOCIALS.map((s) => (
-                <li key={s.label}>
-                  <a
-                    href={s.href}
-                    aria-label={s.label}
-                    title={s.label}
-                    className="inline-flex size-10 items-center justify-center rounded-full border border-white/20 bg-white/5 text-white/90 transition hover:border-saffron hover:bg-saffron hover:text-charcoal"
-                  >
-                    <Icon paths={s.paths} fill={s.fill} />
-                  </a>
-                </li>
-              ))}
-            </ul>
+            <SocialLinks items={SOCIALS} className="mt-6 hidden md:flex" />
+          </div>
+
+          {/* Quick actions (phones) */}
+          <div className="col-span-2 grid grid-cols-2 gap-2 md:hidden">
+            <a href="tel:+8809612000000" className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 font-semibold text-white transition active:bg-white/20">
+              <Icon paths={P.phone} className="size-4 text-saffron" />
+              {tr("Call us", "কল করুন")}
+            </a>
+            <a href="mailto:hello@banglarbiriyani.com" className="flex h-11 items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 font-semibold text-white transition active:bg-white/20">
+              <Icon paths={P.mail} className="size-4 text-saffron" />
+              {tr("Email us", "ইমেইল করুন")}
+            </a>
           </div>
 
           {/* Explore */}
           <nav aria-label={tr("Explore", "ঘুরে দেখুন")} className="col-span-2 md:col-span-2">
             <p className={heading}>{tr("Explore", "ঘুরে দেখুন")}</p>
-            <ul className="mt-2 flex flex-wrap gap-x-5 md:mt-4 md:block md:space-y-0.5">
+            <ul className="mt-1 grid grid-cols-2 gap-x-6 md:mt-4 md:block md:space-y-0.5">
               {LINKS.map((l) => (
-                <li key={l.href}>
+                <li key={l.href} className="border-b border-white/10 md:border-0">
                   <a href={l.href} className={link}>
-                    <span className="hidden h-px w-3 bg-saffron/70 md:block" aria-hidden />
-                    {tr(l.en, l.bn)}
+                    <span className="flex items-center gap-2">
+                      <span className="hidden h-px w-3 bg-saffron/70 md:block" aria-hidden />
+                      {tr(l.en, l.bn)}
+                    </span>
+                    <span className="text-saffron/70 md:hidden" aria-hidden>›</span>
                   </a>
                 </li>
               ))}
@@ -151,13 +175,13 @@ export function Footer() {
                   )}
                 </span>
               </li>
-              <li>
+              <li className="hidden md:block">
                 <a href="tel:+8809612000000" className="flex items-center gap-2.5 transition hover:text-saffron">
                   <Icon paths={P.phone} className="size-4 shrink-0 text-saffron" />
                   +880 9612-000000
                 </a>
               </li>
-              <li>
+              <li className="hidden md:block">
                 <a href="mailto:hello@banglarbiriyani.com" className="flex items-center gap-2.5 break-all transition hover:text-saffron">
                   <Icon paths={P.mail} className="size-4 shrink-0 text-saffron" />
                   hello@banglarbiriyani.com
@@ -190,12 +214,12 @@ export function Footer() {
       {/* Bottom bar */}
       <div className="border-t border-white/20 bg-black/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
-          <p className="text-[11px] text-white/70 md:text-xs">
+          <p className="text-center text-[11px] text-white/70 md:text-left md:text-xs">
             {tr(`© ${year} Banglar Biriyani. All rights reserved.`, `© ${num(year).replace(/,/g, "")} বাংলার বিরিয়ানি। সর্বস্বত্ব সংরক্ষিত।`)}
             <span className="font-bn hidden text-white/50 lg:inline"> · ভালোবাসা দিয়ে রান্না, সাভার থেকে</span>
           </p>
 
-          <div className="flex items-center justify-between gap-3 md:justify-end md:gap-5">
+          <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3 md:justify-end md:gap-5 md:border-0 md:pt-0">
             <div className="flex min-w-0 items-center gap-2.5">
               <span className="grid h-10 w-8 shrink-0 place-items-center overflow-hidden rounded-md bg-[#f9f6f1] p-0.5 md:h-11 md:w-9">
                 <img src="/eloris-labs.png" alt="Eloris Labs" width={240} height={282} loading="lazy" className="size-full object-contain" />
