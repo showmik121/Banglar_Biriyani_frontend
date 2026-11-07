@@ -1,7 +1,6 @@
 import type { ReactNode } from "react"
 import { TornEdge } from "./TornEdge"
 import { PHOTOS } from "../data/photos"
-import { useLang } from "../context/LanguageContext"
 
 const LINKS = [
   { en: "Our menu", bn: "আমাদের মেনু", href: "#menu" },
@@ -95,9 +94,11 @@ const CREDIT_LINKS: Ico[] = [
 const heading = "text-eyebrow text-saffron"
 const link = "flex items-center justify-between gap-1.5 py-2.5 text-white/85 transition hover:text-saffron md:inline-flex md:justify-start md:py-1.5 md:hover:translate-x-0.5"
 
+/** The footer is always English, whatever language the site is set to. */
+const tr = (en: string, _bn?: string) => en
+
 export function Footer() {
   const year = new Date().getFullYear()
-  const { tr, num } = useLang()
 
   return (
     <footer id="contact" className="bg-jali relative mt-16 scroll-mt-[var(--header-h,120px)] text-white">
@@ -114,7 +115,7 @@ export function Footer() {
           <div className="flex items-center gap-4">
             <img src={PHOTOS.cta} alt="" loading="lazy" className="size-14 shrink-0 rounded-full object-cover ring-4 ring-white md:hidden" />
             <div>
-              <p className="font-bn text-base font-semibold text-charcoal/70">খিদে পেয়েছে?</p>
+              <p className="text-base font-semibold text-charcoal/70">Hungry?</p>
               <p className="text-display mt-1 text-xl sm:mt-2 sm:text-4xl">
                 {tr("Craving something shahi tonight?", "আজ রাতে শাহি কিছু খেতে মন চাইছে?")}
               </p>
@@ -135,8 +136,8 @@ export function Footer() {
                   <img src="/logo-mark.png" alt="" className="size-full rounded-full object-contain" />
                 </span>
                 <div className="min-w-0">
-                  <p className="text-display text-lg leading-tight md:text-2xl">{tr("Banglar Biriyani", "বাংলার বিরিয়ানি")}</p>
-                  <p className="font-bn text-xs text-saffron md:text-sm">{tr("বাংলার বিরিয়ানি", "Banglar Biriyani")}</p>
+                  <p className="text-display text-lg leading-tight md:text-2xl">Banglar Biriyani</p>
+                  <p className="text-xs font-semibold text-saffron md:text-sm">Savar, Dhaka</p>
                 </div>
               </div>
               <SocialLinks items={SOCIALS} className="flex shrink-0 md:hidden" />
@@ -266,8 +267,8 @@ export function Footer() {
       <div className="border-t border-white/20 bg-black/10">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
           <p className="text-center text-[11px] text-white/70 md:text-left md:text-xs">
-            {tr(`© ${year} Banglar Biriyani. All rights reserved.`, `© ${num(year).replace(/,/g, "")} বাংলার বিরিয়ানি। সর্বস্বত্ব সংরক্ষিত।`)}
-            <span className="font-bn hidden text-white/50 lg:inline"> · ভালোবাসা দিয়ে রান্না, সাভার থেকে</span>
+            {tr(`© ${year} Banglar Biriyani. All rights reserved.`, "")}
+            <span className="hidden text-white/50 lg:inline"> · Cooked with love, from Savar</span>
           </p>
 
           <div className="flex items-center justify-between gap-3 border-t border-white/10 pt-3 md:justify-end md:gap-5 md:border-0 md:pt-0">
